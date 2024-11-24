@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+import { styled } from '@mui/material/styles';
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+import { ThemeProvider } from "@mui/material/styles"; 
+import {theme} from '@/app/theme'
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -24,10 +31,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
-      </body>
-    </html>
+    <html lang="ja">
+    <head>
+      <title>Interview Simulation</title>
+      <meta
+        name="description"
+        content="面接練習用アプリ"
+      />
+    </head>
+    <body className="container mx-auto p-4">
+        
+        <ThemeProvider theme={theme}>
+        <Header title="InterviewSim"/>
+              {children}
+              <Footer/>
+        </ThemeProvider>
+        
+    </body>
+  </html>
   );
 }
