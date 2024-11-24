@@ -13,7 +13,7 @@ export default function ResumeAbstruct() {
     };
 
     return (
-        <CustomCard>
+        <CustomCard sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <CardHeader title="履歴書情報" />
                 
         <CardContent>          
@@ -21,10 +21,10 @@ export default function ResumeAbstruct() {
           <Typography><strong>学歴:</strong> {resumeInfo.education}</Typography>
           <Typography><strong>スキル:</strong> {resumeInfo.skills}</Typography>
         </CardContent>
-        
+        <Box sx={{ flexGrow: 1 }} />
         <CardActions >
           <Link href="/resume">
-            <Button variant="contained" size="small">
+            <Button variant="contained" size="small" sx={{bottom:2}}>
               編集
             </Button>
           </Link>

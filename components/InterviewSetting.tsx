@@ -1,6 +1,6 @@
 'use client';
 import react from 'react';
-import {Card,CardContent,CardHeader,Typography,Button,Slider, CardActions} from '@mui/material';
+import {Card,CardContent,CardHeader,Box,Typography,Button,Slider, CardActions} from '@mui/material';
 import Link from 'next/link';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ export default function InterviewSetting() {
     const [duration,setDuration]=useState(30);
     const [difficulty,setDifficulty]=useState(3);
     return (
-        <CustomCard>
+        <CustomCard sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <CardHeader title="面接設定" />
             <CardContent>
                 <Typography gutterBottom>面接の長さ: {duration}分</Typography>
@@ -36,9 +36,10 @@ export default function InterviewSetting() {
                     onChange={(_,newValue)=>setDifficulty(newValue as number)}
                 />
             </CardContent>
+            <Box sx={{ flexGrow: 1 }} />
             <CardActions>
                 <Link href="/interview">
-                    <Button variant="contained" size="small">
+                    <Button variant="contained" size="small" sx={{bottom:2}}>
                         面接開始
                     </Button>
                 </Link>
