@@ -1,8 +1,8 @@
-export type Resume={
+export type ResumeTypes={
     id:string;
     name:string;
     birth:string;
-    age:number;
+    age:number|string;
     sex:number;
     education:string;
     programming:string;
@@ -13,7 +13,7 @@ export type Resume={
     bestAtStu:string;
 }
 
-export type Company={
+export type CompanyTypes={
     id:string;
     name:string;
     position:string;
