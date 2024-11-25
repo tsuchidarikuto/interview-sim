@@ -11,8 +11,8 @@ import CompanyAbstruct from '@/components/CompanyAbstract';
 
 export default function Page() {
     return (
-    <Box sx={{display:'flex', flexDirection:'column', minHeight:'90vh'}}>        
-    <Container maxWidth='xl' sx={{ mt: 4, mb: 4, flexGrow: 1, display: 'flex' }}>
+    <Box sx={{display:'flex', flexDirection:'column', minHeight:'80vh'}}>        
+    <Container maxWidth='xl' sx={{ mt: 4, mb: 6, flexGrow: 1, display: 'flex' }}>
       <Grid container spacing={3} sx={{flexGrow: 1}}>
         <Grid size={{xs:12, md:6}} sx={{ display: 'flex' }}>            
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
@@ -22,7 +22,7 @@ export default function Page() {
         
   
         <Grid size={{xs:12, md:6}} sx={{ display: 'flex', flexDirection: 'column' }}>            
-            <Box sx={{ display: 'flex', flexGrow: 5, mb: 3,width:'100%' }}>
+            <Box sx={{ display: 'flex', flexGrow: 1, mb: 3,width:'100%' }}>
               <Grid container spacing={3}sx={{flexGrow:1}}>
                 <Grid size={{xs:12, md:6}} sx={{ display: 'flex' }}>
                   <Box sx={{ flexGrow: 1 }}>

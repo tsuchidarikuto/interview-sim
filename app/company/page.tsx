@@ -1,12 +1,11 @@
-import { FunctionComponent } from "react";
-import  Link  from 'next/link'
-import {Box,Button,TextField, Typography,Container, Stack,Card,Divider,Select, MenuItem} from '@mui/material'
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
+import React from 'react';
+import  Link  from 'next/link';
+import {Box,Button,TextField, Typography,Container, Stack,Divider} from '@mui/material';
 import  Grid  from "@mui/material/Grid2";
+
 export default function Company() {
     return (
-        <Container maxWidth="md" sx={{ mt: 5, mb: 4}}>
+        <Container maxWidth="md" sx={{ mt: 5, mb: 4,pb:10}}>
         <Typography variant="h4" component="h1" >　会社情報</Typography>
         <Divider sx={{width:'100%', bgcolor: 'primary.main'}} />
         <Container maxWidth="md" sx={{ mt: 3,mb:3}}>
@@ -33,7 +32,7 @@ export default function Company() {
         </Link>
         </Grid>
         <Grid>
-        <Link href='/company'>
+        <Link href='/resume'>
             <Button  variant="contained" size='small'>
                 エントリーシートを編集する
             </Button>

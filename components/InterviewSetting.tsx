@@ -1,19 +1,19 @@
 'use client';
 import react from 'react';
-import {Card,CardContent,CardHeader,Box,Typography,Button,Slider, CardActions} from '@mui/material';
+import {Card,CardContent,CardHeader,Box,Typography,Divider,Button,Slider, CardActions,Stack} from '@mui/material';
 import Link from 'next/link';
-import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 import { CustomCard } from '@/app/theme';
-
-
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 export default function InterviewSetting() {
     const [duration,setDuration]=useState(30);
     const [difficulty,setDifficulty]=useState(3);
     return (
         <CustomCard sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <CardHeader title="面接設定" />
+            <Box sx={{ display: 'flex', alignItems: 'center', margin: 2 }}><Typography variant="h5" sx={{ flexGrow: 2 }}>面接設定</Typography><SettingsOutlinedIcon sx={{ fontSize: 40 }} /></Box>
+            <Divider sx={{width:'100%',bgcolor:'#000000'}}/>
             <CardContent>
+                <Stack spacing={2}>
                 <Typography gutterBottom>面接の長さ: {duration}分</Typography>
                 <Slider 
                     value={duration} 
@@ -35,17 +35,16 @@ export default function InterviewSetting() {
                     valueLabelDisplay="auto" 
                     onChange={(_,newValue)=>setDifficulty(newValue as number)}
                 />
+                </Stack>
             </CardContent>
             <Box sx={{ flexGrow: 1 }} />
-            <CardActions>
+            <CardActions sx={{ justifyContent: 'center' }}>
                 <Link href="/interview">
-                    <Button variant="contained" size="small" sx={{bottom:2}}>
+                    <Button variant="contained" size="large" sx={{ width: '300px',bottom:10 }}>
                         面接開始
                     </Button>
                 </Link>
             </CardActions>    
         </CustomCard>
     );
-  }
-  
-  
+}

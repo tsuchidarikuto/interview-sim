@@ -20,6 +20,10 @@ const theme = createTheme({
 const CustomCard = styled(Card)({
   height: '100%', // Set your desired height here
   flexGrow: 1,
+  '&:hover': {
+    backgroundColor: '#F5F5F3', // Change background color on hover
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Add shadow on hover
+  },
 });
 
 const chatTheme = {

@@ -14,11 +14,11 @@ export default function Footer() {
         bottom: 0,
         width: '100%',
         textAlign: 'center',
-        backgroundColor: 'default',
+        backgroundColor: '#f5f5f5',
         py: 2,
       }}
     >
-      © 2023 Your Company
+      © 2024 Tsuchida Rikuto
     </Box>
   );
 }
