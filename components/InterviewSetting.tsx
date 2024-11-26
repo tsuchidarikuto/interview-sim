@@ -1,50 +1,56 @@
 'use client';
 import react from 'react';
-import {Card,CardContent,CardHeader,Box,Typography,Divider,Button,Slider, CardActions,Stack} from '@mui/material';
+import { MenuItem, TextField, Container, Box, Typography, Button, Slider, Stack, FormControl, FormLabel, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import Link from 'next/link';
 import { useState } from 'react';
 import { CustomCard } from '@/app/theme';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+
 export default function InterviewSetting() {
-    const [duration,setDuration]=useState(30);
-    const [difficulty,setDifficulty]=useState(3);
+    const [duration, setDuration] = useState(30);
+    const [difficulty, setDifficulty] = useState(3);
+    const [interviewType, setInterviewType] = useState("複合面接");
+
     return (
-        <CustomCard sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', margin: 2 }}><Typography variant="h5" sx={{ flexGrow: 2 }}>面接設定</Typography><SettingsOutlinedIcon sx={{ fontSize: 40 }} /></Box>
-            <Divider sx={{width:'100%',bgcolor:'#000000'}}/>
-            <CardContent>
-                <Stack spacing={2}>
-                <Typography gutterBottom>面接の長さ: {duration}分</Typography>
-                <Slider 
-                    value={duration} 
-                    defaultValue={30} 
-                    step={5} 
-                    marks min={5} 
-                    max={60} 
-                    valueLabelDisplay="auto" 
-                    onChange={(_,newValue)=>setDuration(newValue as number)}
-                />
-                <Typography gutterBottom>審査の難易度: {difficulty}分</Typography>
-                <Slider 
-                    value={difficulty} 
-                    defaultValue={3} 
-                    step={1} 
-                    marks 
-                    min={1} 
-                    max={5} 
-                    valueLabelDisplay="auto" 
-                    onChange={(_,newValue)=>setDifficulty(newValue as number)}
-                />
+        <>
+            <Container maxWidth="md" sx={{ mb: 3 }}>
+                <Stack spacing={10}>
+                    <Box>
+                        <Typography variant="h6" gutterBottom>難易度</Typography>
+                        <TextField select fullWidth required size="medium" id="difficulty" variant="standard" value={difficulty}>
+                            <MenuItem value={1}>簡単</MenuItem>
+                            <MenuItem value={2}>普通</MenuItem>
+                            <MenuItem value={3}>難しい</MenuItem>
+                            <MenuItem value={4}>激ムズ</MenuItem>
+                        </TextField>
+                    </Box>
+                    <Box>
+                        <Typography variant="h6" gutterBottom>面接の長さ: {duration}分</Typography>
+                        <Slider
+                            value={duration}
+                            defaultValue={30}
+                            step={5}
+                            marks min={5}
+                            max={60}
+                            valueLabelDisplay="auto"
+                            onChange={(_, newValue) => setDuration(newValue as number)}
+                        />
+                    </Box>
+                    <Box>
+                        <Typography variant="h6" gutterBottom>面接形式</Typography>
+                        <FormControl>
+                            <RadioGroup row>
+                                <FormControlLabel value="複合面接" control={<Radio />} label="複合面接" />
+                                <FormControlLabel value="技術面接" control={<Radio />} label="技術面接" />
+                                <FormControlLabel value="行動面接" control={<Radio />} label="行動面接" />
+                            </RadioGroup>
+                        </FormControl>
+                    </Box>
+                    <Link href='/interview'>
+                        <Button size="large" variant="contained" sx={{width:'100%'}} >面接開始</Button>
+                    </Link>
                 </Stack>
-            </CardContent>
-            <Box sx={{ flexGrow: 1 }} />
-            <CardActions sx={{ justifyContent: 'center' }}>
-                <Link href="/interview">
-                    <Button variant="contained" size="large" sx={{ width: '300px',bottom:10 }}>
-                        面接開始
-                    </Button>
-                </Link>
-            </CardActions>    
-        </CustomCard>
+            </Container>
+        </>
     );
 }

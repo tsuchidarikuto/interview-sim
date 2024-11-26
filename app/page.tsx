@@ -1,51 +1,39 @@
-import react from 'react';
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
-import Tutorial from '@/components/Tutorial'
-import ResumeAbstruct from '@/components/ResumeAbstruct';
+'use client';
+import {useState,useEffect} from 'react';
+import {Box, Tab, Card, CardHeader,CardContent,Typography} from '@mui/material';
+import Company from '@/components/Company';
+import Resume from '@/components/Resume';
+import {TabList,TabContext,TabPanel} from '@mui/lab';
 import InterviewSetting from '@/components/InterviewSetting';
-import { Container,Box,Paper } from '@mui/material';
-import Grid from '@mui/material/Grid2';
-import CompanyAbstruct from '@/components/CompanyAbstract';
+export default function CenteredTabs() {
+  const [value, setValue] = useState("1");
 
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
+  };
 
-export default function Page() {
-    return (
-    <Box sx={{display:'flex', flexDirection:'column', minHeight:'80vh'}}>        
-    <Container maxWidth='xl' sx={{ mt: 4, mb: 6, flexGrow: 1, display: 'flex' }}>
-      <Grid container spacing={3} sx={{flexGrow: 1}}>
-        <Grid size={{xs:12, md:6}} sx={{ display: 'flex' }}>            
-          <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-            <Tutorial />            
-          </Box>
-        </Grid>
-        
-  
-        <Grid size={{xs:12, md:6}} sx={{ display: 'flex', flexDirection: 'column' }}>            
-            <Box sx={{ display: 'flex', flexGrow: 1, mb: 3,width:'100%' }}>
-              <Grid container spacing={3}sx={{flexGrow:1}}>
-                <Grid size={{xs:12, md:6}} sx={{ display: 'flex' }}>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <ResumeAbstruct/>
-                  </Box>
-                </Grid>
-                <Grid size={{xs:12, md:6}} sx={{ display: 'flex' }}>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <CompanyAbstruct/>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
-            
-            <Box sx={{ display: 'flex', flexGrow: 1 }}>
-              <Box sx={{ flexGrow: 1 }}>
-                <InterviewSetting/>
-              </Box>
-            </Box>
-          </Grid>
-        
-      </Grid> 
-    </Container>
+  return (
+
+    <Box sx={{ width: '100%', typography: 'body1' ,mt:5,mergin:2}}>
+      <Card >
+      <Box>
+        <Typography variant="h5" component="h1" sx={{textAlign:'center'}}>面接シミュレーター</Typography>
+      </Box>
+      <CardContent>
+      <TabContext value={value} >
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <TabList onChange={handleChange} aria-label="lab API tabs example" centered >
+            <Tab label="プロフィール" value="1" />
+            <Tab label="企業情報" value="2" />
+            <Tab label="面接設定" value="3" />
+          </TabList>
+        </Box>
+        <TabPanel value="1"><Resume/></TabPanel>
+        <TabPanel value="2"><Company/></TabPanel>
+        <TabPanel value="3"><InterviewSetting/></TabPanel>
+      </TabContext>
+      </CardContent>
+      </Card>
     </Box>
-    );
+  );
 }
