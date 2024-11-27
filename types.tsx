@@ -23,3 +23,10 @@ export type CompanyTypes={
     culture:string;
     others?:string;
 }
+
+export type SettingTypes={
+    id:string;
+    difficulty:number;
+    duration:number;
+    interviewType:string;
+}
