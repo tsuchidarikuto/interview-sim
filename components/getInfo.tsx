@@ -1,59 +1,32 @@
 'use client';
-import { collection, getDocs, query } from '@firebase/firestore';
+import { collection, getDocs, query ,updateDoc,doc} from '@firebase/firestore';
 import { firestore } from '@/firebase';
-import {ResumeTypes,CompanyTypes ,SettingTypes } from '@/types';
-import {useState,useEffect} from 'react';
 
-
-interface setResumeInfo {
-    (data: ResumeTypes[]): void;
-}
-interface setCompanyInfo {
-    (data: CompanyTypes[]): void;
-}
-interface setSettingInfo {
-    (data: SettingTypes[]): void;
-}
-export const getResume = async (setResumeInfo: setResumeInfo) => {
-    try {
-        const q = query(collection(firestore, 'resumes'));
-        const snapShot = await getDocs(q);
-        if(snapShot){}
-        const data = snapShot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-        })) as ResumeTypes[];
-        
-        setResumeInfo(data);
-    } catch (e) {
-        console.error(e);
+export const getInfo = async <T,>(collectionName: string): Promise<T[]> => {
+  try {
+    const q = query(collection(firestore, collectionName));
+    const snapShot = await getDocs(q);
+    if (snapShot.empty) {
+      console.log('No matching documents.');
+      return [];
     }
+    const data = snapShot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    })) as T[];
+    console.log('Fetched data in getInfo:', data); // データをログ出力
+    return data;
+  } catch (e) {
+    console.error('Error fetching data:', e);
+    return [];
+  }
 };
 
-export const getCompany= async (setCompanyInfo:setCompanyInfo) =>{
-    try{
-      const q= query(collection(firestore,'company'));
-      const snapShot = await getDocs(q);
-      const data = snapShot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })) as CompanyTypes[];          
-      setCompanyInfo(data);      
-    } catch (e){
-      console.error(e);
-    }
-};
-
-export const getSetting= async (setSettingInfo:setSettingInfo) =>{
-    try{
-      const q= query(collection(firestore,'setting'));
-      const snapShot = await getDocs(q);
-      const data = snapShot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })) as SettingTypes[];          
-      setSettingInfo(data);      
-    } catch (e){
-      console.error(e);
-    }
+export const updateInfo = async <T extends{id:string}>(collectionName: string, data: T): Promise<void> => {
+  try {
+    await updateDoc(doc(firestore, collectionName, data.id), data);
+    console.log('Document successfully updated!');
+  } catch (e) {
+    console.error('Error updating document:', e);
+  }
 }
