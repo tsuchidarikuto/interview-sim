@@ -3,17 +3,17 @@ import react from 'react';
 import { MenuItem, TextField, Container, Box, Typography, Button, Slider, Stack, FormControl, CircularProgress, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import {useRouter} from 'next/navigation';
 import React, { useState,useEffect } from 'react';
-import { getInfo,updateInfo } from '@/components/getInfo';
+import { getInfo,updateInfo } from '@/features/getInfo';
 import { SettingTypes } from '@/types';
-import { PreparationInterview } from '@/components/PreparationInterview';
+import { PreparationInterview } from '@/features/PreparationInterview';
 
 export default function InterviewSetting() {
     const {push} = useRouter();
     
     const [settingInfo, setSettingInfo] = useState<SettingTypes[]>([{
         id: "",
-        difficulty: 0,
-        duration: 0,
+        difficulty: "難しい",
+        duration: 30,
         interviewType: ""
     }]);
 
@@ -64,11 +64,11 @@ export default function InterviewSetting() {
                     <Box>
                         <Typography variant="h6" gutterBottom>難易度</Typography>
                         <TextField select fullWidth required size="medium" id="difficulty" variant="standard" value={settingInfo[0].difficulty }
-                        onChange={(event:React.ChangeEvent<HTMLInputElement>) => setSettingInfo(prev => [{ ...prev[0], difficulty: Number(event.target.value) }])}>
-                            <MenuItem value={1}>簡単</MenuItem>
-                            <MenuItem value={2}>普通</MenuItem>
-                            <MenuItem value={3}>難しい</MenuItem>
-                            <MenuItem value={4}>激ムズ</MenuItem>
+                        onChange={(event:React.ChangeEvent<HTMLInputElement>) => setSettingInfo(prev => [{ ...prev[0], difficulty: event.target.value }])}>
+                            <MenuItem value={"簡単"}>簡単</MenuItem>
+                            <MenuItem value={"普通"}>普通</MenuItem>
+                            <MenuItem value={"難しい"}>難しい</MenuItem>
+                            <MenuItem value={"激ムズ"}>激ムズ</MenuItem>
                         </TextField>
                     </Box>
                     <Box>

@@ -26,7 +26,13 @@ export type CompanyTypes={
 
 export type SettingTypes={
     id:string;
-    difficulty:number;
+    difficulty:string;
     duration:number;
     interviewType:string;
+}
+export type openaiTypes={
+    model:string;
+    system:string;
+    prompt:string;
+    
 }

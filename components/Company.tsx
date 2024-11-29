@@ -2,7 +2,7 @@ import React from 'react';
 import  Link  from 'next/link';
 import {Box,Button,TextField, CircularProgress,Container, Stack,Divider} from '@mui/material';
 import { useEffect, useState } from 'react';
-import {getInfo,updateInfo} from '@/components/getInfo';
+import {getInfo,updateInfo} from '@/features/getInfo';
 import {CompanyTypes} from '@/types';
 export default function Company() {
     const [isLoading, setIsLoading] = useState(false);
