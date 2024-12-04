@@ -20,7 +20,7 @@ export default function Result(){
                         
                         <Card sx={{height:'100%',width:'100%'}}>
                             <Typography variant="h6" component="h2" >フィードバック</Typography>
-                            <Divider sx={{width:'100%', bgcolor: '#555555'}} />
+                                   <Divider sx={{width:'100%', bgcolor: '#555555'}} />
                         </Card>
                         
                         </Grid>

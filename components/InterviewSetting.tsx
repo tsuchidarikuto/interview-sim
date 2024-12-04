@@ -3,9 +3,11 @@ import react from 'react';
 import { MenuItem, TextField, Container, Box, Typography, Button, Slider, Stack, FormControl, CircularProgress, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import {useRouter} from 'next/navigation';
 import React, { useState,useEffect } from 'react';
-import { getInfo,updateInfo } from '@/features/getInfo';
+import { getInfo,updateInfo } from '@/utils/getInfo';
 import { SettingTypes } from '@/types';
-import { PreparationInterview } from '@/features/PreparationInterview';
+import { PreparationInterview } from '@/utils/PreparationInterview';
+import {useAtom} from 'jotai';
+import {questionsAtom} from '@/atoms/state';
 
 export default function InterviewSetting() {
     const {push} = useRouter();
@@ -19,6 +21,8 @@ export default function InterviewSetting() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadInterview ,setIsLoadInterview] = useState(false);
+
+    const [questions,setQuestions] = useAtom(questionsAtom);
 
     const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -36,12 +40,17 @@ export default function InterviewSetting() {
         setIsLoadInterview(true);    
         try {
             
-            await PreparationInterview();
+            const data = await PreparationInterview();
             
+            const obj=JSON.parse(data);
+            setQuestions(obj.questions);
             push('/interview');
+            
+            
         } catch (e) {
             console.error('Error during preparation:', e);
         }
+        
         setIsLoading(false);
     }
     
@@ -55,6 +64,10 @@ export default function InterviewSetting() {
         };
         fetchData();
     }, [])
+
+    useEffect(()=>{
+        console.log(questions);
+    },[questions])
     
     return (
         <>

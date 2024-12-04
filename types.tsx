@@ -30,9 +30,15 @@ export type SettingTypes={
     duration:number;
     interviewType:string;
 }
+
+export type questionTypes={
+    id:string;
+    question:string;
+}
+
 export type openaiTypes={
     model:string;
     system:string;
     prompt:string;
-    
+    schemaName:string;
 }

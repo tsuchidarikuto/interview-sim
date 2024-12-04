@@ -4,7 +4,7 @@ import { Box,CircularProgress, Button, TextField, Typography, Container, Stack, 
 import Grid from "@mui/material/Grid2";
 import { useEffect, useState ,FormEvent} from 'react';
 import { ResumeTypes } from '@/types';
-import { getInfo ,updateInfo} from '@/features/getInfo';
+import { getInfo ,updateInfo} from '@/utils/getInfo';
 import { updateDoc,doc } from "firebase/firestore";
 
 
