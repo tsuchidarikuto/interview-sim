@@ -1,6 +1,6 @@
 'use client';
-import {useState,useEffect} from 'react';
-import {Box, Tab, Card, CardHeader,CardContent,Typography} from '@mui/material';
+import {useState} from 'react';
+import {Box, Tab, Card,CardContent,Typography} from '@mui/material';
 import Company from '@/components/Company';
 import Resume from '@/components/Resume';
 import {TabList,TabContext,TabPanel} from '@mui/lab';

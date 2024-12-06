@@ -42,3 +42,8 @@ export type openaiTypes={
     prompt:string;
     schemaName:string;
 }
+
+export type conversationTypes={
+    role:string;
+    message:string;
+}
