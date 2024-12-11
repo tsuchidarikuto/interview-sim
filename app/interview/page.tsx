@@ -6,7 +6,7 @@ import {useAtom} from 'jotai';
 import {questionsAtom,conversationAtom} from '@/atoms/state';
 import {useState,useEffect} from 'react';
 import { conversationTypes,questionTypes } from '@/types';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export default function Interview() {
     const {push} = useRouter();
@@ -21,19 +21,20 @@ export default function Interview() {
         setIsSend(true)
         
         setConversation((prev)=>[...prev,{role:'user',message:message}]);        
-
-        if(questions && questionIndex +1 < questions.length){
-            setConversation((prev)=>[...prev,{role:'system',message:questions[questionIndex+1]?.question}]);
-            setQuestionIndex((prev)=>prev+1);
-        }else if(questionIndex===questions.length){
+        console.log(questionIndex);
+        if(questions && questionIndex  < questions.length){            
+            setConversation((prev)=>[...prev,{role:'system',message:questions[questionIndex]?.question}]);
+            
+        }else if(questionIndex>=questions.length){
             setConversation((prev)=>[...prev,{role:'system',message:'面接終了です。'}]);
             setIsEnd(true)
         }
+        setQuestionIndex((prev)=>prev+1);
         setIsSend(false)        
 
     }
     function handleClickResult(){
-        
+        push('/result')
     }
 
     useEffect(()=>{
@@ -61,7 +62,7 @@ export default function Interview() {
                     />)}
                     
                 </MessageList>
-                {isSend ?
+                {isSend||isEnd ?
                 <MessageInput  disabled placeholder="Sending Message" attachButton={false} />:
                 <MessageInput placeholder="Type message here" attachButton={false} onSend={handleSubmit}/>
                 }
