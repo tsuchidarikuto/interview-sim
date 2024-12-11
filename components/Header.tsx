@@ -8,7 +8,7 @@ export default function Header({title}: HeaderProps) {
     return (
         <AppBar position="static">
             <Toolbar>
-                <Typography variant="h6">{title}</Typography>
+                <Typography variant="h6" >{title}</Typography>
             </Toolbar>
         </AppBar>
     )

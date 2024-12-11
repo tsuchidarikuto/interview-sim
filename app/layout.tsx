@@ -34,7 +34,7 @@ export default function RootLayout({
     <body className="container mx-auto p-4">
         <Provider>
         <ThemeProvider theme={theme}>
-        <Header title="InterviewSim"/>
+        <Header title="InterviewSim" />
         
               {children}
           

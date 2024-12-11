@@ -13,7 +13,7 @@ export async function POST(req:NextRequest){
     const {prompt,model,system,schemaName}=(await req.json()) as openaiTypes;//クライアントサイド  からのリクエストを受け取る
     
     let schema;
-    console.log(`at route.ts:${schemaName}`);
+    
     if(schemaName==="questions"){
         schema=z.object({
             questions:z.array(z.object({

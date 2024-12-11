@@ -18,7 +18,6 @@ export default function Interview() {
         
         setConversation([...conversation,{role:'user',message:message}]);
         
-
         setIsSend(false)        
 
     }
