@@ -11,7 +11,7 @@ export default function Header({ title }: HeaderProps) {
     <AppBar position="static">
       <Toolbar>
         <Link href="/" passHref>
-          <Typography variant="h6" component="a">
+          <Typography variant="h6" >
             {title}
           </Typography>
         </Link>

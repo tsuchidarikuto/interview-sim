@@ -3,18 +3,20 @@ import {Container,Button,Typography} from '@mui/material';
 import Link from 'next/link';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, Avatar } from "@chatscope/chat-ui-kit-react";
 import {useAtom} from 'jotai';
-import {questionsAtom} from '@/atoms/state';
+import {questionsAtom,conversationAtom} from '@/atoms/state';
 import {useState,useEffect} from 'react';
 import { conversationTypes,questionTypes } from '@/types';
-
+import { useRouter } from 'next/router';
 
 export default function Interview() {
+    const {push} = useRouter();
     const [questions] = useAtom(questionsAtom);
     
     const [conversation,setConversation] =useState<conversationTypes[]>([])
     const [isSend,setIsSend]=useState<boolean>(false)
     const [questionIndex,setQuestionIndex]=useState<number>(0)
     const [isEnd,setIsEnd]=useState<boolean>(false)
+    const [,setConversationResult] = useAtom(conversationAtom);
     async function handleSubmit(message:string){
         setIsSend(true)
         
@@ -29,6 +31,9 @@ export default function Interview() {
         }
         setIsSend(false)        
 
+    }
+    function handleClickResult(){
+        
     }
 
     useEffect(()=>{
@@ -63,12 +68,10 @@ export default function Interview() {
                    
             </ChatContainer>
         </MainContainer>    
-         {isEnd &&       
-        <Link href='/result'>
-            <Button variant="contained" size='small'>
+         {isEnd &&               
+            <Button variant="contained" size='small' onClick={handleClickResult}>
                 結果へ
-            </Button>
-        </Link>
+            </Button>        
         }
         </Container>
     );
