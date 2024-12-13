@@ -3,9 +3,9 @@ import {Container,Button,Typography} from '@mui/material';
 import Link from 'next/link';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, Avatar } from "@chatscope/chat-ui-kit-react";
 import {useAtom} from 'jotai';
-import {questionsAtom,conversationAtom} from '@/atoms/state';
+import {questionsAtom,interviewResultAtom} from '@/atoms/state';
 import {useState,useEffect} from 'react';
-import { conversationTypes,questionTypes } from '@/types';
+import { conversationTypes,interviewResultTypes } from '@/types';
 import { useRouter } from 'next/navigation';
 import  analyzeInterviewResult  from '@/utils/analyzeInterviewResult';
 
@@ -17,7 +17,7 @@ export default function Interview() {
     const [isSend,setIsSend]=useState<boolean>(false)
     const [questionIndex,setQuestionIndex]=useState<number>(0)
     const [isEnd,setIsEnd]=useState<boolean>(false)
-    const [,setConversationResult] = useAtom(conversationAtom);
+    const [,setInterviewResult]=useAtom(interviewResultAtom);
     
     async function handleSubmit(message:string){
         setIsSend(true)
@@ -35,10 +35,20 @@ export default function Interview() {
         setIsSend(false)        
 
     }
-    
-    function handleClickResult(){
-        const result = analyzeInterviewResult(JSON.stringify(conversation));
-        push('/result')
+
+    async function handleClickResult() {
+        try {
+            const result:interviewResultTypes|undefined = await analyzeInterviewResult(JSON.stringify(conversation));
+            console.log(result);
+            if (result) {
+                setInterviewResult(result);
+                push('/result');
+            } else {
+                console.error('Result is undefined');
+            }
+        } catch (e) {
+            console.error('Error during preparation:', e);
+        }
     }
 
     useEffect(()=>{

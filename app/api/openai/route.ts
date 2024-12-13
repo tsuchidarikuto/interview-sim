@@ -21,9 +21,27 @@ export async function POST(req:NextRequest){
                 question:z.string(),
             })),
         });
+
+    }else if(schemaName==="interviewResult"){
+        schema=z.object({
+            feedback:z.object({
+                positive:z.string(),
+                negative:z.string(),
+            }),
+            score:z.object({
+                technical:z.number(),
+                communication:z.number(),
+                teamwork:z.number(),
+                logicalThinking:z.number(),
+                learningDesire:z.number(),
+                companyUnderstanding:z.number(),
+            }),
+        });
+
     }else if (schemaName==="undefined"){
         schema=undefined;
     }
+    
     console.log(schema);
     
     try{

@@ -50,7 +50,11 @@ export type conversationTypes={
 
 
 export type interviewResultTypes={
-    feedback :string;
+    isPass?:boolean;
+    feedback :{
+        positive:string;
+        negative:string;
+    }
     score: {
         technical:number;
         communication:number;
