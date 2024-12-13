@@ -34,6 +34,7 @@ export default function Interview() {
 
     }
     function handleClickResult(){
+        
         push('/result')
     }
 
