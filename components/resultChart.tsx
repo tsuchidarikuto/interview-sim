@@ -5,27 +5,40 @@ import { Chart as ChartJS, Title, Tooltip, Legend, RadialLinearScale, PointEleme
 
 // Chart.jsの基本設定
 ChartJS.register(Title, Tooltip, Legend,RadialLinearScale, PointElement, LineElement, Filler);
-    
-export default function ResultChart() {
+
+interface scoreTypes {
+    technical:number,
+    communication:number,
+    teamwork:number,
+    logicalThinking:number,
+    learningDesire:number,
+    companyUnderstanding:number,
+}
+
+export default function ResultChart(score:scoreTypes) {
     const data={
         labels: ['技術力','コミュニケーション力','チームワーク','論理的思考力','学習意欲','企業理解・志望動機'],
         datasets:[{
             label:'評価',
-            data:[5,4,3,2,1,5],
+            data:[
+                score.technical,
+                score.communication,
+                score.teamwork,
+                score.logicalThinking,
+                score.learningDesire,
+                score.companyUnderstanding
+            ],
         }]
 
     }
     const options = {
         responsive: true,
-        plugins: {
-          legend: {
-            position: 'top' as const,
-          },
-          title: {
-            display: true,
-            text: 'Chart.js Bar Chart',
-          },
-        },
+        scales: {
+          r:{
+            suggestedMin: 0,
+            suggestedMax: 10,
+          }
+        }
       }
     return(
         <div style={{height:'100%',width:'100%'}}>

@@ -6,7 +6,6 @@ import { ResumeTypes, CompanyTypes, SettingTypes,interviewResultTypes } from '@/
 export default async function analyzeInterviewResult(conversationLog: string) {
     try{
         const resumeInfo = await getInfo<ResumeTypes>('resumes');
-        const companyInfo = await getInfo<CompanyTypes>('company');
         const settingInfo = await getInfo<SettingTypes>('setting');
 
         const settingDetail: { difficulty: string, type: string } = {
