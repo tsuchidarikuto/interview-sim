@@ -7,6 +7,7 @@ import {questionsAtom,conversationAtom} from '@/atoms/state';
 import {useState,useEffect} from 'react';
 import { conversationTypes,questionTypes } from '@/types';
 import { useRouter } from 'next/navigation';
+import  analyzeInterviewResult  from '@/utils/analyzeInterviewResult';
 
 export default function Interview() {
     const {push} = useRouter();
@@ -17,6 +18,7 @@ export default function Interview() {
     const [questionIndex,setQuestionIndex]=useState<number>(0)
     const [isEnd,setIsEnd]=useState<boolean>(false)
     const [,setConversationResult] = useAtom(conversationAtom);
+    
     async function handleSubmit(message:string){
         setIsSend(true)
         
@@ -33,8 +35,9 @@ export default function Interview() {
         setIsSend(false)        
 
     }
+    
     function handleClickResult(){
-        
+        const result = analyzeInterviewResult(JSON.stringify(conversation));
         push('/result')
     }
 
