@@ -1,0 +1,15 @@
+@charset "utf-8";
+
+$color-text: white;
+$message-content-incoming-bg-color: #555;
+$message-content-outgoing-bg-color: #777;
+$message-input-bg-color: white;
+$message-input-content-editor-wrapper-bg-color: #fff;
+$message-input-content-editor-color: black;
+$button-attachment-color: #555;
+$button-send-color: #444;
+$message-list-scroll-wrapper-padding: 1.2em 1.2em 0 0.8em;
+
+@import "@chatscope/chat-ui-kit-styles/themes/default/variables";
+
+@import "@chatscope/chat-ui-kit-styles/themes/default/main";

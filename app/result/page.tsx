@@ -1,5 +1,5 @@
 'use client';
-import { Container, Typography, Divider, Stack, Card, Button } from '@mui/material';
+import { Container, Typography, Divider, Stack, Card, Button ,Box} from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import ResultChart from "@/components/resultChart";
 import Link from 'next/link';
@@ -13,15 +13,17 @@ export default function Result() {
         <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '80vh' }}>
             <Typography variant="h4" component="h1">結果</Typography>
             <Divider sx={{ width: '100%', bgcolor: 'primary.main' }} />
-            <Container maxWidth="md" sx={{ mt: 1, mb: 3 }}>
+            
                 <Stack spacing={5}>
                     {interviewResult.isPass ?
                         <Typography variant="h5">厳正な審査の結果、採用させていただきます。</Typography>
                         : <Typography variant="h5">残念ながら不採用となりました。</Typography>
                     }
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} alignItems="center" justifyContent="center">
                         <Grid size={{ xs: 12, md: 12 }}>
-                            {ResultChart(interviewResult.score)}
+                            <Box sx={{ width: "80%", margin: "0 auto" }}>
+                                {ResultChart(interviewResult.score)}
+                            </Box>
                         </Grid>
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 6 }}>
@@ -43,8 +45,7 @@ export default function Result() {
                             戻る
                         </Button>
                     </Link>
-                </Stack>
-            </Container>
+                </Stack>            
         </Container>
     )
 };

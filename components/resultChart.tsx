@@ -41,12 +41,12 @@ export default function ResultChart(score:scoreTypes) {
         }
       }
     return(
-        <div style={{height:'100%',width:'100%'}}>
+        <>
         <Radar
             data={data}
             options={options}
         />
-        </div>
+        </>
     )
 }
   

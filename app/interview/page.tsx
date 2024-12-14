@@ -1,6 +1,5 @@
 'use client';
-import {Container,Button,Typography} from '@mui/material';    
-import Link from 'next/link';
+import {Container,Button} from '@mui/material';    
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, Avatar } from "@chatscope/chat-ui-kit-react";
 import {useAtom} from 'jotai';
 import {questionsAtom,interviewResultAtom} from '@/atoms/state';
@@ -8,6 +7,7 @@ import {useState,useEffect} from 'react';
 import { conversationTypes,interviewResultTypes } from '@/types';
 import { useRouter } from 'next/navigation';
 import  analyzeInterviewResult  from '@/utils/analyzeInterviewResult';
+import "@/styles/chat.scss"; 
 
 export default function Interview() {
     const {push} = useRouter();
@@ -61,11 +61,11 @@ export default function Interview() {
 
     return (
         <Container maxWidth="md" sx={{ mt: 5, mb: 4,height:'80vh'}} >       
-        <MainContainer>
-            <ChatContainer>       
-                <MessageList>
+        <MainContainer className="my-chat-container">
+            <ChatContainer className="my-chat-container">       
+                <MessageList className="my-chat-container">
                 {conversation.map((item,index)=> 
-                    <Message 
+                    <Message className="my-chat-container"
                         key={index} 
                         model={{
                             message: item.message,

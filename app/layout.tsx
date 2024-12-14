@@ -6,7 +6,7 @@ import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ThemeProvider } from "@mui/material/styles"; 
-import {theme} from '@/app/theme';
+import {theme} from '@/styles/theme';
 import {Provider} from 'jotai';
 
 
