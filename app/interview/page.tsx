@@ -1,5 +1,5 @@
 'use client';
-import {Container,Button,Box,Backdrop} from '@mui/material';    
+import {Container,Button,Box,Backdrop, Typography} from '@mui/material';    
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, Avatar } from "@chatscope/chat-ui-kit-react";
 import {useAtom} from 'jotai';
 import {questionsAtom,interviewResultAtom} from '@/atoms/state';
@@ -93,7 +93,10 @@ export default function Interview() {
          {isEnd &&               
             <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
             { isAnalyzing?
-            <LinearProgressWithLabel value={progress} />:
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width:'100%',margin:5}}>
+                <Typography>分析中...</Typography>
+                <LinearProgressWithLabel value={progress} />
+            </Box>:        
             <Button variant="contained" size='large' onClick={handleClickResult}>
                 分析開始
             </Button>
