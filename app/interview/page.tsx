@@ -7,6 +7,7 @@ import {useState,useEffect} from 'react';
 import { conversationTypes,interviewResultTypes } from '@/types';
 import { useRouter } from 'next/navigation';
 import  analyzeInterviewResult  from '@/utils/analyzeInterviewResult';
+import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
 import "@/styles/chat.scss"; 
 
 export default function Interview() {
@@ -18,7 +19,8 @@ export default function Interview() {
     const [questionIndex,setQuestionIndex]=useState<number>(0)
     const [isEnd,setIsEnd]=useState<boolean>(false)
     const [,setInterviewResult]=useAtom(interviewResultAtom);
-    
+    const [isAnalyzing,setIsAnalyzing]=useState<boolean>(false)
+    const [progress,setProgress]=useState<number>(0)    
     async function handleSubmit(message:string){
         setIsSend(true)
         
@@ -38,10 +40,13 @@ export default function Interview() {
 
     async function handleClickResult() {
         try {
-            const result:interviewResultTypes|undefined = await analyzeInterviewResult(JSON.stringify(conversation));
-            console.log(result);
+            setIsAnalyzing(true);
+            setProgress(10);
+            const result:interviewResultTypes|undefined = await analyzeInterviewResult(JSON.stringify(conversation),setProgress);
+            
             if (result) {
                 setInterviewResult(result);
+                setProgress(100);
                 push('/result');
             } else {
                 console.error('Result is undefined');
@@ -87,9 +92,12 @@ export default function Interview() {
         <Box sx={{mt:2}}>
          {isEnd &&               
             <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+            { isAnalyzing?
+            <LinearProgressWithLabel value={progress} />:
             <Button variant="contained" size='large' onClick={handleClickResult}>
                 分析開始
             </Button>
+            }
         </Backdrop>       
         }
         </Box>

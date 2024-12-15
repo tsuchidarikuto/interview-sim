@@ -3,11 +3,13 @@ import { getInfo } from '@/utils/getInfo';
 import CallOpenai from "@/utils/callOpenai";
 import { ResumeTypes, CompanyTypes, SettingTypes,interviewResultTypes } from '@/types';
 
-export default async function analyzeInterviewResult(conversationLog: string) {
+export default async function analyzeInterviewResult(conversationLog: string, setProgress: (progress: number) => void) {
     try{
-        const resumeInfo = await getInfo<ResumeTypes>('resumes');
-        const settingInfo = await getInfo<SettingTypes>('setting');
 
+        const resumeInfo = await getInfo<ResumeTypes>('resumes');
+        setProgress(20);
+        const settingInfo = await getInfo<SettingTypes>('setting');
+        setProgress(40);
         const settingDetail: { difficulty: string, type: string } = {
             difficulty: "",
             type: ""
@@ -68,8 +70,9 @@ export default async function analyzeInterviewResult(conversationLog: string) {
         #履歴書情報
         ${JSON.stringify(resumeInfo)}
         `;
-
+        setProgress(50);
         const analysisResult:interviewResultTypes =  JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'interviewResult'));
+        setProgress(80);
         console.log(analysisResult);
         const totalScore = analysisResult.score.technical +
                    analysisResult.score.communication +
