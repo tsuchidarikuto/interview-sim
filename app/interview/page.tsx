@@ -1,5 +1,5 @@
 'use client';
-import {Container,Button} from '@mui/material';    
+import {Container,Button,Box,Backdrop} from '@mui/material';    
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, Avatar } from "@chatscope/chat-ui-kit-react";
 import {useAtom} from 'jotai';
 import {questionsAtom,interviewResultAtom} from '@/atoms/state';
@@ -60,12 +60,13 @@ export default function Interview() {
 
 
     return (
-        <Container maxWidth="md" sx={{ mt: 5, mb: 4,height:'80vh'}} >       
-        <MainContainer className="my-chat-container">
-            <ChatContainer className="my-chat-container">       
-                <MessageList className="my-chat-container">
+        <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '80vh' }}>
+        
+        <MainContainer >
+            <ChatContainer>       
+                <MessageList >
                 {conversation.map((item,index)=> 
-                    <Message className="my-chat-container"
+                    <Message 
                         key={index} 
                         model={{
                             message: item.message,
@@ -82,12 +83,16 @@ export default function Interview() {
                 }
                    
             </ChatContainer>
-        </MainContainer>    
+        </MainContainer>   
+        <Box sx={{mt:2}}>
          {isEnd &&               
-            <Button variant="contained" size='small' onClick={handleClickResult}>
-                結果へ
-            </Button>        
+            <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+            <Button variant="contained" size='large' onClick={handleClickResult}>
+                分析開始
+            </Button>
+        </Backdrop>       
         }
+        </Box>
         </Container>
     );
 
