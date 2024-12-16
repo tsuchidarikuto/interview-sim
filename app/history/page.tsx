@@ -63,21 +63,28 @@ export default function History() {
                             }
                         </Box>
                         <Grid container spacing={5} >
-                            <Grid size={{ xs: 12, md: 6 }}>
+                            <Grid size={{ xs: 6, md: 6 }}>
                                 
-                                    <Box sx={{ width: "80%", margin: "0 auto" }}>
+                                    <Box sx={{ width: "100%", margin: "0 auto" }}>
                                     {ResultChart(item.score)}
                                     </Box>
                                 
                             </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
+                            <Grid size={{ xs: 6, md: 6 }}>
                                 <Card sx={{ p: 2 }} variant="outlined">
                                     <Typography variant="h6" component="h2">良かった点</Typography>
-                                    <Typography variant="body1" component="p">{item.feedback.positive}</Typography>
-                                </Card>
-                                <Card sx={{ p: 2 }} variant="outlined">
-                                    <Typography variant="h6" component="h2">改善点</Typography> 
-                                    <Typography variant="body1" component="p">{item.feedback.negative}</Typography>
+                                    <Card sx={{ p: 2 }} variant="outlined">
+                                    <Typography sx={{ width: '100%', marginLeft: 1, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                        {item.feedback.positive}
+                                    </Typography>
+                                    </Card>
+                                
+                                    <Typography variant="h6" component="h2" sx={{mt:1}}>改善点</Typography> 
+                                    <Card sx={{ p: 2 }} variant="outlined">
+                                    <Typography sx={{ width: '100%', marginLeft: 1, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            {item.feedback.negative}
+                                        </Typography>
+                                    </Card>
                                 </Card>
                             </Grid>
                         </Grid>

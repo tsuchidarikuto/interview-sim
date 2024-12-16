@@ -18,8 +18,7 @@ interface scoreTypes {
 export default function ResultChart(score:scoreTypes) {
     const data={
         labels: ['技術力','コミュニケーション力','チームワーク','論理的思考力','学習意欲','企業理解・志望動機'],
-        datasets:[{
-            label:'評価',
+        datasets:[{            
             data:[
                 score.technical,
                 score.communication,
@@ -31,7 +30,12 @@ export default function ResultChart(score:scoreTypes) {
         }]
 
     }
-    const options = {
+    const options = {    
+        plugins: {
+            legend: {
+                display: false,
+            },            
+          },    
         responsive: true,
         scales: {
           r:{
