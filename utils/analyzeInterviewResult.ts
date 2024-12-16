@@ -72,7 +72,7 @@ export default async function analyzeInterviewResult(conversationLog: string, se
         `;
         setProgress(50);
         const analysisResult:interviewResultTypes =  JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'interviewResult'));
-        setProgress(80);
+        setProgress(70);
         console.log(analysisResult);
         const totalScore = analysisResult.score.technical +
                    analysisResult.score.communication +

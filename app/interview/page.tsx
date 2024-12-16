@@ -8,6 +8,8 @@ import { conversationTypes,interviewResultTypes } from '@/types';
 import { useRouter } from 'next/navigation';
 import  analyzeInterviewResult  from '@/utils/analyzeInterviewResult';
 import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
+import { addToHistory } from '@/utils/addToHistory';
+
 import "@/styles/chat.scss"; 
 
 export default function Interview() {
@@ -21,6 +23,7 @@ export default function Interview() {
     const [,setInterviewResult]=useAtom(interviewResultAtom);
     const [isAnalyzing,setIsAnalyzing]=useState<boolean>(false)
     const [progress,setProgress]=useState<number>(0)    
+
     async function handleSubmit(message:string){
         setIsSend(true)
         
@@ -46,6 +49,8 @@ export default function Interview() {
             
             if (result) {
                 setInterviewResult(result);
+                setProgress(80);
+                addToHistory(result);
                 setProgress(100);
                 push('/result');
             } else {
