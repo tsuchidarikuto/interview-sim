@@ -18,6 +18,7 @@ export default function CenteredTabs() {
       <Card >
       <Box>
         <Typography variant="h5" component="h1" sx={{textAlign:'center'}}>面接シミュレーター</Typography>
+        
       </Box>
       <CardContent>
       <TabContext value={value} >

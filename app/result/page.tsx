@@ -25,27 +25,32 @@ export default function Result() {
                         </Typography>
                     }
                     </Card>
-                    <Grid container spacing={2} alignItems="center" justifyContent="center">
-                        <Grid size={{ xs: 12, md: 12 }}>
-                            <Box sx={{ width: "80%", margin: "0 auto" }}>
-                                {ResultChart(interviewResult.score)}
-                            </Box>
-                        </Grid>
-                        <Grid container spacing={2}>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Card sx={{ height: '100%', width: '100%' }}variant="outlined">
+                    <Grid container spacing={5} >
+                            <Grid size={{ xs: 6, md: 6 }}>        
+                                <Card sx={{ p: 2 }} variant="outlined">                        
+                                    <Box sx={{ width: "100%", margin: "0 auto" }}>
+                                    {ResultChart(interviewResult.score)}
+                                    </Box>                                
+                                    </Card>
+                            </Grid>
+                            <Grid size={{ xs: 6, md: 6 }}>
+                                <Card sx={{ p: 2 }} variant="outlined">
                                     <Typography variant="h6" component="h2">良かった点</Typography>
-                                    <Typography variant="body1" component="p">{interviewResult.feedback.positive}</Typography>
-                                </Card>
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Card sx={{ height: '100%', width: '100%' }}variant="outlined">
-                                    <Typography variant="h6" component="h2">改善点</Typography>
-                                    <Typography variant="body1" component="p">{interviewResult.feedback.negative}</Typography>
+                                    <Card sx={{ p: 2 }} variant="outlined">
+                                    <Typography sx={{ width: '100%', marginLeft: 1 }}>
+                                        {interviewResult.feedback.positive}
+                                    </Typography>
+                                    </Card>
+                                
+                                    <Typography variant="h6" component="h2" sx={{mt:1}}>改善点</Typography> 
+                                    <Card sx={{ p: 2 }} variant="outlined">
+                                    <Typography sx={{ width: '100%', marginLeft: 1 }}>
+                                            {interviewResult.feedback.negative}
+                                        </Typography>
+                                    </Card>
                                 </Card>
                             </Grid>
                         </Grid>
-                    </Grid>
                     <Link href='/'>
                         <Button variant="contained" size='small'>
                             戻る

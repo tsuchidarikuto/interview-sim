@@ -78,6 +78,7 @@ export default function History() {
                                         {item.feedback.positive}
                                     </Typography>
                                     </Card>
+                                    <Box sx={{flexGrow: 1}} />
                                 
                                     <Typography variant="h6" component="h2" sx={{mt:1}}>改善点</Typography> 
                                     <Card sx={{ p: 2 }} variant="outlined">

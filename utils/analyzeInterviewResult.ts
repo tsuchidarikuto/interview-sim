@@ -1,7 +1,7 @@
 'use client';
 import { getInfo } from '@/utils/getInfo';
 import CallOpenai from "@/utils/callOpenai";
-import { ResumeTypes, CompanyTypes, SettingTypes,interviewResultTypes } from '@/types';
+import { ResumeTypes, SettingTypes,interviewResultTypes } from '@/types';
 
 export default async function analyzeInterviewResult(conversationLog: string, setProgress: (progress: number) => void) {
     try{
@@ -17,7 +17,7 @@ export default async function analyzeInterviewResult(conversationLog: string, se
     
         switch (settingInfo[0].difficulty) {
             case "簡単":
-                settingDetail.difficulty = "簡単です。面接初心者なのでかなり甘めに採点しましょう";
+                settingDetail.difficulty = "簡単です。面接初心者なので激甘採点にしてください。ほとんど合格させてしまって構いません。";
                 break;
             case "普通":
                 settingDetail.difficulty = "普通です。一般的な基準で採点しましょう";
