@@ -1,6 +1,6 @@
 'use client';
 import {useState} from 'react';
-import {Box, Tab, Card,CardContent,Typography} from '@mui/material';
+import {Box, Tab, Card,CardContent,Typography,Container} from '@mui/material';
 import Company from '@/components/Company';
 import Resume from '@/components/Resume';
 import {TabList,TabContext,TabPanel} from '@mui/lab';
@@ -14,13 +14,9 @@ export default function CenteredTabs() {
 
   return (
 
-    <Box sx={{ width: '100%', typography: 'body1' ,mt:5,mergin:2}}>
-      <Card >
-      <Box>
-        <Typography variant="h5" component="h1" sx={{textAlign:'center'}}>面接シミュレーター</Typography>
-        
-      </Box>
-      <CardContent>
+    <Container maxWidth="md" sx={{ mt: 3, mb: 4, }}>    
+      
+  
       <TabContext value={value} >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <TabList onChange={handleChange} aria-label="lab API tabs example" centered >
@@ -33,8 +29,7 @@ export default function CenteredTabs() {
         <TabPanel value="2"><Company/></TabPanel>
         <TabPanel value="3"><InterviewSetting/></TabPanel>
       </TabContext>
-      </CardContent>
-      </Card>
-    </Box>
+      </Container>
+  
   );
 }
