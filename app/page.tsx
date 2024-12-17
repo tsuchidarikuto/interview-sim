@@ -16,6 +16,16 @@ export default function CenteredTabs() {
 
     <Container maxWidth="md" sx={{ mt: 3, mb: 4, }}>    
       
+          <Typography variant="h4" component="div" sx={{textAlign:'center', mb:1}}>
+            InterviewSim
+          </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{textAlign:'center'}}>
+            本アプリはAIを活用した面接シミュレーターです。<br/>
+            プロフィールと志望企業の情報を入力して、実践的な面接練習を始めましょう。<br/>
+            採用目指して頑張るぞ！！
+            </Typography>
+        
+      
   
       <TabContext value={value} >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
