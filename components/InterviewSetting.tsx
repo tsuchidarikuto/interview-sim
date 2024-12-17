@@ -1,6 +1,7 @@
 'use client';
 import react from 'react';
 import { MenuItem, TextField, Container, Box, Typography, Button, Slider, Stack, FormControl, CircularProgress, FormControlLabel, RadioGroup, Radio } from '@mui/material';
+import  LinearProgressWithLabel  from '@/components/LinearProgressWithLabel';
 import {useRouter} from 'next/navigation';
 import React, { useState,useEffect } from 'react';
 import { getInfo,updateInfo } from '@/utils/getInfo';
@@ -21,6 +22,7 @@ export default function InterviewSetting() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadInterview ,setIsLoadInterview] = useState(false);
+    const [progress, setProgress] = useState(0);
 
     const [questions,setQuestions] = useAtom(questionsAtom);
 
@@ -39,11 +41,12 @@ export default function InterviewSetting() {
     const handleStartInterview = async () => {
         setIsLoadInterview(true);    
         try {
-            
-            const data = await PreparationInterview();
+            setProgress(10);
+            const data = await PreparationInterview(setProgress);
             
             const obj=JSON.parse(data);
             setQuestions(obj.questions);
+            setProgress(100);
             push('/interview');
             
             
@@ -107,7 +110,11 @@ export default function InterviewSetting() {
                         </FormControl>
                     </Box>
                     {isLoading ? <CircularProgress /> : <Button type="submit" variant="outlined" sx={{width:'fit-content',alignSelf:'left'}}>保存する</Button>}        
-                    {isLoadInterview ? <CircularProgress/>:<Button size="large" variant="contained" sx={{width:'100%'}} onClick={handleStartInterview}>面接開始</Button>}
+
+                    {isLoadInterview ? 
+                    <LinearProgressWithLabel  value={progress} />:
+                    <Button size="large" variant="contained" sx={{width:'100%'}} onClick={handleStartInterview}>面接開始</Button>
+                    }
                     
                 </Stack>
                 </form>

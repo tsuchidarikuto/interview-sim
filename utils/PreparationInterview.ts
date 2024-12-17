@@ -5,12 +5,14 @@ import { ResumeTypes, CompanyTypes, SettingTypes } from '@/types';
 
 
 
-export async function PreparationInterview() {
+export async function PreparationInterview(setProgress: (progress: number) => void) {
     try{
     const resumeInfo = await getInfo<ResumeTypes>('resumes');
+    setProgress(20);
     const companyInfo = await getInfo<CompanyTypes>('company');
+    setProgress(30);
     const settingInfo = await getInfo<SettingTypes>('setting');
-
+    setProgress(40);
     const settingDetail: { difficulty: string, type: string } = {
         difficulty: "",
         type: ""
@@ -99,10 +101,10 @@ export async function PreparationInterview() {
             ${companyInfo[0].others}
     `;
 
-    
+    setProgress(60);
 
     const data = await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt,"questions");
-    
+    setProgress(90);
     
     
     console.log(data);

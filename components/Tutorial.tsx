@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Card, CardContent,Container } from '@mui/material';
-import { CustomCard } from '@/app/theme';
+import { CustomCard } from '@/styles/theme';
 
 
 

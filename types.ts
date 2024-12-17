@@ -47,3 +47,20 @@ export type conversationTypes={
     role:string;
     message:string;
 }
+
+
+export type interviewResultTypes={
+    isPass?:boolean;
+    feedback :{
+        positive:string;
+        negative:string;
+    }
+    score: {
+        technical:number;
+        communication:number;
+        teamwork:number;
+        logicalThinking:number;
+        learningDesire:number;
+        companyUnderstanding:number;
+    }
+}

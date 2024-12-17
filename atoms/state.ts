@@ -1,5 +1,19 @@
 import {atom} from 'jotai';
-import type {PrimitiveAtom} from 'jotai';
-import {questionTypes} from '@/types';
+import {questionTypes,interviewResultTypes} from '@/types';
 
 export const questionsAtom = atom<questionTypes[]>([]);
+
+export const interviewResultAtom = atom<interviewResultTypes>({
+    feedback:{
+        positive:'',
+        negative:''
+    },
+    score:{
+        technical:0,
+        communication:0,
+        teamwork:0,
+        logicalThinking:0,
+        learningDesire:0,
+        companyUnderstanding:0
+    }
+})

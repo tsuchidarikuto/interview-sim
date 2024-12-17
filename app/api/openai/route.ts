@@ -13,7 +13,7 @@ export async function POST(req:NextRequest){
     const {prompt,model,system,schemaName}=(await req.json()) as openaiTypes;//クライアントサイド  からのリクエストを受け取る
     
     let schema;
-    console.log(`at route.ts:${schemaName}`);
+    
     if(schemaName==="questions"){
         schema=z.object({
             questions:z.array(z.object({
@@ -21,9 +21,27 @@ export async function POST(req:NextRequest){
                 question:z.string(),
             })),
         });
+
+    }else if(schemaName==="interviewResult"){
+        schema=z.object({
+            feedback:z.object({
+                positive:z.string(),
+                negative:z.string(),
+            }),
+            score:z.object({
+                technical:z.number(),
+                communication:z.number(),
+                teamwork:z.number(),
+                logicalThinking:z.number(),
+                learningDesire:z.number(),
+                companyUnderstanding:z.number(),
+            }),
+        });
+
     }else if (schemaName==="undefined"){
         schema=undefined;
     }
+    
     console.log(schema);
     
     try{
