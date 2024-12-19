@@ -9,6 +9,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import {theme} from '@/styles/theme';
 import {Provider} from 'jotai';
 
+import { AuthProvider } from '@/provider/AuthContext';
+
 
 
 
@@ -32,15 +34,17 @@ export default function RootLayout({
       />
     </head>
     <body className="container mx-auto p-4">
+    <AuthProvider>
         <Provider>
-        <ThemeProvider theme={theme}>
-        <Header title="InterviewSim" />
-        
-              {children}
-          
-              <Footer/>
-        </ThemeProvider>
+          <ThemeProvider theme={theme}>
+            
+            <Header title="InterviewSim" />        
+              {children}          
+            <Footer/>
+            
+          </ThemeProvider>
         </Provider>
+        </AuthProvider>
     </body>
   </html>
   );

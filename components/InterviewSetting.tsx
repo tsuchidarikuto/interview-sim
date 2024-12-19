@@ -14,6 +14,7 @@ export default function InterviewSetting() {
     const {push} = useRouter();
     
     const [settingInfo, setSettingInfo] = useState<SettingTypes[]>([{
+        uid: "",
         id: "",
         difficulty: "難しい",
         duration: 30,

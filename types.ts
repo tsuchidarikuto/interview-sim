@@ -1,5 +1,6 @@
 export type ResumeTypes={
     id:string;
+    uid:string;
     name:string;
     birth:string;
     age:number|string;
@@ -15,6 +16,7 @@ export type ResumeTypes={
 
 export type CompanyTypes={
     id:string;
+    uid:string;
     name:string;
     position:string;
     skillset?:string;
@@ -26,6 +28,7 @@ export type CompanyTypes={
 
 export type SettingTypes={
     id:string;
+    uid:string;
     difficulty:string;
     duration:number;
     interviewType:string;
@@ -33,6 +36,7 @@ export type SettingTypes={
 
 export type questionTypes={
     id:string;
+    uid:string;
     question:string;
 }
 
@@ -50,6 +54,8 @@ export type conversationTypes={
 
 
 export type interviewResultTypes={
+    
+    uid:string;
     isPass?:boolean;
     feedback :{
         positive:string;
