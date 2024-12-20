@@ -1,6 +1,6 @@
 'use client'
 import CallOpenai from "@/utils/callOpenai";
-import { getInfo } from '@/utils/getInfo';
+import { getInfo } from '@/utils/handleFirebase';
 import { ResumeTypes, CompanyTypes, SettingTypes } from '@/types';
 
 

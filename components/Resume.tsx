@@ -4,7 +4,7 @@ import { Box,CircularProgress, Button, TextField, Typography, Container, Stack, 
 import Grid from "@mui/material/Grid2";
 import { useEffect, useState ,FormEvent,useContext} from 'react';
 import { ResumeTypes } from '@/types';
-import { getInfo ,updateInfo,addInfo} from '@/utils/getInfo';
+import { getInfo ,updateInfo,addInfo} from '@/utils/handleFirebase';
 import { AuthContext } from '@/provider/AuthContext';
 
 
@@ -32,14 +32,15 @@ export default function Resume() {
     const handleSubmit = async (event:FormEvent<HTMLFormElement>) => {
         event.preventDefault();        
         setIsLoading(true);
-        try{if(user){
-            if(isNew){
-                await addInfo<ResumeTypes>('resumes',resumeInfo[0],user.uid);
-            }else{
-                await updateInfo<ResumeTypes>('resumes',resumeInfo[0]);
+        try{
+            if(user){
+                if(isNew){
+                    await addInfo<ResumeTypes>('resumes',resumeInfo[0],user.uid);
+                }else{
+                    await updateInfo<ResumeTypes>('resumes',resumeInfo[0]);
+                }
+                setIsLoading(false);
             }
-            setIsLoading(false);
-        }
         } catch(e){
             console.error('Error updating document:', e);
 
@@ -52,14 +53,14 @@ export default function Resume() {
     useEffect(() => {
         const fetchData = async () => {
             if(user){
-          const data = await getInfo<ResumeTypes>('resumes',user.uid);
-            if (data.length === 0) {
-                setIsNew(true);
-                return;
+                const data = await getInfo<ResumeTypes>('resumes',user.uid);
+                if (data.length === 0) {
+                    setIsNew(true);
+                    return;
+                }
+                setResumeInfo(data);
+                console.log(`data from Resume: ${data}`);
             }
-          setResumeInfo(data);
-          console.log(`data from Resume: ${data}`);
-        }
         };
         fetchData();
     }, []);

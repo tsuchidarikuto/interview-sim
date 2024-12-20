@@ -1,12 +1,20 @@
-import React from 'react';
+import React,{useContext} from 'react';
 import  Link  from 'next/link';
 import {Box,Button,TextField, CircularProgress,Container, Stack,Divider} from '@mui/material';
 import { useEffect, useState } from 'react';
-import {getInfo,updateInfo} from '@/utils/getInfo';
+import {getInfo,updateInfo,addInfo} from '@/utils/handleFirebase';
 import {CompanyTypes} from '@/types';
+import { AuthContext } from '@/provider/AuthContext';
+
+
 export default function Company() {
+    const{user} = useContext(AuthContext);
+
     const [isLoading, setIsLoading] = useState(false);
+    const [isNew, setIsNew] = useState(false);
+
     const [companyInfo, setCompanyInfo] = useState<CompanyTypes[]>([{
+        uid:"",
         id: "",
         name: "",
         position: "",
@@ -16,22 +24,36 @@ export default function Company() {
         culture: "",
         others: ""
     }]);
+
     const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
         try {
-            await updateInfo<CompanyTypes>('company', companyInfo[0]);
-            setIsLoading(false);
+            if(user){
+                if(isNew){
+                    await addInfo<CompanyTypes>('company',companyInfo[0],user.uid);
+                }
+                else{
+                    await updateInfo<CompanyTypes>('company',companyInfo[0]);
+                }
+                setIsLoading(false);
+            }
         } catch (e) {
             console.error('Error updating document:', e);
         }
         setIsLoading(false);
     }
+
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getInfo<CompanyTypes>('company');
-            if (data) {
+            if(user){
+                const data = await getInfo<CompanyTypes>('company',user.uid);
+                if(data.length===0){
+                    setIsNew(true);
+                    return;
+                }
                 setCompanyInfo(data);
+                console.log(`data from Company: ${data}`);
             }
         };
         fetchData();

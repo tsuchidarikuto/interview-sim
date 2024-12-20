@@ -1,17 +1,18 @@
 'use client';
-import react from 'react';
 import { MenuItem, TextField, Container, Box, Typography, Button, Slider, Stack, FormControl, CircularProgress, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import  LinearProgressWithLabel  from '@/components/LinearProgressWithLabel';
 import {useRouter} from 'next/navigation';
-import React, { useState,useEffect } from 'react';
-import { getInfo,updateInfo } from '@/utils/getInfo';
+import React, { useState,useEffect,useContext,FormEvent } from 'react';
+import { getInfo,updateInfo,addInfo } from '@/utils/handleFirebase';
 import { SettingTypes } from '@/types';
 import { PreparationInterview } from '@/utils/PreparationInterview';
 import {useAtom} from 'jotai';
 import {questionsAtom} from '@/atoms/state';
+import {AuthContext } from '@/provider/AuthContext';
 
 export default function InterviewSetting() {
     const {push} = useRouter();
+    const {user} = useContext(AuthContext);
     
     const [settingInfo, setSettingInfo] = useState<SettingTypes[]>([{
         uid: "",
@@ -23,21 +24,29 @@ export default function InterviewSetting() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadInterview ,setIsLoadInterview] = useState(false);
+    const [isNew, setIsNew] = useState(false);
     const [progress, setProgress] = useState(0);
 
     const [questions,setQuestions] = useAtom(questionsAtom);
 
-    const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setIsLoading(true);
-        try {
-            await updateInfo<SettingTypes>('setting', settingInfo[0]);
+    const handleSubmit = async (event:FormEvent<HTMLFormElement>) => {
+            event.preventDefault();        
+            setIsLoading(true);
+            try{
+                if(user){
+                    if(isNew){
+                        await addInfo<SettingTypes>('setting',settingInfo[0],user.uid);
+                    }else{
+                        await updateInfo<SettingTypes>('setting',settingInfo[0]);
+                    }
+                    setIsLoading(false);
+                }
+            } catch(e){
+                console.error('Error updating document:', e);
+    
+            };
             setIsLoading(false);
-        } catch (e) {
-            console.error('Error updating document:', e);
         }
-        setIsLoading(false);
-    }
 
     const handleStartInterview = async () => {
         setIsLoadInterview(true);    
@@ -53,17 +62,21 @@ export default function InterviewSetting() {
             
         } catch (e) {
             console.error('Error during preparation:', e);
-        }
-        
+        }        
         setIsLoading(false);
     }
     
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getInfo<SettingTypes>('setting');
-            if (data) {
+            if(user){
+                const data = await getInfo<SettingTypes>('setting',user.uid);
+                if (data.length === 0) {
+                    setIsNew(true);
+                    return;
+                }
                 setSettingInfo(data);
+                console.log(`data from InterviewSetting: ${data}`);            
             }
         };
         fetchData();
