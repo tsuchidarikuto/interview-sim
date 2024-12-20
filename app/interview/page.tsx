@@ -3,17 +3,20 @@ import {Container,Button,Box,Backdrop, Typography} from '@mui/material';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, Avatar } from "@chatscope/chat-ui-kit-react";
 import {useAtom} from 'jotai';
 import {questionsAtom,interviewResultAtom} from '@/atoms/state';
-import {useState,useEffect} from 'react';
+import {useState,useEffect,useContext} from 'react';
 import { conversationTypes,interviewResultTypes } from '@/types';
 import { useRouter } from 'next/navigation';
 import  analyzeInterviewResult  from '@/utils/analyzeInterviewResult';
 import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
 import { addToHistory } from '@/utils/addToHistory';
+import {AuthContext} from '@/provider/AuthContext';
 
 import "@/styles/chat.scss"; 
 
 export default function Interview() {
     const {push} = useRouter();
+    const {user} = useContext(AuthContext);
+
     const [questions] = useAtom(questionsAtom);
     
     const [conversation,setConversation] =useState<conversationTypes[]>([])
@@ -43,14 +46,17 @@ export default function Interview() {
 
     async function handleClickResult() {
         try {
+            if(!user){
+                throw new Error('User is not found');
+            }
             setIsAnalyzing(true);
             setProgress(10);
-            const result:interviewResultTypes|undefined = await analyzeInterviewResult(JSON.stringify(conversation),setProgress);
+            const result:interviewResultTypes|undefined = await analyzeInterviewResult(JSON.stringify(conversation),setProgress,user.uid);
             
             if (result) {
                 setInterviewResult(result);
                 setProgress(80);
-                addToHistory(result);
+                addToHistory(result,user.uid);
                 setProgress(100);
                 push('/result');
             } else {

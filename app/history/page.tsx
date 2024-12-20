@@ -1,23 +1,34 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from "react";
-import { collection, getDocs, query } from 'firebase/firestore';
+import { useEffect, useState, useContext } from "react";
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Container, Card, Stack, Typography, Box,Button } from '@mui/material';
 import { firestore } from '@/firebase';
 import { interviewResultTypes } from '@/types';
 import ResultChart from '@/components/resultChart';
 import Grid from '@mui/material/Grid2';
+import {AuthContext} from '@/provider/AuthContext';
+
 
 export default function History() {
     const [history, setHistory] = useState<interviewResultTypes[]>([]);
+    const {user} = useContext(AuthContext);
 
     async function getHistory() {
         try {
-            const q = query(collection(firestore, 'history'));
+            if (!user) {
+                throw new Error('User is not found');
+            }
+            const q = query(
+                collection(firestore, 'history'),
+                where('uid','==',user.uid)
+            );
+
             const snapShot = await getDocs(q);
             const interviewResultHistory = snapShot.docs.map(doc => {
                 const data = doc.data();
                 const convertedData: interviewResultTypes = {
+                    uid: data.uid,
                     isPass: data.isPass,
                     feedback: {
                         positive: data.positiveFeedback,

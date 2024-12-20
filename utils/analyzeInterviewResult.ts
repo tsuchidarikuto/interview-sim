@@ -3,12 +3,13 @@ import { getInfo } from '@/utils/handleFirebase';
 import CallOpenai from "@/utils/callOpenai";
 import { ResumeTypes, SettingTypes,interviewResultTypes } from '@/types';
 
-export default async function analyzeInterviewResult(conversationLog: string, setProgress: (progress: number) => void) {
-    try{
 
-        const resumeInfo = await getInfo<ResumeTypes>('resumes');
+export default async function analyzeInterviewResult(conversationLog: string, setProgress: (progress: number) => void,uid:string) {
+
+    try{        
+        const resumeInfo = await getInfo<ResumeTypes>('resumes',uid);
         setProgress(20);
-        const settingInfo = await getInfo<SettingTypes>('setting');
+        const settingInfo = await getInfo<SettingTypes>('setting',uid);
         setProgress(40);
         const settingDetail: { difficulty: string, type: string } = {
             difficulty: "",
@@ -73,18 +74,15 @@ export default async function analyzeInterviewResult(conversationLog: string, se
         setProgress(50);
         const analysisResult:interviewResultTypes =  JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'interviewResult'));
         setProgress(70);
-        console.log(analysisResult);
+        
         const totalScore = analysisResult.score.technical +
                    analysisResult.score.communication +
                    analysisResult.score.teamwork +
                    analysisResult.score.logicalThinking +
                    analysisResult.score.learningDesire +
                    analysisResult.score.companyUnderstanding;
-
         analysisResult.isPass = totalScore >= 40;
-
         return analysisResult;
-
     }catch(e){
         console.error(e);
     }

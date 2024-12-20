@@ -3,15 +3,16 @@ import CallOpenai from "@/utils/callOpenai";
 import { getInfo } from '@/utils/handleFirebase';
 import { ResumeTypes, CompanyTypes, SettingTypes } from '@/types';
 
-
-
-export async function PreparationInterview(setProgress: (progress: number) => void) {
+export async function PreparationInterview(setProgress: (progress: number) => void,uid:string) {
+    
     try{
-    const resumeInfo = await getInfo<ResumeTypes>('resumes');
+        
+
+    const resumeInfo = await getInfo<ResumeTypes>('resumes',uid);
     setProgress(20);
-    const companyInfo = await getInfo<CompanyTypes>('company');
+    const companyInfo = await getInfo<CompanyTypes>('company',uid);
     setProgress(30);
-    const settingInfo = await getInfo<SettingTypes>('setting');
+    const settingInfo = await getInfo<SettingTypes>('setting',uid);
     setProgress(40);
     const settingDetail: { difficulty: string, type: string } = {
         difficulty: "",
