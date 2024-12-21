@@ -45,6 +45,7 @@ export default async function analyzeInterviewResult(conversationLog: string, se
 
         const systemPrompt = `
         入力される候補者の情報を参考にして、面接結果を分析してください。
+        中身のない解答や、失礼な態度の解答は遠慮なく0点を付け、フィードバックで厳しく、ネチネチと指導してください
         候補者への忖度はせず、良いとこは良い、悪いところは悪いと判断し客観的な評価を行ってください。
         また面接の難易度は${settingDetail.difficulty}
         面接のタイプは${settingDetail.type}
