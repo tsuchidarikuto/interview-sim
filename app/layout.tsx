@@ -33,15 +33,13 @@ export default function RootLayout({
         content="面接練習用アプリ"
       />
     </head>
-    <body className="container mx-auto p-4">
+    <body className="Paper_v2">
     <AuthProvider>
         <Provider>
-          <ThemeProvider theme={theme}>
-            
-            <Header title="InterviewSim" />        
-              {children}          
-            <Footer/>
-            
+          <ThemeProvider theme={theme}>          
+            <Header title="InterviewSim" />              
+              {children}                        
+            <Footer/>          
           </ThemeProvider>
         </Provider>
         </AuthProvider>
