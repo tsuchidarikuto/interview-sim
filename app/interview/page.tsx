@@ -87,7 +87,7 @@ export default function Interview() {
                         model={{
                             message: item.message,
                             sender: item.role,
-                            position:'last',
+                            position:'single',
                             direction: item.role==='user'?'outgoing':'incoming',
                         }}
                     />)}

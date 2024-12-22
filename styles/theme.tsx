@@ -9,7 +9,7 @@ import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#000000',
+      main: '#444444', // Orange color
     },
     secondary: {
       main: '#FFFFFF',
@@ -17,14 +17,6 @@ const theme = createTheme({
   },
 });
 
-const CustomCard = styled(Card)({
-  height: '100%', // Set your desired height here
-  flexGrow: 1,
-  '&:hover': {
-    backgroundColor: '#F5F5F3', // Change background color on hover
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Add shadow on hover
-  },
-});
 
 
-export { theme, CustomCard, };
+export { theme };
