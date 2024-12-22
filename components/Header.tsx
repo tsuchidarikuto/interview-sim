@@ -1,7 +1,7 @@
 'use client';
 import React, { useContext } from 'react';
 import Link from 'next/link';
-import { AppBar, Toolbar, Typography, Button ,Stack} from '@mui/material';
+import { AppBar, Toolbar, Typography, Button ,Box} from '@mui/material';
 import { signOut } from 'firebase/auth';
 
 import { AuthContext } from '@/provider/AuthContext';
@@ -44,8 +44,10 @@ export default function Header({ title }: HeaderProps) {
           </>
         )}
         {isLogin && (
-        <Link href="/history">
-          <HistoryIcon sx={{ cursor: 'pointer'  }} />
+        <Link href="/history" passHref>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <HistoryIcon sx={{ cursor: 'pointer' }} />
+          </Box>
         </Link>
         )}
       </Toolbar>
