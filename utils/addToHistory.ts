@@ -2,9 +2,10 @@ import {addDoc,doc,collection} from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import { interviewResultTypes } from '@/types';
 
-export async function addToHistory(result:interviewResultTypes){
+export async function addToHistory(result:interviewResultTypes,uid:string){
     try{
         await addDoc(collection(firestore,'history'),{
+            uid:uid,
             isPass:result.isPass,
             positiveFeedback:result.feedback.positive,
             negativeFeedback:result.feedback.negative,

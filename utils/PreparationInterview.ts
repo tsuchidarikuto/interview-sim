@@ -1,18 +1,25 @@
 'use client'
 import CallOpenai from "@/utils/callOpenai";
-import { getInfo } from '@/utils/getInfo';
+import { getInfo } from '@/utils/handleFirebase';
 import { ResumeTypes, CompanyTypes, SettingTypes } from '@/types';
 
-
-
-export async function PreparationInterview(setProgress: (progress: number) => void) {
+export async function PreparationInterview(setProgress: (progress: number) => void,uid:string) {
+    
     try{
-    const resumeInfo = await getInfo<ResumeTypes>('resumes');
+        
+
+    const resumeInfo = await getInfo<ResumeTypes>('resumes',uid);
     setProgress(20);
-    const companyInfo = await getInfo<CompanyTypes>('company');
+    const companyInfo = await getInfo<CompanyTypes>('company',uid);
     setProgress(30);
-    const settingInfo = await getInfo<SettingTypes>('setting');
+    const settingInfo = await getInfo<SettingTypes>('setting',uid);
     setProgress(40);
+
+    if (resumeInfo.length === 0 || companyInfo.length === 0 || settingInfo.length === 0) {
+        return [];
+    }
+
+
     const settingDetail: { difficulty: string, type: string } = {
         difficulty: "",
         type: ""
@@ -101,7 +108,7 @@ export async function PreparationInterview(setProgress: (progress: number) => vo
             ${companyInfo[0].others}
     `;
 
-    setProgress(60);
+    setProgress(80);
 
     const data = await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt,"questions");
     setProgress(90);

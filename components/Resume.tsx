@@ -2,15 +2,17 @@
 import React from "react";
 import { Box,CircularProgress, Button, TextField, Typography, Container, Stack, Card, Divider, Select, MenuItem } from '@mui/material';
 import Grid from "@mui/material/Grid2";
-import { useEffect, useState ,FormEvent} from 'react';
+import { useEffect, useState ,FormEvent,useContext} from 'react';
 import { ResumeTypes } from '@/types';
-import { getInfo ,updateInfo} from '@/utils/getInfo';
-import { updateDoc,doc } from "firebase/firestore";
+import { getInfo ,updateInfo,addInfo} from '@/utils/handleFirebase';
+import { AuthContext } from '@/provider/AuthContext';
 
 
 export default function Resume() {
+    const {user}=useContext(AuthContext);
 
     const [resumeInfo, setResumeInfo] = useState<ResumeTypes[]>([{
+        uid:"",
         id: "",
         name: "",
         birth: "",
@@ -24,16 +26,21 @@ export default function Resume() {
         bestAtStu: "",
         reason: ""
     }]);
-
+    const [isNew, setIsNew] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (event:FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+        event.preventDefault();        
         setIsLoading(true);
         try{
-            await updateInfo<ResumeTypes>('resumes',resumeInfo[0]);
-            setIsLoading(false);
-            
+            if(user){
+                if(isNew){
+                    await addInfo<ResumeTypes>('resumes',resumeInfo[0],user.uid);
+                }else{
+                    await updateInfo<ResumeTypes>('resumes',resumeInfo[0]);
+                }
+                setIsLoading(false);
+            }
         } catch(e){
             console.error('Error updating document:', e);
 
@@ -45,12 +52,19 @@ export default function Resume() {
 
     useEffect(() => {
         const fetchData = async () => {
-          const data = await getInfo<ResumeTypes>('resumes');
-          setResumeInfo(data);
-          console.log(`data from Resume: ${data}`);
+            if(user){
+                const data = await getInfo<ResumeTypes>('resumes',user.uid);
+                if (data.length === 0) {
+                    setIsNew(true);
+                    return;
+                }
+                setResumeInfo(data);
+                console.log(`data from Resume: ${data}`);
+            }
         };
         fetchData();
-      }, []);
+    }, []);
+
     return (
         <Container maxWidth="md" sx={{ mb: 3, height: '100%' }}>
             <form onSubmit={handleSubmit}>
