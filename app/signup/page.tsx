@@ -3,9 +3,11 @@ import {useState, FormEvent} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 import { Typography,Container,Card,TextField,Button } from '@mui/material';
+import { addInfo} from '@/utils/handleFirebase';
 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebase';
+import { ResumeTypes,SettingTypes,CompanyTypes } from '@/types';
 
 export default function Page() {
     const {push} = useRouter();
@@ -16,7 +18,55 @@ export default function Page() {
     const handleSignUp = async (e:FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
         try{
-            await createUserWithEmailAndPassword(auth,email,password);
+            
+            const userCredential =  await createUserWithEmailAndPassword(auth,email,password);
+            await addInfo<ResumeTypes>(
+                'resumes',
+                {            
+                    uid:"",
+                    id: "",
+                    name: "",
+                    birth: "",
+                    age: "",
+                    sex: 0,
+                    education: "",
+                    programming: "",
+                    selfPR: "",
+                    research: "",
+                    qualification: "",
+                    bestAtStu: "",
+                    reason: ""
+                }
+                ,userCredential.user.uid
+            )
+            
+            await addInfo<CompanyTypes>(
+                'company',
+                {
+                    uid:'',
+                    id:'',
+                    name:'',
+                    position:'',
+                    skillset:'',
+                    mission:'',
+                    product:'',
+                    culture:'',
+                    others:''                    
+                },
+                userCredential.user.uid
+            )
+
+            await addInfo<SettingTypes>(
+                'setting',
+                {
+                    uid:'',
+                    id:'',
+                    difficulty:'普通',
+                    duration:30,
+                    interviewType:'複合面接'
+                }
+                ,userCredential.user.uid
+            )
             push('/');            
         } catch (error){
             console.log(error);

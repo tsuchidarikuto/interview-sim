@@ -52,6 +52,7 @@ export default function InterviewSetting() {
             if (!user) {
                 throw new Error('User not found');
             }
+
             if (isNew) {
                 await addInfo<SettingTypes>('setting', settingInfo[0], user.uid);
             } else {
@@ -69,8 +70,7 @@ export default function InterviewSetting() {
         try {
             if (!user) {
                 throw new Error('User not found');
-            }
-            setProgress(10);
+            }            
             const data = await PreparationInterview(setProgress, user.uid);
 
             const obj = JSON.parse(data);
@@ -88,7 +88,14 @@ export default function InterviewSetting() {
             if (user) {
                 const data = await getInfo<SettingTypes>('setting', user.uid);
                 if (data.length === 0) {
-                    setIsNew(true);
+                    setIsNew(true);                    
+                    setSettingInfo([{
+                        uid: user.uid,
+                        id: '',
+                        difficulty: '難しい',
+                        duration: 30,
+                        interviewType: '',
+                    }]);
                     return;
                 }
                 setSettingInfo(data);

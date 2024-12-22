@@ -21,26 +21,33 @@ export default function Header({ title }: HeaderProps) {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Link href="/" passHref>
+        {isLogin ? (
+          <Link href="/" passHref>
+            <Typography variant="h6">
+              {title}
+            </Typography>
+          </Link>):
+        (
           <Typography variant="h6">
-            {title}
+            {title} 
           </Typography>
-        </Link>
+        )}
 
         <div style={{ flexGrow: 1 }} />
-        {isLogin && (//あとでなおす
+        {isLogin && (
           <>
             <Typography variant='body1'>{user.email}</Typography>
             
             <Button onClick={() => signOut(auth)}>
               <LogoutOutlinedIcon sx={{  cursor: 'pointer' }} color = "secondary" />
-            </Button>
-            
+            </Button>            
           </>
         )}
+        {isLogin && (
         <Link href="/history">
           <HistoryIcon sx={{ cursor: 'pointer'  }} />
         </Link>
+        )}
       </Toolbar>
     </AppBar>
   );

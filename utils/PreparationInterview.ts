@@ -14,6 +14,12 @@ export async function PreparationInterview(setProgress: (progress: number) => vo
     setProgress(30);
     const settingInfo = await getInfo<SettingTypes>('setting',uid);
     setProgress(40);
+
+    if (resumeInfo.length === 0 || companyInfo.length === 0 || settingInfo.length === 0) {
+        return [];
+    }
+
+
     const settingDetail: { difficulty: string, type: string } = {
         difficulty: "",
         type: ""
@@ -102,7 +108,7 @@ export async function PreparationInterview(setProgress: (progress: number) => vo
             ${companyInfo[0].others}
     `;
 
-    setProgress(60);
+    setProgress(80);
 
     const data = await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt,"questions");
     setProgress(90);
