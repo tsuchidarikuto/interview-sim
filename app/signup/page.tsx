@@ -83,7 +83,7 @@ export default function Page() {
                 メールアドレスとパスワードを入力して<br/>
                 InterviewSimアカウントを作成して下さい
             </Typography>
-            <Card sx={{p:3}}>
+            <Card sx={{p:3}} variant='outlined'>
             <form onSubmit = {handleSignUp}>
                 <TextField
                     label="メールアドレス"

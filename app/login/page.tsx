@@ -33,7 +33,7 @@ export default function Page() {
             InterviewSimを始めるには<br/>
             InterviewSimアカウントにログインして下さい
         </Typography>
-        <Card sx={{p:3}}>
+        <Card sx={{p:3}} variant='outlined'>
             <form onSubmit = {handleLogin}>
                 <TextField
                     required
