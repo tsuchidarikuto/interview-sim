@@ -55,7 +55,7 @@ export type conversationTypes={
 
 export type interviewResultTypes={
     
-    uid:string;
+    uid?:string;
     isPass?:boolean;
     feedback :{
         positive:string;
