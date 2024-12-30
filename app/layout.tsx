@@ -14,10 +14,6 @@ import { AuthProvider } from '@/provider/AuthContext';
 
 
 
-export const metadata: Metadata = {
-  title: "InterviewSim",
-  description: "面接シミュレーター",
-};
 
 export default function RootLayout({
   children,
@@ -30,7 +26,7 @@ export default function RootLayout({
       <title>Interview Simulation</title>
       <meta property="og:title" content="InterviewSim"/> 
       <meta property="og:description" content="面接をシミュレーションするよ"/>
-      <meta property="og:image" content="/favicon.ico"/>
+      <meta property="og:image" content="/og-image.jpg"/>
 
     </head>
     <body className="Paper_v2">
