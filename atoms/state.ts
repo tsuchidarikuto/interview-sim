@@ -4,6 +4,7 @@ import {questionTypes,interviewResultTypes} from '@/types';
 export const questionsAtom = atom<questionTypes[]>([]);
 
 export const interviewResultAtom = atom<interviewResultTypes>({
+    uid:'',
     feedback:{
         positive:'',
         negative:''
