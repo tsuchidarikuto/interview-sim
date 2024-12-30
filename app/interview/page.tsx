@@ -1,6 +1,6 @@
 'use client';
 import {Container,Button,Box,Backdrop, Typography} from '@mui/material';    
-import { MainContainer, ChatContainer, MessageList, Message, MessageInput, Avatar } from "@chatscope/chat-ui-kit-react";
+import { MainContainer, ChatContainer, MessageList, Message, MessageInput } from "@chatscope/chat-ui-kit-react";
 import {useAtom} from 'jotai';
 import {questionsAtom,interviewResultAtom} from '@/atoms/state';
 import {useState,useEffect,useContext} from 'react';

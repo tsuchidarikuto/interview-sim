@@ -1,6 +1,5 @@
 import React,{useContext} from 'react';
-import  Link  from 'next/link';
-import {Box,Button,TextField, CircularProgress,Container, Stack,Divider} from '@mui/material';
+import {Box,Button,TextField, CircularProgress,Container, Stack} from '@mui/material';
 import { useEffect, useState } from 'react';
 import {getInfo,updateInfo,addInfo} from '@/utils/handleFirebase';
 import {CompanyTypes} from '@/types';
