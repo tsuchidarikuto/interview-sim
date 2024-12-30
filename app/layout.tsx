@@ -28,9 +28,9 @@ export default function RootLayout({
     <html lang="ja">
     <head>
       <title>Interview Simulation</title>
-      <meta property="og:title" content="title:URLプレビューテスト"/> 
-      <meta property="og:description" content="description:URLプレビューテスト"/>
-      <meta property="og:image" content="https://placehold.jp/d92733/ffffff/150x150.png?text=LINE%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E3%83%86%E3%82%B9%E3%83%88"/>
+      <meta property="og:title" content="InterviewSim"/> 
+      <meta property="og:description" content="面接をシミュレーションするよ"/>
+      <meta property="og:image" content="/favicon.ico"/>
 
     </head>
     <body className="Paper_v2">
