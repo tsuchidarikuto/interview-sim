@@ -29,9 +29,10 @@ export default function RootLayout({
     <head>
       <title>Interview Simulation</title>
       <meta
-        name="description"
-        content="面接練習用アプリ"
+      name="description"
+      content="面接をシミュレーションできるよ"        
       />
+      <link rel="icon" href="/favicon.ico" />
     </head>
     <body className="Paper_v2">
     <AuthProvider>
