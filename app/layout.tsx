@@ -32,7 +32,10 @@ export default function RootLayout({
       name="description"
       content="面接をシミュレーションできるよ"        
       />
-      <link rel="icon" href="/favicon.ico" />
+      <meta
+        property = "og:image"
+        content  = "/favicon.ico"
+      />
     </head>
     <body className="Paper_v2">
     <AuthProvider>
