@@ -44,11 +44,18 @@ export default function Header({ title }: HeaderProps) {
           </>
         )}
         {isLogin && (
+          <>
         <Link href="/history" passHref>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <HistoryIcon sx={{ cursor: 'pointer' }} />
           </Box>
         </Link>
+        <Link href="/mailbox" passHref>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <HistoryIcon sx={{ cursor: 'pointer' }} />
+          </Box>
+        </Link>
+        </>
         )}
       </Toolbar>
     </AppBar>
