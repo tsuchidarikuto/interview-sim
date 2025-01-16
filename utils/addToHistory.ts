@@ -16,6 +16,7 @@ export async function addToHistory(result:interviewResultTypes,uid:string){
             learningDesireScore:result.score.learningDesire,
             companyUnderstandingScore:result.score.companyUnderstanding,            
         });
+        
     }catch(e){
         console.error('Error adding document:',e);
     }

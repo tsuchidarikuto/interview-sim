@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid2';
 import {AuthContext} from '@/provider/AuthContext';
 
 
-export default function History() {
+export default function MailBox() {
     const [history, setHistory] = useState<interviewResultTypes[]>([]);
     const {user} = useContext(AuthContext);
 
@@ -19,6 +19,7 @@ export default function History() {
             if (!user) {
                 throw new Error('User is not found');
             }
+            
             const q = query(
                 collection(firestore, 'history'),
                 where('uid','==',user.uid)
@@ -27,7 +28,10 @@ export default function History() {
             const snapShot = await getDocs(q);
             const interviewResultHistory = snapShot.docs.map(doc => {
                 const data = doc.data();
+                const id = doc.id;
+
                 const convertedData: interviewResultTypes = {
+                    id:id,
                     uid: data.uid,
                     isPass: data.isPass,
                     feedback: {
@@ -62,14 +66,16 @@ export default function History() {
             <h1>MailBox</h1>
             <Card variant="outlined" sx={{height:"80%"}}>
             <Stack spacing={0}>                
-                {history.map((item, index) => (
-                    <Link href='/result'>
-                    <Card key={index} variant="outlined" sx={{height:52}}>
-                        <Typography >{item.feedback.positive}</Typography>
-                        <Typography >面接結果のお知らせ</Typography>
-                    </Card>
-                    </Link>
-))}
+                {history.map((item, index) => (                   
+                        <Card key={index} variant="outlined" sx={{height:52}}>
+                            <Link href = {`/mailbox/${item.id}` }>
+                            <Typography >{item.feedback.positive}</Typography>
+                            <Typography >面接結果のお知らせ</Typography>
+                            </Link>
+                        </Card>
+                    
+                    
+                ))}
             </Stack>
             <Box sx={{flexGrow:1}}/>
             </Card>
