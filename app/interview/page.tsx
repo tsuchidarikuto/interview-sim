@@ -21,7 +21,7 @@ export default function Interview() {
     
     const [conversation,setConversation] =useState<ConversationTypes[]>([])
     const [isSend,setIsSend]=useState<boolean>(false)
-    const [questionIndex,setQuestionIndex]=useState<number>(0)
+    const [questionIndex,setQuestionIndex]=useState<number>(1)
     const [isEnd,setIsEnd]=useState<boolean>(false)    
     const [isAnalyzing,setIsAnalyzing]=useState<boolean>(false)
     const [progress,setProgress]=useState<number>(0)
