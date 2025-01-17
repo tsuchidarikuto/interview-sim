@@ -7,9 +7,10 @@ import ResultChart from "@/components/resultChart";
 import { interviewResultTypes } from '@/types';
 import Link from 'next/link';
 import { AuthContext } from '@/provider/AuthContext';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc,updateDoc } from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import Interview from "@/app/interview/page";
+import {updateInfo} from '@/utils/handleFirebase';
 
 
 export default function Page() {
@@ -24,14 +25,19 @@ export default function Page() {
         const getResult = async () => {
           try {
             if (!user) return;
+            
             const rid = Array.isArray(resultId) ? resultId[0] : resultId;
+            
             if (!rid) return;
             const docRef = doc(firestore, "history", rid);
             const snapShot = await getDoc(docRef);
             const data = snapShot.data();
             if (!data) return;
+            await updateDoc(docRef, { isRead: true });
+
             setInterviewResult({
-                id:rid,
+                id: rid,
+                isRead: true, 
                 uid: data.uid,
                 isPass: data.isPass,
                 feedback: {
@@ -47,7 +53,6 @@ export default function Page() {
                     companyUnderstanding: data.companyUnderstandingScore
                 }
             })
-            
           } catch (error) {
             console.log(error);
           }
@@ -104,7 +109,7 @@ export default function Page() {
         }            
         <Link href='/mailbox'>
                         <Button variant="contained" size='small'>
-                            戻る
+                            ホームへ
                         </Button>
                     </Link> 
         </Container>

@@ -7,7 +7,7 @@ import { signOut } from 'firebase/auth';
 import { AuthContext } from '@/provider/AuthContext';
 import { auth } from '@/firebase';
 
-import HistoryIcon from '@mui/icons-material/History';
+import EmailIcon from '@mui/icons-material/Email';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
 interface HeaderProps {
@@ -45,14 +45,10 @@ export default function Header({ title }: HeaderProps) {
         )}
         {isLogin && (
           <>
-        <Link href="/history" passHref>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <HistoryIcon sx={{ cursor: 'pointer' }} />
-          </Box>
-        </Link>
+        
         <Link href="/mailbox" passHref>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <HistoryIcon sx={{ cursor: 'pointer' }} />
+            <EmailIcon sx={{ cursor: 'pointer' }} />
           </Box>
         </Link>
         </>

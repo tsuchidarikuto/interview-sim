@@ -7,6 +7,7 @@ export async function addToHistory(result:interviewResultTypes,uid:string){
         await addDoc(collection(firestore,'history'),{
             uid:uid,
             isPass:result.isPass,
+            isRead:false,
             positiveFeedback:result.feedback.positive,
             negativeFeedback:result.feedback.negative,
             technicalScore:result.score.technical,

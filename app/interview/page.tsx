@@ -58,7 +58,7 @@ export default function Interview() {
                 setProgress(80);
                 addToHistory(result,user.uid);
                 setProgress(100);
-                push('/result');
+                push('/mailbox');
             } else {
                 console.error('Result is undefined');
             }
@@ -104,7 +104,7 @@ export default function Interview() {
          {isEnd &&               
             <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
             { isAnalyzing?
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width:'100%',margin:5}}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width:'100%',margin:10}}>
                 <Typography>分析中...</Typography>
                 <LinearProgressWithLabel value={progress} />
             </Box>:        
