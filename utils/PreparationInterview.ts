@@ -2,18 +2,31 @@
 import CallOpenai from "@/utils/callOpenai";
 import { getInfo } from '@/utils/handleFirebase';
 import { ResumeTypes, CompanyTypes, SettingTypes } from '@/types';
+import {useAtom} from "jotai"
+import {questionsAtom,companyAtom,resumeAtom,settingAtom} from "@/atoms/state"
 
-export async function PreparationInterview(setProgress: (progress: number) => void,uid:string) {
+export async function PreparationInterview(
+        setProgress: (progress: number) => void,
+        setQuestions:(q:any)=>void,
+        setResume:(r:any)=>void,
+        setCopmany:(c:any)=>void,
+        setSetting:(s:any)=>void,
+        uid:string
+    ){
     
     try{
         
-
+    
     const resumeInfo = await getInfo<ResumeTypes>('resumes',uid);
+    setResume(resumeInfo)
     setProgress(20);
     const companyInfo = await getInfo<CompanyTypes>('company',uid);
+    setCopmany(companyInfo)
     setProgress(30);
     const settingInfo = await getInfo<SettingTypes>('setting',uid);
+    setSetting(settingInfo)
     setProgress(40);
+
 
     if (resumeInfo.length === 0 || companyInfo.length === 0 || settingInfo.length === 0) {
         return [];
@@ -110,17 +123,18 @@ export async function PreparationInterview(setProgress: (progress: number) => vo
 
     setProgress(80);
 
-    const data = await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt,"questions");
+    const questionList = await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt,"questions");
     setProgress(90);
-    
-    
-    console.log(data);
+    console.log(questionList)
+    const parsedQuestionList = JSON.parse(questionList)
+    console.log(parsedQuestionList)
+    setQuestions(parsedQuestionList.questions)
     
 
     
-    return data;
+    return;
 }catch(e){
     console.error('Error during preparation:', e);
-    return [];
+    return ;
 }
 }

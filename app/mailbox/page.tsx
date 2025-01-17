@@ -4,7 +4,7 @@ import { useEffect, useState, useContext } from "react";
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Container, Card, Stack, Typography, Box,Button, Divider } from '@mui/material';
 import { firestore } from '@/firebase';
-import { interviewResultTypes } from '@/types';
+import { HistoryTypes } from '@/types';
 import ResultChart from '@/components/resultChart';
 import Grid from '@mui/material/Grid2';
 import {AuthContext} from '@/provider/AuthContext';
@@ -13,7 +13,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import HelpIcon from '@mui/icons-material/Help';
 
 export default function MailBox() {
-    const [history, setHistory] = useState<interviewResultTypes[]>([]);
+    const [history, setHistory] = useState<HistoryTypes[]>([]);
     const {user} = useContext(AuthContext);
 
     async function getHistory() {
@@ -29,28 +29,9 @@ export default function MailBox() {
 
             const snapShot = await getDocs(q);
             const interviewResultHistory = snapShot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;
-
-                const convertedData: interviewResultTypes = {
-                    id:id,
-                    uid: data.uid,
-                    isRead: data.isRead,
-                    isPass: data.isPass,
-                    feedback: {
-                        positive: data.positiveFeedback,
-                        negative: data.negativeFeedback
-                    },
-                    score: {
-                        technical: data.technicalScore,
-                        communication: data.communicationScore,
-                        teamwork: data.teamworkScore,
-                        logicalThinking: data.logicalThinkingScore,
-                        learningDesire: data.learningDesireScore,
-                        companyUnderstanding: data.companyUnderstandingScore
-                    }
-                }
-                return convertedData;
+                const data = doc.data();              
+                const interviewResult:any = data;
+                return interviewResult;
             });
             console.log(interviewResultHistory);
             setHistory(interviewResultHistory);
@@ -82,7 +63,7 @@ export default function MailBox() {
                                 </Grid>                                                                        
                             </Grid>
                             <Divider sx={{ width: '100%', bgcolor: 'primary.main'}} />
-            <Card variant="outlined" sx={{height:"80%"}}>
+            <Card variant="outlined" sx={{height:"80%", overflow:"auto"}}>
             <Stack spacing={0}> 
             
                 {history.map((item, index) => (                   
@@ -100,7 +81,7 @@ export default function MailBox() {
                                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                 {item.isRead ? 
                                     (
-                                        item.isPass ? <CheckCircleIcon  color = "success" sx={{fontSize:50}}/> : <CancelIcon color ="warning" sx={{fontSize:50}}/>
+                                        item.result.isPass ? <CheckCircleIcon  color = "success" sx={{fontSize:50}}/> : <CancelIcon color ="warning" sx={{fontSize:50}}/>
                                     ):
                                         <HelpIcon color = "disabled" sx={{fontSize:50}}/>
                                 }

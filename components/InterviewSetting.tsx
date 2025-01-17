@@ -21,7 +21,7 @@ import { getInfo, updateInfo, addInfo } from '@/utils/handleFirebase';
 import { SettingTypes } from '@/types';
 import { PreparationInterview } from '@/utils/PreparationInterview';
 import { useAtom } from 'jotai';
-import { questionsAtom } from '@/atoms/state';
+import { questionsAtom,companyAtom,settingAtom,resumeAtom } from '@/atoms/state';
 import { AuthContext } from '@/provider/AuthContext';
 
 export default function InterviewSetting() {
@@ -43,7 +43,12 @@ export default function InterviewSetting() {
     const [isNew, setIsNew] = useState(false);
     const [progress, setProgress] = useState(0);
 
-    const [questions, setQuestions] = useAtom(questionsAtom);
+    const [,setQuestions]=useAtom(questionsAtom);
+    const [,setResume] = useAtom (resumeAtom);
+    const [,setCompany] = useAtom (companyAtom);
+    const [, setSetting] = useAtom(settingAtom);
+
+    
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -71,10 +76,8 @@ export default function InterviewSetting() {
             if (!user) {
                 throw new Error('User not found');
             }            
-            const data = await PreparationInterview(setProgress, user.uid);
+            await PreparationInterview(setProgress,setQuestions,setResume,setCompany,setSetting, user.uid);
 
-            const obj = JSON.parse(data);
-            setQuestions(obj.questions);
             setProgress(100);
             push('/interview');
         } catch (e) {
@@ -84,7 +87,7 @@ export default function InterviewSetting() {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             if (user) {
                 const data = await getInfo<SettingTypes>('setting', user.uid);
                 if (data.length === 0) {
@@ -104,10 +107,6 @@ export default function InterviewSetting() {
         };
         fetchData();
     }, []);
-
-    useEffect(() => {
-        console.log(questions);
-    }, [questions]);
 
     return (
         <>

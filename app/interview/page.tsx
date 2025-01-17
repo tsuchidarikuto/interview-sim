@@ -2,9 +2,9 @@
 import {Container,Button,Box,Backdrop, Typography} from '@mui/material';    
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput } from "@chatscope/chat-ui-kit-react";
 import {useAtom} from 'jotai';
-import {questionsAtom,interviewResultAtom} from '@/atoms/state';
+import {questionsAtom,interviewResultAtom,resumeAtom,companyAtom,settingAtom} from '@/atoms/state';
 import {useState,useEffect,useContext} from 'react';
-import { conversationTypes,interviewResultTypes } from '@/types';
+import { ConversationTypes,interviewResultTypes } from '@/types';
 import { useRouter } from 'next/navigation';
 import  analyzeInterviewResult  from '@/utils/analyzeInterviewResult';
 import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
@@ -19,13 +19,18 @@ export default function Interview() {
 
     const [questions] = useAtom(questionsAtom);
     
-    const [conversation,setConversation] =useState<conversationTypes[]>([])
+    const [conversation,setConversation] =useState<ConversationTypes[]>([])
     const [isSend,setIsSend]=useState<boolean>(false)
     const [questionIndex,setQuestionIndex]=useState<number>(0)
-    const [isEnd,setIsEnd]=useState<boolean>(false)
-    const [,setInterviewResult]=useAtom(interviewResultAtom);
+    const [isEnd,setIsEnd]=useState<boolean>(false)    
     const [isAnalyzing,setIsAnalyzing]=useState<boolean>(false)
-    const [progress,setProgress]=useState<number>(0)    
+    const [progress,setProgress]=useState<number>(0)
+    
+    const [,setInterviewResult]=useAtom(interviewResultAtom);
+    const [company,]=useAtom(companyAtom);
+    const [resume,]=useAtom(resumeAtom);
+    const [setting,]= useAtom(settingAtom);
+
 
     async function handleSubmit(message:string){
         setIsSend(true)
@@ -51,12 +56,22 @@ export default function Interview() {
             }
             setIsAnalyzing(true);
             setProgress(10);
-            const result:interviewResultTypes|undefined = await analyzeInterviewResult(JSON.stringify(conversation),setProgress,user.uid);
+            if (!company) {
+                throw new Error('Company information is not found');
+            }
+            if (!resume) {
+                throw new Error('Resume information is not found');
+            }
+            if (!setting) {
+                throw new Error('Setting information is not found');
+            }
+            
+            const result:interviewResultTypes|undefined = await analyzeInterviewResult(JSON.stringify(conversation),setProgress,company,resume,setting);
             
             if (result) {
                 setInterviewResult(result);
                 setProgress(80);
-                addToHistory(result,user.uid);
+                addToHistory(result,company,resume,setting,conversation,user.uid);
                 setProgress(100);
                 push('/mailbox');
             } else {

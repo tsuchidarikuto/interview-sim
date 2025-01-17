@@ -1,21 +1,17 @@
 import {addDoc,doc,collection} from 'firebase/firestore';
 import { firestore } from '@/firebase';
-import { interviewResultTypes } from '@/types';
+import { interviewResultTypes ,CompanyTypes,ResumeTypes,SettingTypes,ConversationTypes} from '@/types';
 
-export async function addToHistory(result:interviewResultTypes,uid:string){
+export async function addToHistory(result:interviewResultTypes,company:CompanyTypes[],resume:ResumeTypes[],setting:SettingTypes[],conversation:ConversationTypes[],uid:string){
     try{
         await addDoc(collection(firestore,'history'),{
-            uid:uid,
-            isPass:result.isPass,
+            uid:uid,            
             isRead:false,
-            positiveFeedback:result.feedback.positive,
-            negativeFeedback:result.feedback.negative,
-            technicalScore:result.score.technical,
-            communicationScore:result.score.communication,
-            teamworkScore:result.score.teamwork,
-            logicalThinkingScore:result.score.logicalThinking,
-            learningDesireScore:result.score.learningDesire,
-            companyUnderstandingScore:result.score.companyUnderstanding,            
+            result,
+            company: company[0],
+            resume: resume[0],
+            setting: setting[0],
+            conversation
         });
         
     }catch(e){
