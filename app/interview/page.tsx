@@ -71,7 +71,7 @@ export default function Interview() {
             if (result) {
                 setInterviewResult(result);
                 setProgress(80);
-                addToHistory(result,company,resume,setting,conversation,user.uid);
+                addToHistory(result, company, resume, setting, conversation, user.uid);
                 setProgress(100);
                 push('/mailbox');
             } else {

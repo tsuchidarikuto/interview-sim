@@ -55,7 +55,7 @@ export type ConversationTypes={
 
 export type interviewResultTypes={
     id?:string;
-    uid?:string;
+    uid?:string;    
     isPass?:boolean;
     isRead:boolean;
     feedback :{
@@ -74,7 +74,8 @@ export type interviewResultTypes={
 }
 
 export type HistoryTypes ={
-    id:string
+    id?:string;
+    time:string;
     isRead:boolean;
     company:CompanyTypes;
     conversation:ConversationTypes[];

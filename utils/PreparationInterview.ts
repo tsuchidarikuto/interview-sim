@@ -18,13 +18,13 @@ export async function PreparationInterview(
         
     
     const resumeInfo = await getInfo<ResumeTypes>('resumes',uid);
-    setResume(resumeInfo)
+    setResume(resumeInfo[0])
     setProgress(20);
     const companyInfo = await getInfo<CompanyTypes>('company',uid);
-    setCopmany(companyInfo)
+    setCopmany(companyInfo[0])
     setProgress(30);
     const settingInfo = await getInfo<SettingTypes>('setting',uid);
-    setSetting(settingInfo)
+    setSetting(settingInfo[0])
     setProgress(40);
 
 

@@ -1,8 +1,27 @@
 'use client';
+import React from 'react';
 import Link from 'next/link';
 import { useEffect, useState, useContext } from "react";
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { Container, Card, Stack, Typography, Box,Button, Divider } from '@mui/material';
+import {
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    ListItemAvatar,
+    Card,
+    CardActions,
+    CardContent,
+    Avatar,
+    Divider,
+    Box,
+    Chip,
+    Typography,
+    Button
+    
+} from '@mui/material';
+
+import MailIcon from '@mui/icons-material/Mail';
 import { firestore } from '@/firebase';
 import { HistoryTypes } from '@/types';
 import ResultChart from '@/components/resultChart';
@@ -29,13 +48,13 @@ export default function MailBox() {
 
             const snapShot = await getDocs(q);
             const interviewResultHistory = snapShot.docs.map(doc => {
-                const data = doc.data();              
-                const interviewResult:any = data;
+                const data = doc.data();
+                const interviewResult: any = { ...data, id: doc.id };
                 return interviewResult;
             });
-            console.log(interviewResultHistory);
+            interviewResultHistory.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
             setHistory(interviewResultHistory);
-            console.log(history)
+            
         } catch (e) {
             console.error('Error getting document:', e);
         }
@@ -46,61 +65,81 @@ export default function MailBox() {
     }, []);
 
     return (
-        <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '80vh' }}>
-            <h1>MailBox</h1>
-            <Grid container spacing={0} alignItems="center" sx={{mt:2}}>
-                                
-                                <Grid size = {4}>
-                                    <Typography variant="h6" component="h1" sx ={{ml:2}}>Name</Typography>
-                                </Grid>
-                                <Grid size = {6}>
-                                    <Typography variant="h6" component="h1" sx ={{ml:2}}>Title</Typography>
-                                </Grid>
-                                <Grid size={2}>
-                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                    <Typography variant="h6" component="h1" >Status</Typography>
-                                    </Box>
-                                </Grid>                                                                        
-                            </Grid>
-                            <Divider sx={{ width: '100%', bgcolor: 'primary.main'}} />
-            <Card variant="outlined" sx={{height:"80%", overflow:"auto"}}>
-            <Stack spacing={0}> 
-            
-                {history.map((item, index) => (                   
-                        <Card key={index} variant="outlined" sx={{  height: '100%' }}>
-                            <Link href = {`/mailbox/${item.id}` }>
-                            <Grid container spacing={0} alignItems="center">
-                                
-                                <Grid size = {4}>
-                                    <Typography variant="h6" component="h1" sx ={{margin:2}}>企業名</Typography>
-                                </Grid>
-                                <Grid size = {6}>
-                                    <Typography variant="h6" component="h1" sx ={{margin:2}}>面接結果のお知らせ</Typography>
-                                </Grid>
-                                <Grid size={2}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                {item.isRead ? 
-                                    (
-                                        item.result.isPass ? <CheckCircleIcon  color = "success" sx={{fontSize:50}}/> : <CancelIcon color ="warning" sx={{fontSize:50}}/>
-                                    ):
-                                        <HelpIcon color = "disabled" sx={{fontSize:50}}/>
-                                }
-                                </Box>
-                                </Grid>                                                                        
-                            </Grid>
-                            </Link>
-                        </Card>
-                ))}
-            </Stack>
-            <Box sx={{flexGrow:1}}/>
+        <Box sx={{ maxWidth: 800, mx: 'auto', p: 2, minHeight: '80vh' }}>
+            <Typography variant="h3" component="h1"><strong>MailBox</strong></Typography>
+    
+            <Card variant="outlined">
+                <CardContent sx={{ p: 0 }}>
+                    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+                        {history.map((item, index) => (
+                            <React.Fragment key={item.id}>
+                                <ListItemButton
+                                    component={Link}
+                                    href={`/mailbox/${item.id}`}
+                                    sx={{
+                                        bgcolor: item.isRead ? 'transparent' : 'action.hover',
+                                        '&:hover': {
+                                            bgcolor: 'action.selected',
+                                        },
+                                    }}
+                                >
+                                    <ListItem
+                                        secondaryAction={
+                                            <Box >
+                                                <Chip
+                                                    icon={item.isRead ? 
+                                                        (item.result.isPass ? <CheckCircleIcon /> : <CancelIcon />) : 
+                                                        <MailIcon />
+                                                    }
+                                                    label={item.isRead ?
+                                                        (item.result.isPass ? 'Passed' : 'Not passed'):
+                                                        'New'
+                                                    }
+                                                    color={item.isRead ? 
+                                                        (item.result.isPass ? 'success' : 'error') : 
+                                                        'default'
+                                                    }
+                                                    variant={item.isRead ? 'filled' : 'outlined'}
+                                                    
+                                                />
+                                            </Box>
+                                        }
+                                    >
+                                        <ListItemAvatar>
+                                            <Avatar>
+                                                {item.company?.name?.[0] || '?'}
+                                            </Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <Typography variant="subtitle1" component="div">
+                                                    {item.company?.name}
+                                                </Typography>
+                                            }
+                                            secondary={
+                                                <>                                                    
+                                                    <Typography variant="body2" component="span" color="text.secondary">
+                                                        {item.time}
+                                                    </Typography>
+                                                </>
+                                            }
+                                        />
+                                    </ListItem>
+                                </ListItemButton>
+                                {index < history.length - 1 && (
+                                    <Divider variant="inset" component="li" />
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </List>
+                </CardContent>
+                
             </Card>
                            
-            <Link href='/'>
-                        <Button variant="contained" size='small'>
-                            戻る
-                        </Button>
-                </Link>
- 
-        </Container>
-    )
+                    <Link href="/" passHref>
+                        <Button variant="contained" sx={{mt:3}}>ホームへ</Button>
+                    </Link>
+            
+        </Box>
+    );
 }
