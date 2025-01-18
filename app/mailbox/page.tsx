@@ -24,12 +24,10 @@ import {
 import MailIcon from '@mui/icons-material/Mail';
 import { firestore } from '@/firebase';
 import { HistoryTypes } from '@/types';
-import ResultChart from '@/components/resultChart';
-import Grid from '@mui/material/Grid2';
 import {AuthContext} from '@/provider/AuthContext';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import HelpIcon from '@mui/icons-material/Help';
+
 
 export default function MailBox() {
     const [history, setHistory] = useState<HistoryTypes[]>([]);

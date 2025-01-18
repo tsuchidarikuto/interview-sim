@@ -10,6 +10,7 @@ import  analyzeInterviewResult  from '@/utils/analyzeInterviewResult';
 import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
 import { addToHistory } from '@/utils/addToHistory';
 import {AuthContext} from '@/provider/AuthContext';
+import checkUserInput from '@/utils/checkUserInput';
 
 import "@/styles/chat.scss"; 
 
@@ -26,6 +27,12 @@ export default function Interview() {
     const [isAnalyzing,setIsAnalyzing]=useState<boolean>(false)
     const [progress,setProgress]=useState<number>(0)
     
+    const [currentConversation,setCurrentConversation] = useState<ConversationTypes[]>([]);
+    const [isSubjectEnd, setIsSubjectEnd] =useState<boolean>(false);
+    const [interest,setInterest] = useState<number[]>([]);
+    const [isInjected,setIsInjected] = useState<boolean>(false);
+    const [isContinue,setIscontinue] = useState<boolean>(false);
+
     const [,setInterviewResult]=useAtom(interviewResultAtom);
     const [company,]=useAtom(companyAtom);
     const [resume,]=useAtom(resumeAtom);
@@ -35,17 +42,22 @@ export default function Interview() {
     async function handleSubmit(message:string){
         setIsSend(true)
         
-        setConversation((prev)=>[...prev,{role:'user',message:message}]);        
-        console.log(questionIndex);
+        setCurrentConversation((prev)=>[...prev,{role:'user',message:message}]);                
         if(questions && questionIndex  < questions.length){            
-            setConversation((prev)=>[...prev,{role:'system',message:questions[questionIndex]?.question}]);
+            const checkedResponse = await checkUserInput(currentConversation,setting);
+            //todo:入力チェック後の処理を書く
             
         }else if(questionIndex>=questions.length){
             setConversation((prev)=>[...prev,{role:'system',message:'面接終了です。'}]);
             setIsEnd(true)
         }
-        setQuestionIndex((prev)=>prev+1);
-        setIsSend(false)        
+        if(isSubjectEnd==true){
+            setConversation((prev)=>[...prev, ...currentConversation]);
+            setCurrentConversation([]);
+            setQuestionIndex((prev)=>prev+1);
+            setIsSubjectEnd(false);
+        } 
+        setIsSend(false)      
 
     }
 
