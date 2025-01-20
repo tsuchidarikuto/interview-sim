@@ -15,7 +15,7 @@ export default async function analyzeInterviewResult(conversationLog: string, se
     
         switch (settingInfo.difficulty) {
             case "簡単":
-                settingDetail.difficulty = "簡単です。面接初心者なので激甘採点にしてください。ほとんど合格させてしまって構いません。";
+                settingDetail.difficulty = "簡単です。面接初心者なので激甘採点にしてください。基本的に6点以上を付けましょう";
                 break;
             case "普通":
                 settingDetail.difficulty = "普通です。一般的な基準で採点しましょう";

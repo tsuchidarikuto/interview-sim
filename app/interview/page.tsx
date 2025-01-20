@@ -22,7 +22,7 @@ export default function Interview() {
     
     const [conversation,setConversation] =useState<ConversationTypes[]>([])
     const [isSend,setIsSend]=useState<boolean>(false)
-    const [questionIndex,setQuestionIndex]=useState<number>(1)
+    const [questionIndex,setQuestionIndex]=useState<number>(0)
     const [isEnd,setIsEnd]=useState<boolean>(false)    
     const [isAnalyzing,setIsAnalyzing]=useState<boolean>(false)
     const [progress,setProgress]=useState<number>(0)
@@ -38,25 +38,60 @@ export default function Interview() {
     const [resume,]=useAtom(resumeAtom);
     const [setting,]= useAtom(settingAtom);
 
+    useEffect(()=>{
+        if(questions){            
+            setCurrentConversation([{role:'system',message:questions[0]?.question}])
+        }
+    },[])  
+
+    useEffect(() => {
+        if(isSubjectEnd==true){
+            console.log("hello")
+            console.log(`1${currentConversation}`)
+            setConversation((prev)=>[...prev, ...currentConversation]);
+
+            setCurrentConversation([]);
+            console.log(`2${currentConversation}`)
+            setQuestionIndex((prev)=>prev+1);
+            
+
+            if (questionIndex + 1 < questions.length) {
+                setCurrentConversation([                  
+                  { role: 'system', message: questions[questionIndex + 1].question },
+                ]);
+                console.log(`3${currentConversation}`)
+            }
+
+            setIsSubjectEnd(false);
+            console.log(`4${currentConversation}`)
+            
+        } 
+      }, [isSubjectEnd]);
 
     async function handleSubmit(message:string){
         setIsSend(true)
         
         setCurrentConversation((prev)=>[...prev,{role:'user',message:message}]);                
+        
         if(questions && questionIndex  < questions.length){            
             const checkedResponse = await checkUserInput(currentConversation,setting);
-            //todo:入力チェック後の処理を書く
+            //"isSubjectEnd": <true or false>,
+            //"interest": <1-5の整数>,
+            //"isInjected": <true or false>
+            //"response": <ユーザへの応答>            
+            setInterest(checkedResponse.interest);
+            setIsInjected(checkedResponse.isInjected);
+            setIsSubjectEnd(checkedResponse.isSubjectEnd);
+            setCurrentConversation((prev)=>[...prev,{role:'system',message:checkedResponse.response}]);
+            console.log("hi")
             
         }else if(questionIndex>=questions.length){
             setConversation((prev)=>[...prev,{role:'system',message:'面接終了です。'}]);
             setIsEnd(true)
         }
-        if(isSubjectEnd==true){
-            setConversation((prev)=>[...prev, ...currentConversation]);
-            setCurrentConversation([]);
-            setQuestionIndex((prev)=>prev+1);
-            setIsSubjectEnd(false);
-        } 
+
+
+        
         setIsSend(false)      
 
     }
@@ -92,23 +127,14 @@ export default function Interview() {
         } catch (e) {
             console.error('Error during preparation:', e);
         }
-    }
-
-    useEffect(()=>{
-        if(questions){
-            
-            setConversation([{role:'system',message:questions[0]?.question}])
-        }
-    },[])
-
+    }  
 
     return (
-        <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '80vh' }}>
-        
+        <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '80vh' }}>        
         <MainContainer >
             <ChatContainer>       
                 <MessageList >
-                {conversation.map((item,index)=> 
+                {[...conversation,...currentConversation].map((item,index)=> 
                     <Message 
                         key={index} 
                         model={{
@@ -117,8 +143,7 @@ export default function Interview() {
                             position:'single',
                             direction: item.role==='user'?'outgoing':'incoming',
                         }}
-                    />)}
-                    
+                    />)}                    
                 </MessageList>
                 {isSend||isEnd ?
                 <MessageInput  disabled placeholder="Sending Message" attachButton={false} />:
