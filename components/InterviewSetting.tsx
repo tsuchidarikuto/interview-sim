@@ -97,7 +97,7 @@ export default function InterviewSetting() {
                         id: '',
                         difficulty: '難しい',
                         duration: 30,
-                        interviewType: '',
+                        interviewType: '複合面接',
                     }]);
                     return;
                 }
