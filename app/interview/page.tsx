@@ -1,173 +1,241 @@
 'use client';
-import {Container,Button,Box,Backdrop, Typography} from '@mui/material';    
-import { MainContainer, ChatContainer, MessageList, Message, MessageInput } from "@chatscope/chat-ui-kit-react";
+import {
+    Box,
+    TextField,
+    Paper,
+    Typography,
+    Avatar,
+    Stack,
+    Container,
+    Backdrop,
+    Button,
+    IconButton
+} from "@mui/material";  
 import {useAtom} from 'jotai';
-import {questionsAtom,interviewResultAtom,resumeAtom,companyAtom,settingAtom} from '@/atoms/state';
-import {useState,useEffect,useContext} from 'react';
-import { ConversationTypes,interviewResultTypes } from '@/types';
-import { useRouter } from 'next/navigation';
-import  analyzeInterviewResult  from '@/utils/analyzeInterviewResult';
+import {questionsAtom, interviewResultAtom, resumeAtom, companyAtom, settingAtom} from '@/atoms/state';
+import {useState, useEffect, useContext, useRef} from 'react';
+import {ConversationTypes, interviewResultTypes} from '@/types';
+import {useRouter} from 'next/navigation';
+import analyzeInterviewResult from '@/utils/analyzeInterviewResult';
 import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
-import { addToHistory } from '@/utils/addToHistory';
+import {addToHistory} from '@/utils/addToHistory';
 import {AuthContext} from '@/provider/AuthContext';
 import checkUserInput from '@/utils/checkUserInput';
-
+import {styled} from "@mui/system";
+import SendIcon from '@mui/icons-material/Send';
 import "@/styles/chat.scss"; 
 
 export default function Interview() {
-    const {push} = useRouter();
-    const {user} = useContext(AuthContext);
+  const {push} = useRouter();
+  const {user} = useContext(AuthContext);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [questions] = useAtom(questionsAtom);
+  const [conversation,setConversation] = useState<ConversationTypes[]>([]);
+  const [isSend,setIsSend] = useState<boolean>(false);
+  const [questionIndex,setQuestionIndex] = useState<number>(0);
+  const [isEnd,setIsEnd] = useState<boolean>(false);    
+  const [isAnalyzing,setIsAnalyzing] = useState<boolean>(false);
+  const [progress,setProgress] = useState<number>(0);
+  const [currentConversation,setCurrentConversation] = useState<ConversationTypes[]>([]);
+  const [isSubjectEnd, setIsSubjectEnd] = useState<boolean>(false);
+  const [interest,setInterest] = useState<number[]>([]);
+  const [isInjected,setIsInjected] = useState<boolean>(false);
+  const [,setInterviewResult] = useAtom(interviewResultAtom);
+  const [company] = useAtom(companyAtom);
+  const [resume] = useAtom(resumeAtom);
+  const [setting] = useAtom(settingAtom);
+  const [userMessage, setUserMessage] = useState("");
 
-    const [questions] = useAtom(questionsAtom);
+  const ChatContainer = styled(Paper)({
+    height: "80vh",
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: 16,
+    overflow: "hidden",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+  });
+
+  const MessagesContainer = styled(Box)({
+    flex: 1,
+    overflowY: "auto",
+    padding: "20px",
+    "&::-webkit-scrollbar": {
+      width: "6px",
+    },
+    "&::-webkit-scrollbar-track": {
+      background: "#f1f1f1",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      background: "#888",
+      borderRadius: "3px",
+    },
+  });
+
+  const MessageBubble = styled(Box)<{ role: string }>(({ role }) => ({
+    display: "flex",
+    alignItems: "flex-start",
+    marginBottom: "16px",
+    flexDirection: role === "user" ? "row-reverse" : "row",
+  }));
     
-    const [conversation,setConversation] =useState<ConversationTypes[]>([])
-    const [isSend,setIsSend]=useState<boolean>(false)
-    const [questionIndex,setQuestionIndex]=useState<number>(0)
-    const [isEnd,setIsEnd]=useState<boolean>(false)    
-    const [isAnalyzing,setIsAnalyzing]=useState<boolean>(false)
-    const [progress,setProgress]=useState<number>(0)
-    
-    const [currentConversation,setCurrentConversation] = useState<ConversationTypes[]>([]);
-    const [isSubjectEnd, setIsSubjectEnd] =useState<boolean>(false);
-    const [interest,setInterest] = useState<number[]>([]);
-    const [isInjected,setIsInjected] = useState<boolean>(false);
-    const [isContinue,setIscontinue] = useState<boolean>(false);
+  const MessageContent = styled(Paper)<{ role: string }>(({ role }) => ({
+    padding: "12px 16px",
+    borderRadius: "16px",
+    maxWidth: "70%",
+    marginLeft: role === "user" ? 0 : "12px",
+    marginRight: role === "user" ? "12px" : 0,
+    backgroundColor: role === "user" ? "#222222" : "#f5f5f5",
+    color: role === "user" ? "#fff" : "#000",
+    transition: "all 0.2s ease-in-out",
+    "&:hover": {
+      transform: "scale(1.02)",
+    },
+  }));
 
-    const [,setInterviewResult]=useAtom(interviewResultAtom);
-    const [company,]=useAtom(companyAtom);
-    const [resume,]=useAtom(resumeAtom);
-    const [setting,]= useAtom(settingAtom);
+  const InputContainer = styled(Box)({
+    padding: "20px",
+    borderTop: "1px solid rgba(0, 0, 0, 0.1)",
+  });
 
-    useEffect(()=>{
-        if(questions){            
-            setCurrentConversation([{role:'system',message:questions[0]?.question}])
-        }
-    },[])  
-
-    useEffect(() => {
-        if(isSubjectEnd==true){
-            console.log("hello")
-            console.log(`1${currentConversation}`)
-            setConversation((prev)=>[...prev, ...currentConversation]);
-
-            setCurrentConversation([]);
-            console.log(`2${currentConversation}`)
-            setQuestionIndex((prev)=>prev+1);
-            
-
-            if (questionIndex + 1 < questions.length) {
-                setCurrentConversation([                  
-                  { role: 'system', message: questions[questionIndex + 1].question },
-                ]);
-                console.log(`3${currentConversation}`)
-            }
-
-            setIsSubjectEnd(false);
-            console.log(`4${currentConversation}`)
-            
-        } 
-      }, [isSubjectEnd]);
-
-    async function handleSubmit(message:string){
-        setIsSend(true)
-        
-        setCurrentConversation((prev)=>[...prev,{role:'user',message:message}]);                
-        
-        if(questions && questionIndex  < questions.length){            
-            const checkedResponse = await checkUserInput(currentConversation,setting);
-            //"isSubjectEnd": <true or false>,
-            //"interest": <1-5の整数>,
-            //"isInjected": <true or false>
-            //"response": <ユーザへの応答>            
-            setInterest(checkedResponse.interest);
-            setIsInjected(checkedResponse.isInjected);
-            setIsSubjectEnd(checkedResponse.isSubjectEnd);
-            setCurrentConversation((prev)=>[...prev,{role:'system',message:checkedResponse.response}]);
-            console.log("hi")
-            
-        }else if(questionIndex>=questions.length){
-            setConversation((prev)=>[...prev,{role:'system',message:'面接終了です。'}]);
-            setIsEnd(true)
-        }
-
-
-        
-        setIsSend(false)      
-
+  useEffect(()=>{
+    if(questions){
+      setCurrentConversation([{role:'system',message:questions[0]?.question}]);
     }
+  },[]);
 
-    async function handleClickResult() {
-        try {
-            if(!user){
-                throw new Error('User is not found');
-            }
-            setIsAnalyzing(true);
-            setProgress(10);
-            if (!company) {
-                throw new Error('Company information is not found');
-            }
-            if (!resume) {
-                throw new Error('Resume information is not found');
-            }
-            if (!setting) {
-                throw new Error('Setting information is not found');
-            }
-            
-            const result:interviewResultTypes|undefined = await analyzeInterviewResult(JSON.stringify(conversation),setProgress,company,resume,setting);
-            
-            if (result) {
-                setInterviewResult(result);
-                setProgress(80);
-                addToHistory(result, company, resume, setting, conversation, user.uid);
-                setProgress(100);
-                push('/mailbox');
-            } else {
-                console.error('Result is undefined');
-            }
-        } catch (e) {
-            console.error('Error during preparation:', e);
-        }
-    }  
+  useEffect(() => {
+    if(isSubjectEnd){
+      setConversation((prev)=>[...prev, ...currentConversation]);
+      setCurrentConversation([]);
+      setQuestionIndex((prev)=>prev+1);
 
-    return (
-        <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '80vh' }}>        
-        <MainContainer >
-            <ChatContainer>       
-                <MessageList >
-                {[...conversation,...currentConversation].map((item,index)=> 
-                    <Message 
-                        key={index} 
-                        model={{
-                            message: item.message,
-                            sender: item.role,
-                            position:'single',
-                            direction: item.role==='user'?'outgoing':'incoming',
-                        }}
-                    />)}                    
-                </MessageList>
-                {isSend||isEnd ?
-                <MessageInput  disabled placeholder="Sending Message" attachButton={false} />:
-                <MessageInput placeholder="Type message here" attachButton={false} onSend={handleSubmit}/>
+      if (questionIndex + 1 < questions.length) {
+        setCurrentConversation([
+          { role: 'system', message: questions[questionIndex + 1].question },
+        ]);
+      }
+      setIsSubjectEnd(false);
+    } 
+  }, [isSubjectEnd]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [currentConversation]);
+
+
+  async function handleSubmit(message: string){
+    setIsSend(true);
+    setCurrentConversation((prev)=>[...prev,{role:'user',message:message}]);                
+    
+    if(questions && questionIndex  < questions.length){            
+      const checkedResponse = await checkUserInput(currentConversation,setting);
+      setInterest(checkedResponse.interest);
+      setIsInjected(checkedResponse.isInjected);
+      setIsSubjectEnd(checkedResponse.isSubjectEnd);
+      setCurrentConversation((prev)=>[...prev,{role:'system',message:checkedResponse.response}]);
+    } else if(questionIndex >= questions.length){
+      setConversation((prev)=>[...prev,{role:'system',message:'面接終了です。'}]);
+      setIsEnd(true);
+    }
+    setUserMessage("");
+    setIsSend(false);
+  }
+
+  async function handleClickResult() {
+    try {
+      if(!user) throw new Error('User is not found');
+      setIsAnalyzing(true);
+      setProgress(10);
+      if (!company) throw new Error('Company information is not found');
+      if (!resume) throw new Error('Resume information is not found');
+      if (!setting) throw new Error('Setting information is not found');
+            
+      const result: interviewResultTypes|undefined =
+        await analyzeInterviewResult(JSON.stringify(conversation), setProgress, company, resume, setting);
+            
+      if (result) {
+        setInterviewResult(result);
+        setProgress(80);
+        addToHistory(result, company, resume, setting, conversation, user.uid);
+        setProgress(100);
+        push('/mailbox');
+      } 
+    } catch (e) {
+      console.error('Error during preparation:', e);
+    }
+  }
+
+  return (
+    <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '80vh' }}>
+      <ChatContainer>
+        <MessagesContainer>
+          {[...conversation, ...currentConversation].map((item,index) => (
+            <MessageBubble key={index} role={item.role}>
+              {item.role=== "system" &&
+              <Avatar
+                src={"/avatar_1.svg"}
+                alt={item.role}
+                sx={{width: 100,height: 100}}
+              />
                 }
-                   
-            </ChatContainer>
-        </MainContainer>   
-        <Box sx={{mt:2}}>
-         {isEnd &&               
-            <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-            { isAnalyzing?
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width:'100%',margin:10}}>
-                <Typography>分析中...</Typography>
-                <LinearProgressWithLabel value={progress} />
-            </Box>:        
+              <MessageContent role={item.role}>
+                <Typography variant="body1" component="div">
+                  {item.message}
+                </Typography>
+              </MessageContent>
+            </MessageBubble>
+          ))}
+        <div ref={messagesEndRef}></div>
+        </MessagesContainer>        
+        <InputContainer>
+          <Box display="flex" alignItems="center">
+            <TextField
+              fullWidth
+              disabled={isEnd || isSend}
+              value={userMessage}
+              autoFocus
+              onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setUserMessage(event.target.value)}
+              placeholder="解答を入力"
+              inputProps={{
+                lang: "ja",
+                inputMode: "text",
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey && userMessage) {
+                  handleSubmit(userMessage);
+                }
+              }}
+            />
+            <IconButton
+              color="primary"
+              disabled={isEnd || isSend || !userMessage}
+              onClick={()=>handleSubmit(userMessage)}
+            >
+              <SendIcon />
+            </IconButton>
+          </Box>
+        </InputContainer>
+      </ChatContainer>
+      <Box sx={{mt:2}}>
+        {isEnd &&
+        <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+          {isAnalyzing ?
+          
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width:'100%', margin:10}}>
+              <Typography>分析中...</Typography>
+              <LinearProgressWithLabel value={progress} />
+            </Box>
+            :
             <Button variant="contained" size='large' onClick={handleClickResult}>
-                分析開始
+              分析開始
             </Button>
-            }
-        </Backdrop>       
-        }
-        </Box>
-        </Container>
-    );
-
+          }
+        </Backdrop>}
+      </Box>
+    </Container>
+  );
 }
