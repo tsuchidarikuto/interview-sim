@@ -22,10 +22,14 @@ export default function Header({ title }: HeaderProps) {
     <AppBar position="sticky">
       <Toolbar >
         {isLogin ? (
+          
           <Link href="/" passHref>
+            <Box sx={{display:"flex",alignItems:"center"}}>
             <Typography variant="h6">
               {title}
             </Typography>
+            <Box sx={{ backgroundImage: 'url(/avatar_logo.svg)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',height:40,width:50}}/>
+          </Box>
           </Link>):
         (
           <Typography variant="h6">

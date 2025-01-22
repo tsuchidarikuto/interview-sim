@@ -57,10 +57,12 @@ export default function CenteredTabs() {
   return (
 
     <Container maxWidth="md" sx={{ mt: 3, mb: 4, }}>    
-      
+      <Box sx={{display:"flex",justifyContent:"center",alignItems:"center"}}>
           <Typography variant="h4" component="div" sx={{textAlign:'center', mb:1}}>
-            InterviewSim
+            <strong>MenTRY</strong>
           </Typography>
+          <Box sx={{ backgroundImage: 'url(/avatar_3.svg)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',height:100,width:100}}/>
+        </Box>
             <Typography variant="body2" color="text.secondary" sx={{textAlign:'center'}}>
             本アプリはAIを活用した面接シミュレーターです。<br/>
             プロフィールと志望企業の情報を入力して、実践的な面接練習を始めましょう。<br/>
