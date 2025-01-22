@@ -9,7 +9,8 @@ import {
     Container,
     Backdrop,
     Button,
-    IconButton
+    IconButton,
+
 } from "@mui/material";  
 import {useAtom} from 'jotai';
 import {questionsAtom, interviewResultAtom, resumeAtom, companyAtom, settingAtom} from '@/atoms/state';
@@ -24,6 +25,7 @@ import checkUserInput from '@/utils/checkUserInput';
 import {styled} from "@mui/system";
 import SendIcon from '@mui/icons-material/Send';
 import "@/styles/chat.scss"; 
+import Link from 'next/link';
 
 export default function Interview() {
   const {push} = useRouter();
@@ -152,6 +154,19 @@ export default function Interview() {
     } catch (e) {
       console.error('Error during preparation:', e);
     }
+  }
+
+  if(isInjected){
+    return (
+      <Box sx={{display:"flex",alignItems:"center",justifyContent:"center",height:"80vh" }}>
+        <Typography variant="h1">
+          プロンプトインジェクションが検知されました。面接を中止します。
+        </Typography>
+        <Link href="/" passHref>
+          <Button variant="outlined" sx={{mt:3}}>反省してホームに戻る</Button>
+        </Link>
+      </Box>
+    )
   }
 
   return (

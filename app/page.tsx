@@ -68,7 +68,7 @@ export default function CenteredTabs() {
             </Typography>
         
       
-      <Box sx = {{ height:"70vh", overflowY: "auto"}}>
+      <Box sx = {{ height:"65vh", overflowY: "auto"}}>
       <TabContext value={value} >
       <Box sx={{ borderBottom: 1, borderColor: 'divider', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>
       <TabList onChange={handleChange} aria-label="lab API tabs example" centered>
