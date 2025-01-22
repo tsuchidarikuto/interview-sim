@@ -36,11 +36,12 @@ export default function Header({ title }: HeaderProps) {
         <div style={{ flexGrow: 1 }} />
         {isLogin && (
           <>
-            <Typography variant='body1'>{user.email}</Typography>
-            
+            <Typography variant='body2' sx= {{mt:1}}>{user.email}</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <Button onClick={() => signOut(auth)}>
               <LogoutOutlinedIcon sx={{  cursor: 'pointer' }} color = "secondary" />
-            </Button>            
+            </Button>        
+            </Box>    
           </>
         )}
         {isLogin && (
