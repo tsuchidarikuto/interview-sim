@@ -24,6 +24,7 @@ import {
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import BuildIcon from '@mui/icons-material/Build';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import InterestShiftChart from '@/components/InterestShiftChart';
 
 export default function Page() {
     const { user } = useContext(AuthContext);
@@ -51,17 +52,21 @@ export default function Page() {
 
     if (!selectedHistory) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <CircularProgress />
+            <Box sx={{width: "100%",display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <Card variant="outlined" sx={{width: 800,height:600,mt:2}}>
+                <Box sx={{ maxWidth: 800,display: 'flex', justifyContent: 'center', alignItems: 'center',height: 600 ,p: 2 }}>
+                    <CircularProgress />
+                    </Box>
+                </Card>
             </Box>
         );
     }
 
-    const { result, company, resume, setting, time } = selectedHistory;
+    const { result, company, resume, setting, time,interestShift,conversation } = selectedHistory;
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
-            <Card>
+            <Card variant="outlined">
                 <CardHeader
                     avatar={
                         <Avatar alt={company.name}>
@@ -99,7 +104,7 @@ export default function Page() {
                                   "慎重に選考を重ねました結果、誠に残念ながら、今回は貴意に沿いかねる結果となりました。\n\n" +
                                   "貴殿の今後のご活躍を心よりお祈り申し上げます。"}
                         </Typography>
-    
+                        <Divider sx={{ my: 3 }} />
                         <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 3 }}>
                             フィードバック
                         </Typography>
@@ -117,14 +122,25 @@ export default function Page() {
                             <strong>改善を期待する点:</strong> <br/>
                             {result.feedback.negative}
                         </Typography>
-    
+                        <Divider sx={{ my: 3 }} />
                         <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 3 }}>
-                            評価詳細
-                        </Typography>
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
-                            <ResultChart {...result.score} />
+                            項目別の評価
+                        </Typography>                                                
+                        
+                        <Box sx={{ display: 'flex', alignItems:"center", justifyContent:"center",flexDirection:  'column', gap: 2, mt: 2 }}>
+                            <Box sx={{display: 'flex', alignItems:"center", justifyContent:"center",width:"70%" }}>
+                                <ResultChart {...result.score} />
+                            </Box>
                         </Box>
-    
+
+                        <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 3 }}>
+                            興味の推移
+                        </Typography>                        
+                        <Box sx={{ display: 'flex', alignItems:"center", justifyContent:"center",flexDirection:  'column', gap: 2, mt: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems:"center", justifyContent:"center",width:"70%"}}>
+                                <InterestShiftChart {...interestShift} />
+                            </Box>
+                        </Box>
                         <Divider sx={{ my: 3 }} />
     
                         <Typography variant="subtitle1" fontWeight="bold">

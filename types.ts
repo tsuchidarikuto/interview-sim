@@ -83,6 +83,7 @@ export type HistoryTypes ={
     result:interviewResultTypes;
     resume:ResumeTypes;
     setting:SettingTypes;
+    interestShift:number[];
 
 
 }

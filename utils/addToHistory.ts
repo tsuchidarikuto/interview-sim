@@ -9,6 +9,7 @@ export async function addToHistory(
     resume: ResumeTypes,
     setting: SettingTypes,
     conversation: ConversationTypes[],
+    interestShift:number[],
     uid: string
 ) {
     try {
@@ -20,7 +21,8 @@ export async function addToHistory(
             company,
             resume,
             setting,
-            conversation
+            conversation,
+            interestShift
         });
     } catch (e) {
         console.error('Error adding document:', e);

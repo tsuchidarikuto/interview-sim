@@ -38,6 +38,7 @@ export default function Interview() {
   const [progress,setProgress] = useState<number>(0);
   const [currentConversation,setCurrentConversation] = useState<ConversationTypes[]>([]);
   const [isSubjectEnd, setIsSubjectEnd] = useState<boolean>(false);
+  const [interestShift,setInterestShift] = useState<number[]>([]);
   const [isInjected,setIsInjected] = useState<boolean>(false);
   const [,setInterviewResult] = useAtom(interviewResultAtom);
   const [company] = useAtom(companyAtom);
@@ -70,13 +71,13 @@ export default function Interview() {
 
   useEffect(() => {
     if (!isEnd && !isSend) {
-      inputRef.current?.focus();
+      inputRef.current?.focus();//オートフォーカス
     }
   }, [isEnd, isSend]);
 
   useEffect(()=>{
     if(questions){
-      setCurrentConversation([{role:'system',message:questions[0]?.question,interest:3}]);
+      setCurrentConversation([{role:'system',message:questions[0]?.question,interest:3}]);//最初の質問
     }
   },[]);
 
@@ -118,6 +119,7 @@ export default function Interview() {
       const checkedResponse = await checkUserInput(updatedConversation, setting);
       setIsInjected(checkedResponse.isInjected);
       setIsSubjectEnd(checkedResponse.isSubjectEnd);
+      setInterestShift((prev)=>[...prev,checkedResponse.interest])
       setCurrentConversation((prev) => [...prev, {role:'system', message:checkedResponse.response, interest:checkedResponse.interest}]);
     } else if (questionIndex >= questions.length) {
       setConversation((prev) => [...prev, {role:'system',message:'面接終了です。',interest:3}]);
@@ -141,7 +143,7 @@ export default function Interview() {
       if (result) {
         setInterviewResult(result);
         setProgress(80);
-        addToHistory(result, company, resume, setting, conversation, user.uid);
+        addToHistory(result, company, resume, setting, conversation, interestShift,user.uid);
         setProgress(100);
         push('/mailbox');
       } 
