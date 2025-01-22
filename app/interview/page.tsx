@@ -38,42 +38,16 @@ export default function Interview() {
   const [progress,setProgress] = useState<number>(0);
   const [currentConversation,setCurrentConversation] = useState<ConversationTypes[]>([]);
   const [isSubjectEnd, setIsSubjectEnd] = useState<boolean>(false);
-  const [interest,setInterest] = useState<number[]>([]);
   const [isInjected,setIsInjected] = useState<boolean>(false);
   const [,setInterviewResult] = useAtom(interviewResultAtom);
   const [company] = useAtom(companyAtom);
   const [resume] = useAtom(resumeAtom);
   const [setting] = useAtom(settingAtom);
-  const [userMessage, setUserMessage] = useState("");
-
-  const ChatContainer = styled(Paper)({
-    height: "80vh",
-    display: "flex",
-    flexDirection: "column",
-    borderRadius: 16,
-    overflow: "hidden",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-  });
-
-  const MessagesContainer = styled(Box)({
-    flex: 1,
-    overflowY: "auto",
-    padding: "20px",
-    "&::-webkit-scrollbar": {
-      width: "6px",
-    },
-    "&::-webkit-scrollbar-track": {
-      background: "#f1f1f1",
-    },
-    "&::-webkit-scrollbar-thumb": {
-      background: "#888",
-      borderRadius: "3px",
-    },
-  });
+  const [userMessage, setUserMessage] = useState<string>("");
 
   const MessageBubble = styled(Box)<{ role: string }>(({ role }) => ({
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "center",
     marginBottom: "16px",
     flexDirection: role === "user" ? "row-reverse" : "row",
   }));
@@ -92,14 +66,9 @@ export default function Interview() {
     },
   }));
 
-  const InputContainer = styled(Box)({
-    padding: "20px",
-    borderTop: "1px solid rgba(0, 0, 0, 0.1)",
-  });
-
   useEffect(()=>{
     if(questions){
-      setCurrentConversation([{role:'system',message:questions[0]?.question}]);
+      setCurrentConversation([{role:'system',message:questions[0]?.question,interest:3}]);
     }
   },[]);
 
@@ -108,10 +77,15 @@ export default function Interview() {
       setConversation((prev)=>[...prev, ...currentConversation]);
       setCurrentConversation([]);
       setQuestionIndex((prev)=>prev+1);
-
       if (questionIndex + 1 < questions.length) {
+        
+          
         setCurrentConversation([
-          { role: 'system', message: questions[questionIndex + 1].question },
+          { 
+            role: 'system', 
+            message: questions[questionIndex + 1].question,
+            interest: 3
+          },
         ]);
       }
       setIsSubjectEnd(false);
@@ -129,16 +103,16 @@ export default function Interview() {
 
   async function handleSubmit(message: string){
     setIsSend(true);
-    setCurrentConversation((prev)=>[...prev,{role:'user',message:message}]);                
-    
-    if(questions && questionIndex  < questions.length){            
-      const checkedResponse = await checkUserInput(currentConversation,setting);
-      setInterest(checkedResponse.interest);
+    const updatedConversation = [...currentConversation, {role:'user', message}];
+    setCurrentConversation(updatedConversation);
+  
+    if (questions && questionIndex < questions.length) {
+      const checkedResponse = await checkUserInput(updatedConversation, setting);
       setIsInjected(checkedResponse.isInjected);
       setIsSubjectEnd(checkedResponse.isSubjectEnd);
-      setCurrentConversation((prev)=>[...prev,{role:'system',message:checkedResponse.response}]);
-    } else if(questionIndex >= questions.length){
-      setConversation((prev)=>[...prev,{role:'system',message:'面接終了です。'}]);
+      setCurrentConversation((prev) => [...prev, {role:'system', message:checkedResponse.response, interest:checkedResponse.interest}]);
+    } else if (questionIndex >= questions.length) {
+      setConversation((prev) => [...prev, {role:'system',message:'面接終了です。',interest:3}]);
       setIsEnd(true);
     }
     setUserMessage("");
@@ -154,8 +128,7 @@ export default function Interview() {
       if (!resume) throw new Error('Resume information is not found');
       if (!setting) throw new Error('Setting information is not found');
             
-      const result: interviewResultTypes|undefined =
-        await analyzeInterviewResult(JSON.stringify(conversation), setProgress, company, resume, setting);
+      const result: interviewResultTypes|undefined = await analyzeInterviewResult(JSON.stringify(conversation), setProgress, company, resume, setting);
             
       if (result) {
         setInterviewResult(result);
@@ -171,18 +144,17 @@ export default function Interview() {
 
   return (
     <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '80vh' }}>
-      <ChatContainer>
-        <MessagesContainer>
+      <Container sx={{height:"90%" ,flex: 1,overflow: "auto",padding: "20px",display: "flex", flexDirection: "column",gap: "16px",}}>      
           {[...conversation, ...currentConversation].map((item,index) => (
             <MessageBubble key={index} role={item.role}>
               {item.role=== "system" &&
               <Avatar
-                src={"/avatar_1.svg"}
+                src={`/avatar_${item.interest}.svg`}
                 alt={item.role}
                 sx={{width: 100,height: 100}}
               />
                 }
-              <MessageContent role={item.role}>
+              <MessageContent  role={item.role} variant="outlined">
                 <Typography variant="body1" component="div">
                   {item.message}
                 </Typography>
@@ -190,41 +162,38 @@ export default function Interview() {
             </MessageBubble>
           ))}
         <div ref={messagesEndRef}></div>
-        </MessagesContainer>        
-        <InputContainer>
-          <Box display="flex" alignItems="center">
-            <TextField
-              fullWidth
-              disabled={isEnd || isSend}
-              value={userMessage}
-              autoFocus
-              onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setUserMessage(event.target.value)}
-              placeholder="解答を入力"
-              inputProps={{
-                lang: "ja",
-                inputMode: "text",
+        </Container>
+      <Box sx={{display:"flex"}}>
+      <TextField
+        autoFocus
+            fullWidth
+            disabled={isEnd || isSend}
+            value={userMessage}              
+            onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setUserMessage(event.target.value)}
+            placeholder="解答を入力"              
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.shiftKey && userMessage) {
+                event.preventDefault();
+                handleSubmit(userMessage);
+              }
               }}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey && userMessage) {
-                  handleSubmit(userMessage);
-                }
-              }}
-            />
-            <IconButton
+          />
+          <IconButton
               color="primary"
               disabled={isEnd || isSend || !userMessage}
               onClick={()=>handleSubmit(userMessage)}
-            >
+          >
               <SendIcon />
-            </IconButton>
-          </Box>
-        </InputContainer>
-      </ChatContainer>
+          </IconButton>
+        </Box>
+          
+          
+          
       <Box sx={{mt:2}}>
         {isEnd &&
         <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           {isAnalyzing ?
-          
+
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width:'100%', margin:10}}>
               <Typography>分析中...</Typography>
               <LinearProgressWithLabel value={progress} />
