@@ -24,7 +24,7 @@ export default function CenteredTabs() {
   const [, setSetting] = useAtom(settingAtom);
   const [progress, setProgress] = useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
@@ -68,15 +68,16 @@ export default function CenteredTabs() {
             </Typography>
         
       
-      <Box sx = {{ height:"70vh"}}>
+      <Box sx = {{ height:"70vh", overflowY: "auto"}}>
       <TabContext value={value} >
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label="lab API tabs example" centered >
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>
+      <TabList onChange={handleChange} aria-label="lab API tabs example" centered>
             <Tab label="プロフィール" value="1" />
             <Tab label="企業情報" value="2" />
             <Tab label="面接設定" value="3" />
           </TabList>
         </Box>
+
         <TabPanel value="1"><Resume/></TabPanel>
         <TabPanel value="2"><Company/></TabPanel>
         <TabPanel value="3"><InterviewSetting/></TabPanel>
@@ -84,7 +85,7 @@ export default function CenteredTabs() {
       </Box>
       
       
-                        <Box sx ={{display:"flex",justifyContent:"center"}}>
+                        <Box sx ={{display:"flex",justifyContent:"center", mb:10}}>
                             <Button
                                 size="large"
                                 variant="contained"

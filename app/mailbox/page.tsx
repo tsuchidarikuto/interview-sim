@@ -67,7 +67,7 @@ export default function MailBox() {
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', p: 2, minHeight: '80vh' }}>
-            <Typography variant="h3" component="h1"><strong>MailBox</strong></Typography>
+            <Typography variant="h5"><strong>MailBox</strong></Typography>
             
             <Card variant="outlined">
                 {isFetching ? (
@@ -77,7 +77,7 @@ export default function MailBox() {
                 )
                 :
                 (
-                <CardContent sx={{ p: 0,maxHeight: 600, overflowY: 'auto', pr: 2 }}>
+                <CardContent sx={{ p: 0,maxHeight: 600, overflowY: 'auto'}}>
                     <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
                         {history.map((item, index) => (
                             <React.Fragment key={item.id}>
@@ -100,7 +100,7 @@ export default function MailBox() {
                                                         <MailIcon />
                                                     }
                                                     label={item.isRead ?
-                                                        (item.result.isPass ? 'Passed' : 'Not passed'):
+                                                        (item.result.isPass ? 'Passed' : 'Failed'):
                                                         'New'
                                                     }
                                                     color={item.isRead ? 
