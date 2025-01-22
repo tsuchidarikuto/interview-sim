@@ -7,7 +7,7 @@ function LinearProgressWithLabel(props: LinearProgressProps & { value: number })
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Box sx={{ width: '100%', mr: 1 }}>
-        <LinearProgress variant="determinate" {...props} />
+        <LinearProgress variant="determinate" {...props} sx={{height:10}} />
       </Box>
       <Box sx={{ minWidth: 35 }}>
         <Typography
