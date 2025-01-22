@@ -66,6 +66,14 @@ export default function Interview() {
     },
   }));
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!isEnd && !isSend) {
+      inputRef.current?.focus();
+    }
+  }, [isEnd, isSend]);
+
   useEffect(()=>{
     if(questions){
       setCurrentConversation([{role:'system',message:questions[0]?.question,interest:3}]);
@@ -165,18 +173,18 @@ export default function Interview() {
         </Container>
       <Box sx={{display:"flex"}}>
       <TextField
-        autoFocus
-            fullWidth
-            disabled={isEnd || isSend}
-            value={userMessage}              
-            onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setUserMessage(event.target.value)}
-            placeholder="解答を入力"              
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey && userMessage) {
-                event.preventDefault();
-                handleSubmit(userMessage);
-              }
-              }}
+        inputRef={inputRef}
+        fullWidth
+        disabled={isEnd || isSend}
+        value={userMessage}              
+        onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setUserMessage(event.target.value)}
+        placeholder="解答を入力"              
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && !event.shiftKey && userMessage) {
+            event.preventDefault();
+            handleSubmit(userMessage);
+          }
+        }}
           />
           <IconButton
               color="primary"
