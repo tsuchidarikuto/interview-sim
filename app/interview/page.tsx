@@ -87,8 +87,7 @@ export default function Interview() {
       setConversation((prev)=>[...prev, ...currentConversation]);
       setCurrentConversation([]);
       setQuestionIndex((prev)=>prev+1);
-      if(isLastSubject){
-        setConversation((prev) => [...prev, {role:'system',message:'面接終了です。',interest:3}]);
+      if(isLastSubject){        
         setIsEnd(true);
       }
 
@@ -121,14 +120,12 @@ export default function Interview() {
     const updatedConversation = [...currentConversation, {role:'user', message}];
     setCurrentConversation(updatedConversation);
   
-    if (questions && questionIndex < questions.length) {
-      const checkedResponse = await checkUserInput(updatedConversation, setting);
+    if (questions ) {
+      const checkedResponse = await checkUserInput(updatedConversation, setting,isLastSubject);
       setIsInjected(checkedResponse.isInjected);
       setIsSubjectEnd(checkedResponse.isSubjectEnd);
       setInterestShift((prev)=>[...prev,checkedResponse.interest])
       setCurrentConversation((prev) => [...prev, {role:'system', message:checkedResponse.response, interest:checkedResponse.interest}]);
-    } else if (questionIndex >= questions.length) {
-      
     }
     setUserMessage("");
     setIsSend(false);
