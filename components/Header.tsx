@@ -1,7 +1,7 @@
 'use client';
 import React, { useContext } from 'react';
 import Link from 'next/link';
-import { AppBar, Toolbar, Typography, Button ,Box} from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { signOut } from 'firebase/auth';
 
 import { AuthContext } from '@/provider/AuthContext';
@@ -19,8 +19,8 @@ export default function Header({ title }: HeaderProps) {
   const isLogin = !!user; 
 
   return (
-    <AppBar position="static">
-      <Toolbar>
+    <AppBar position="sticky">
+      <Toolbar >
         {isLogin ? (
           <Link href="/" passHref>
             <Typography variant="h6">
