@@ -6,6 +6,7 @@ import { useEffect, useState ,FormEvent,useContext} from 'react';
 import { ResumeTypes } from '@/types';
 import { getInfo ,updateInfo,addInfo} from '@/utils/handleFirebase';
 import { AuthContext } from '@/provider/AuthContext';
+import { set } from "zod";
 
 
 export default function Resume() {
@@ -28,6 +29,7 @@ export default function Resume() {
     }]);
     const [isNew, setIsNew] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetchingResume,setIsFetchingResume] = useState<boolean>(true);
 
     const handleSubmit = async (event:FormEvent<HTMLFormElement>) => {
         event.preventDefault();        
@@ -56,14 +58,23 @@ export default function Resume() {
                 const data = await getInfo<ResumeTypes>('resumes',user.uid);
                 if (data.length === 0) {
                     setIsNew(true);
+                    setIsFetchingResume(false);
                     return;
                 }
                 setResumeInfo(data);
-                console.log(`data from Resume: ${data}`);
+                setIsFetchingResume(false);                
             }
         };
         fetchData();
     }, []);
+
+    if(isFetchingResume){
+        return(
+            <Box sx={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh"}}>
+                            <CircularProgress/>
+            </Box>            
+        )
+    }
 
     return (
         <Container maxWidth="md" sx={{ mb: 3, height: '100%' }}>
@@ -86,7 +97,7 @@ export default function Resume() {
                     </Grid>
                 </Grid>
                 <TextField fullWidth size="medium" required id="最終学歴" label="最終学歴" variant="standard" value={resumeInfo[0].education} onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setResumeInfo(prev=>[{...prev[0],education:event.target.value}])}/>
-                <TextField required fullWidth multiline maxRows={4} size="medium" id="資格" label="資格" variant="standard" value={resumeInfo[0].qualification} onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setResumeInfo(prev=>[{...prev[0],qualification:event.target.value}])}/>
+                <TextField required fullWidth  size="medium" id="資格" label="資格" variant="standard" value={resumeInfo[0].qualification} onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setResumeInfo(prev=>[{...prev[0],qualification:event.target.value}])}/>
                 <TextField required fullWidth multiline maxRows={4} size="medium" id="研究成果" label="研究成果" variant="standard" value={resumeInfo[0].research} onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setResumeInfo(prev=>[{...prev[0],research:event.target.value}])}/>
                 <TextField required fullWidth multiline maxRows={4} size="medium" id="プログラミングの経験・使用言語" label="プログラミングの経験・使用言語" variant="standard" value={resumeInfo[0].programming} onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setResumeInfo(prev=>[{...prev[0],programming:event.target.value}])}/>
                 <TextField multiline rows={3} required fullWidth  size="medium" id="自己PR" label="自己PR" variant="standard" value={resumeInfo[0].selfPR} onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setResumeInfo(prev=>[{...prev[0],selfPR:event.target.value}])}/>                                

@@ -14,14 +14,11 @@ import {
     RadioGroup,
     Radio,
 } from '@mui/material';
-import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
+
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useContext, FormEvent } from 'react';
 import { getInfo, updateInfo, addInfo } from '@/utils/handleFirebase';
 import { SettingTypes } from '@/types';
-import { PreparationInterview } from '@/utils/PreparationInterview';
-import { useAtom } from 'jotai';
-import { questionsAtom,companyAtom,settingAtom,resumeAtom } from '@/atoms/state';
 import { AuthContext } from '@/provider/AuthContext';
 
 export default function InterviewSetting() {
@@ -39,14 +36,10 @@ export default function InterviewSetting() {
     ]);
 
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoadInterview, setIsLoadInterview] = useState(false);
+    
     const [isNew, setIsNew] = useState(false);
-    const [progress, setProgress] = useState(0);
-
-    const [,setQuestions]=useAtom(questionsAtom);
-    const [,setResume] = useAtom (resumeAtom);
-    const [,setCompany] = useAtom (companyAtom);
-    const [, setSetting] = useAtom(settingAtom);
+    const [isFetchingSetting,setIsFetchingSetting] = useState(true);
+    
 
     
 
@@ -70,28 +63,13 @@ export default function InterviewSetting() {
         setIsLoading(false);
     };
 
-    const handleStartInterview = async () => {
-        setIsLoadInterview(true);
-        try {
-            if (!user) {
-                throw new Error('User not found');
-            }            
-            await PreparationInterview(setProgress,setQuestions,setResume,setCompany,setSetting, user.uid);
-
-            setProgress(100);
-            push('/interview');
-        } catch (e) {
-            console.error('Error during preparation:', e);
-        }
-        setIsLoading(false);
-    };
 
     useEffect(() => {
         const fetchData = async (): Promise<void> => {
             if (user) {
                 const data = await getInfo<SettingTypes>('setting', user.uid);
                 if (data.length === 0) {
-                    setIsNew(true);                    
+                    setIsNew(true);                                        
                     setSettingInfo([{
                         uid: user.uid,
                         id: '',
@@ -99,14 +77,23 @@ export default function InterviewSetting() {
                         duration: 30,
                         interviewType: '複合面接',
                     }]);
+                    setIsFetchingSetting(false)
                     return;
                 }
                 setSettingInfo(data);
-                console.log(`data from InterviewSetting: ${data}`);
+                setIsFetchingSetting(false)
             }
         };
         fetchData();
     }, []);
+
+    if(isFetchingSetting){
+            return(
+                <Box sx={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh"}}>
+                    <CircularProgress/>
+                </Box>            
+            )
+    }
 
     return (
         <>
@@ -177,18 +164,7 @@ export default function InterviewSetting() {
                                 保存する
                             </Button>
                         )}
-                        {isLoadInterview ? (
-                            <LinearProgressWithLabel value={progress} />
-                        ) : (
-                            <Button
-                                size="large"
-                                variant="contained"
-                                sx={{ width: '100%' }}
-                                onClick={handleStartInterview}
-                            >
-                                面接開始
-                            </Button>
-                        )}
+                        
                     </Stack>
                 </form>
             </Container>
