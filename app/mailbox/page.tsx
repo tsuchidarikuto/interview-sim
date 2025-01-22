@@ -17,7 +17,8 @@ import {
     Box,
     Chip,
     Typography,
-    Button
+    Button,
+    CircularProgress
     
 } from '@mui/material';
 
@@ -31,6 +32,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 
 export default function MailBox() {
     const [history, setHistory] = useState<HistoryTypes[]>([]);
+    const [isFetching,setIsFetching] = useState<boolean>(true);
     const {user} = useContext(AuthContext);
 
     async function getHistory() {
@@ -52,6 +54,7 @@ export default function MailBox() {
             });
             interviewResultHistory.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
             setHistory(interviewResultHistory);
+            setIsFetching(false);
             
         } catch (e) {
             console.error('Error getting document:', e);
@@ -65,9 +68,16 @@ export default function MailBox() {
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', p: 2, minHeight: '80vh' }}>
             <Typography variant="h3" component="h1"><strong>MailBox</strong></Typography>
-    
+            
             <Card variant="outlined">
-                <CardContent sx={{ p: 0 }}>
+                {isFetching ? (
+                    <Box sx={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh"}}>
+                                                <CircularProgress/>
+                                </Box>      
+                )
+                :
+                (
+                <CardContent sx={{ p: 0,maxHeight: 600, overflowY: 'auto', pr: 2 }}>
                     <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
                         {history.map((item, index) => (
                             <React.Fragment key={item.id}>
@@ -131,7 +141,9 @@ export default function MailBox() {
                         ))}
                     </List>
                 </CardContent>
-                
+                )
+                }
+            
             </Card>
                            
                     <Link href="/" passHref>
