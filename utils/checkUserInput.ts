@@ -37,7 +37,7 @@ export default async function checkUserInput(
 
                 #必須項目
                 話題リストは別で準備しているため、あなたが次の話題を考える必要はありません。次の話題に映る場合(isSubjectEndがtrue)は「次の質問にうつります」みたいなことだけ言って
-                中身のない解答や、失礼な態度の解答は遠慮なく1点を付け、次の話題に切り替えましょう
+                中身のない解答や、失礼な態度の解答は遠慮なくいinteresting:1を付け、次の話題に切り替えましょう
 
                 結果は以下のjson形式で返してください。
                 {
@@ -52,7 +52,10 @@ export default async function checkUserInput(
         ${JSON.stringify(currentConversation[currentConversation.length-1])}
         #会話履歴
         ${JSON.stringify(currentConversation)}
+
+        
         `
+        console.log(prompt);
         const result = JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'checkResponse'));      
         console.log(result)
         return result;
