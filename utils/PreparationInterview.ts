@@ -64,12 +64,24 @@ export async function PreparationInterview(
             settingDetail.type = "複合面接です。技術面接と行動面接の両方を行い、総合的に判断してください";
             break;
     }
+    // Replace the fixed numberOfQuestions with a log-based calculation
+    const minDuration = 5;
+    const maxDuration = 60;
+    const minQuestions = 3;
+    const maxQuestions = 20;
+
+    const duration = settingInfo[0].duration;
+    const ratio = (Math.log(duration) - Math.log(minDuration)) / (Math.log(maxDuration) - Math.log(minDuration));
+    const rawQuestions = minQuestions + ratio * (maxQuestions - minQuestions);
+    let numberOfQuestions = Math.round(rawQuestions);
+    numberOfQuestions = Math.min(Math.max(numberOfQuestions, minQuestions), maxQuestions);
+
 
     const systemPrompt = `
         以下の設定を参考にし、面接の質問リストをJSON形式で出力してください。実際の面接をシミュレーションするため、応募者の情報と会社情報を参考にしてください。
         面接内容は面接の難易度と面接のタイプに合わせて適切な質問をしてください。
         質問の量は面接時間に合わせてください。
-
+        ただし質問の数は${numberOfQuestions}個にしてください。
         質問の順番は一般的な面接の流れに沿ってください。
         **設定:**
 
@@ -88,6 +100,7 @@ export async function PreparationInterview(
 
 
     `;
+    console.log(systemPrompt);
 
     const prompt = `
         #応募者の情報
