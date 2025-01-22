@@ -50,6 +50,7 @@ export type openaiTypes={
 export type ConversationTypes={
     role:string;
     message:string;
+    interest?:number;
 }
 
 
