@@ -45,6 +45,7 @@ export default function Interview() {
   const [resume] = useAtom(resumeAtom);
   const [setting] = useAtom(settingAtom);
   const [userMessage, setUserMessage] = useState<string>("");
+  const [isLastSubject,setIsLastSubject ]= useState<boolean> (false);
 
   const MessageBubble = styled(Box)<{ role: string }>(({ role }) => ({
     display: "flex",
@@ -86,9 +87,15 @@ export default function Interview() {
       setConversation((prev)=>[...prev, ...currentConversation]);
       setCurrentConversation([]);
       setQuestionIndex((prev)=>prev+1);
+      if(isLastSubject){
+        setConversation((prev) => [...prev, {role:'system',message:'面接終了です。',interest:3}]);
+        setIsEnd(true);
+      }
+
       if (questionIndex + 1 < questions.length) {
-        
-          
+        if(questionIndex+1==questions.length-1){
+          setIsLastSubject(true);
+        }
         setCurrentConversation([
           { 
             role: 'system', 
@@ -109,7 +116,6 @@ export default function Interview() {
     scrollToBottom();
   }, [currentConversation]);
 
-
   async function handleSubmit(message: string){
     setIsSend(true);
     const updatedConversation = [...currentConversation, {role:'user', message}];
@@ -122,8 +128,7 @@ export default function Interview() {
       setInterestShift((prev)=>[...prev,checkedResponse.interest])
       setCurrentConversation((prev) => [...prev, {role:'system', message:checkedResponse.response, interest:checkedResponse.interest}]);
     } else if (questionIndex >= questions.length) {
-      setConversation((prev) => [...prev, {role:'system',message:'面接終了です。',interest:3}]);
-      setIsEnd(true);
+      
     }
     setUserMessage("");
     setIsSend(false);
