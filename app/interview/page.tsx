@@ -48,6 +48,9 @@ export default function Interview() {
   const [setting] = useAtom(settingAtom);
   const [userMessage, setUserMessage] = useState<string>("");
   const [isLastSubject,setIsLastSubject ]= useState<boolean> (false);
+  const [conversationCount,setConversationCount]=useState<number>(0);
+
+  const conversationLimit = setting?.difficulty === '激ムズ' ? 5 : setting?.difficulty === '難しい' ? 3 : setting?.difficulty === '普通' ? 2 : 1;
 
   const MessageBubble = styled(Box)<{ role: string }>(({ role }) => ({
     display: "flex",
@@ -86,11 +89,13 @@ export default function Interview() {
 
   useEffect(() => {
     if(isSubjectEnd){
-      setConversation((prev)=>[...prev, ...currentConversation]);
-      setCurrentConversation([]);
-      setQuestionIndex((prev)=>prev+1);
+      setConversation((prev)=>[...prev, ...currentConversation]);//全体の会話履歴に保存
+      setCurrentConversation([]);//現在の会話を書記か
+      setConversationCount(0);//会話数をリセット
+      setQuestionIndex((prev)=>prev+1);//質問リストを進める
+
       if(isLastSubject){        
-        setIsEnd(true);
+        setIsEnd(true);//最後の話題だったら面接終了フラグを立てる
       }
 
       if (questionIndex + 1 < questions.length) {
@@ -120,15 +125,18 @@ export default function Interview() {
   async function handleSubmit(message: string){
     setIsSend(true);
     const updatedConversation = [...currentConversation, {role:'user', message}];
-    setCurrentConversation(updatedConversation);
+    setCurrentConversation(updatedConversation);    
+    
+    const isConversationLimitReached = (conversationCount+1 === conversationLimit);
   
     if (questions ) {
-      const checkedResponse = await checkUserInput(updatedConversation, setting,isLastSubject);
+      const checkedResponse = await checkUserInput(updatedConversation, setting,isLastSubject,isConversationLimitReached);
       setIsInjected(checkedResponse.isInjected);
       setIsSubjectEnd(checkedResponse.isSubjectEnd);
       setInterestShift((prev)=>[...prev,checkedResponse.interest])
       setCurrentConversation((prev) => [...prev, {role:'system', message:checkedResponse.response, interest:checkedResponse.interest}]);
     }
+    setConversationCount((prev)=>prev+1);
     setUserMessage("");
     setIsSend(false);
   }
