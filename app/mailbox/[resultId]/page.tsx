@@ -61,7 +61,7 @@ export default function Page() {
         );
     }
 
-    const { result, company, resume, setting, time,interestShift,conversation } = selectedHistory;
+    const { result, company, resume, setting, time,interestShift } = selectedHistory;
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
