@@ -48,3 +48,30 @@ export const addInfo = async <T>(collectionName: string, data: T, uid: string): 
     console.error('Error adding document:', e);
   }
 }
+
+
+
+export async function getHistory(uid:string) {
+        try {
+            
+            
+            const q = query(
+                collection(firestore, 'history'),
+                where('uid','==',uid)
+            );
+
+            const snapShot = await getDocs(q);
+            const interviewResultHistory = snapShot.docs.map(doc => {
+                const data = doc.data();
+                const interviewResult: any = { ...data, id: doc.id };
+                return interviewResult;
+            });
+            interviewResultHistory.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+            const isFetching=false;
+            return {interviewResultHistory,isFetching};
+            
+            
+        } catch (e) {
+            console.error('Error getting document:', e);
+        }
+    };
