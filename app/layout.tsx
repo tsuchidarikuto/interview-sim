@@ -29,7 +29,7 @@ export default function RootLayout({
     <head>    
     <meta property="og:image" content="/og-image.jpg"/>
     </head>
-    <body className="Paper_v2">
+    <body className="Paper_v2" style={{height:"100vH"}}>
     <AuthProvider>
         <Provider>
           <ThemeProvider theme={theme}>          

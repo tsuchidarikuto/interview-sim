@@ -15,7 +15,7 @@ export default function Footer() {
         width: '100%',
         textAlign: 'center',
         backgroundColor: '#f5f5f5',
-        py: 2,
+        py:0.5
       }}
     >
       © 2024 Tsuchida Rikuto

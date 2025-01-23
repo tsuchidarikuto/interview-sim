@@ -56,12 +56,9 @@ export default function CenteredTabs() {
 
   return (
 
-    <Container maxWidth="md" sx={{  mb: 4, }}>    
-      <Box sx={{display:"flex",justifyContent:"center",alignItems:"center"}}>
-            <Typography variant="h4" component="div" sx={{ textAlign: 'center', mb: 1, fontFamily: 'Haettenschweiler' }}>
-            InterviewSim
-            </Typography>
-          <Box sx={{ backgroundImage: 'url(/avatar_3.svg)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',height:100,width:100}}/>
+    <Container maxWidth="md" >    
+      <Box sx={{display:"flex",justifyContent:"center",alignItems:"center"}}>            
+          <Box sx={{mt:2, backgroundImage: 'url(/homeLogo.svg)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',height:150,width:400}}/>
         </Box>
             <Typography variant="body2" color="text.secondary" sx={{textAlign:'center'}}>
             本アプリはAIを活用した面接シミュレーターです。<br/>
@@ -70,7 +67,7 @@ export default function CenteredTabs() {
             </Typography>
         
       
-      <Box sx = {{ height:"65vh", overflowY: "auto"}}>
+      <Box sx = {{ height:"60vh", overflowY: "auto"}}>
       <TabContext value={value} >
       <Box sx={{ borderBottom: 1, borderColor: 'divider', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>
       <TabList onChange={handleChange} aria-label="lab API tabs example" centered>
@@ -87,9 +84,9 @@ export default function CenteredTabs() {
       </Box>
       
       
-                        <Box sx ={{display:"flex",justifyContent:"center", mb:13}}>
-                            <Button
-                                size="large"
+                        <Box sx ={{display:"flex",justifyContent:"center"}}>
+                            <Button                
+                                size="large"                
                                 variant="contained"
                                 sx={{ width: '90%' }}
                                 onClick={handleStartInterview}
