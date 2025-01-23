@@ -58,9 +58,9 @@ export default function CenteredTabs() {
 
     <Container maxWidth="md" sx={{  mb: 4, }}>    
       <Box sx={{display:"flex",justifyContent:"center",alignItems:"center"}}>
-          <Typography variant="h4" component="div" sx={{textAlign:'center', mb:1}}>
-            <strong>MenTRY</strong>
-          </Typography>
+            <Typography variant="h4" component="div" sx={{ textAlign: 'center', mb: 1, fontFamily: 'Haettenschweiler' }}>
+            InterviewSim
+            </Typography>
           <Box sx={{ backgroundImage: 'url(/avatar_3.svg)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',height:100,width:100}}/>
         </Box>
             <Typography variant="body2" color="text.secondary" sx={{textAlign:'center'}}>

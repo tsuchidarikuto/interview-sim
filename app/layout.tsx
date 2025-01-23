@@ -15,7 +15,7 @@ import { AuthProvider } from '@/provider/AuthContext';
 
 
 export const metadata: Metadata = {
-  title: "MenTRY",
+  title: "InterviewSim",
   description: "面接をシミュレートするよ",
 };
 
@@ -33,7 +33,7 @@ export default function RootLayout({
     <AuthProvider>
         <Provider>
           <ThemeProvider theme={theme}>          
-            <Header title="MenTRY" />              
+            <Header title="InterviewSim" />              
               {children}                        
             <Footer/>          
           </ThemeProvider>

@@ -2,8 +2,7 @@
 import CallOpenai from "@/utils/callOpenai";
 import { getInfo } from '@/utils/handleFirebase';
 import { ResumeTypes, CompanyTypes, SettingTypes } from '@/types';
-import {useAtom} from "jotai"
-import {questionsAtom,companyAtom,resumeAtom,settingAtom} from "@/atoms/state"
+
 
 export async function PreparationInterview(
         setProgress: (progress: number) => void,

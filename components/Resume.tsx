@@ -6,7 +6,7 @@ import { useEffect, useState ,FormEvent,useContext} from 'react';
 import { ResumeTypes } from '@/types';
 import { getInfo ,updateInfo,addInfo} from '@/utils/handleFirebase';
 import { AuthContext } from '@/provider/AuthContext';
-import { set } from "zod";
+
 
 
 export default function Resume() {
