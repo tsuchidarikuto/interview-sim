@@ -2,7 +2,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { useEffect, useState, useContext } from "react";
-import { collection, getDocs, query, where } from 'firebase/firestore';
 import {
     List,
     ListItem,
@@ -23,11 +22,11 @@ import {
 } from '@mui/material';
 
 import MailIcon from '@mui/icons-material/Mail';
-import { firestore } from '@/firebase';
 import { HistoryTypes } from '@/types';
 import {AuthContext} from '@/provider/AuthContext';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { getHistory} from "@/utils/handleFirebase"
 
 
 export default function MailBox() {
@@ -35,34 +34,20 @@ export default function MailBox() {
     const [isFetching,setIsFetching] = useState<boolean>(true);
     const {user} = useContext(AuthContext);
 
-    async function getHistory() {
-        try {
-            if (!user) {
-                throw new Error('User is not found');
-            }
-            
-            const q = query(
-                collection(firestore, 'history'),
-                where('uid','==',user.uid)
-            );
-
-            const snapShot = await getDocs(q);
-            const interviewResultHistory = snapShot.docs.map(doc => {
-                const data = doc.data();
-                const interviewResult: any = { ...data, id: doc.id };
-                return interviewResult;
-            });
-            interviewResultHistory.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
-            setHistory(interviewResultHistory);
-            setIsFetching(false);
-            
-        } catch (e) {
-            console.error('Error getting document:', e);
-        }
-    };
+    
 
     useEffect(() => {
-        getHistory();
+        if (!user) {
+            throw new Error('User is not found');
+        }
+        const fetchHistory = async () => {
+            const result = await getHistory(user.uid);
+            if (result) {
+                setHistory(result.interviewResultHistory);
+                setIsFetching(result.isFetching);
+            }
+        };
+        fetchHistory();
     }, []);
 
     return (
