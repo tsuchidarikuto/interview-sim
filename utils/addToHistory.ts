@@ -1,22 +1,30 @@
-import {addDoc,doc,collection} from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import { firestore } from '@/firebase';
-import { interviewResultTypes } from '@/types';
+import { interviewResultTypes, CompanyTypes, ResumeTypes, SettingTypes, ConversationTypes } from '@/types';
+import { formatDate } from "@/utils/formatDate";
 
-export async function addToHistory(result:interviewResultTypes,uid:string){
-    try{
-        await addDoc(collection(firestore,'history'),{
-            uid:uid,
-            isPass:result.isPass,
-            positiveFeedback:result.feedback.positive,
-            negativeFeedback:result.feedback.negative,
-            technicalScore:result.score.technical,
-            communicationScore:result.score.communication,
-            teamworkScore:result.score.teamwork,
-            logicalThinkingScore:result.score.logicalThinking,
-            learningDesireScore:result.score.learningDesire,
-            companyUnderstandingScore:result.score.companyUnderstanding,            
+export async function addToHistory(
+    result: interviewResultTypes,
+    company: CompanyTypes,
+    resume: ResumeTypes,
+    setting: SettingTypes,
+    conversation: ConversationTypes[],
+    interestShift:number[],
+    uid: string
+) {
+    try {
+        await addDoc(collection(firestore, 'history'), {
+            uid: uid,
+            isRead: false,
+            time: formatDate(),
+            result,
+            company,
+            resume,
+            setting,
+            conversation,
+            interestShift
         });
-    }catch(e){
-        console.error('Error adding document:',e);
+    } catch (e) {
+        console.error('Error adding document:', e);
     }
 }

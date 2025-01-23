@@ -1,24 +1,20 @@
 'use client';
-import { getInfo } from '@/utils/handleFirebase';
 import CallOpenai from "@/utils/callOpenai";
-import { ResumeTypes, SettingTypes,interviewResultTypes } from '@/types';
+import { CompanyTypes, ResumeTypes, SettingTypes,interviewResultTypes } from '@/types';
 
 
-export default async function analyzeInterviewResult(conversationLog: string, setProgress: (progress: number) => void,uid:string) {
+export default async function analyzeInterviewResult(conversationLog: string, setProgress: (progress: number) => void,companyInfo:CompanyTypes,resumeInfo:ResumeTypes,settingInfo:SettingTypes) {
 
     try{        
-        const resumeInfo = await getInfo<ResumeTypes>('resumes',uid);
-        setProgress(20);
-        const settingInfo = await getInfo<SettingTypes>('setting',uid);
-        setProgress(40);
+        
         const settingDetail: { difficulty: string, type: string } = {
             difficulty: "",
             type: ""
         }
     
-        switch (settingInfo[0].difficulty) {
+        switch (settingInfo.difficulty) {
             case "簡単":
-                settingDetail.difficulty = "簡単です。面接初心者なので激甘採点にしてください。ほとんど合格させてしまって構いません。";
+                settingDetail.difficulty = "簡単です。面接初心者なので激甘採点にしてください。基本的に6点以上を付けましょう";
                 break;
             case "普通":
                 settingDetail.difficulty = "普通です。一般的な基準で採点しましょう";
@@ -31,7 +27,7 @@ export default async function analyzeInterviewResult(conversationLog: string, se
                 break;
         }
     
-        switch (settingInfo[0].interviewType) {
+        switch (settingInfo.interviewType) {
             case "技術面接":
                 settingDetail.type = "技術面接です。プログラミングの経験や研究成果について判断してください";
                 break;
@@ -71,6 +67,8 @@ export default async function analyzeInterviewResult(conversationLog: string, se
         ${conversationLog}
         #履歴書情報
         ${JSON.stringify(resumeInfo)}
+        #あなたの会社の情報
+        ${JSON.stringify(companyInfo)}
         `;
         setProgress(50);
         const analysisResult:interviewResultTypes =  JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'interviewResult'));

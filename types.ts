@@ -47,16 +47,18 @@ export type openaiTypes={
     schemaName:string;
 }
 
-export type conversationTypes={
+export type ConversationTypes={
     role:string;
     message:string;
+    interest?:number;
 }
 
 
 export type interviewResultTypes={
-    
-    uid?:string;
+    id?:string;
+    uid?:string;    
     isPass?:boolean;
+    isRead:boolean;
     feedback :{
         positive:string;
         negative:string;
@@ -69,4 +71,19 @@ export type interviewResultTypes={
         learningDesire:number;
         companyUnderstanding:number;
     }
+    
+}
+
+export type HistoryTypes ={
+    id?:string;
+    time:string;
+    isRead:boolean;
+    company:CompanyTypes;
+    conversation:ConversationTypes[];
+    result:interviewResultTypes;
+    resume:ResumeTypes;
+    setting:SettingTypes;
+    interestShift:number[];
+
+
 }

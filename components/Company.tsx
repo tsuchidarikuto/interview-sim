@@ -11,6 +11,7 @@ export default function Company() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isNew, setIsNew] = useState(false);
+    const [isFetchingCompany,setIsFetchingCompany] = useState(true);
 
     const [companyInfo, setCompanyInfo] = useState<CompanyTypes[]>([{
         uid:"",
@@ -49,14 +50,25 @@ export default function Company() {
                 const data = await getInfo<CompanyTypes>('company',user.uid);
                 if(data.length===0){
                     setIsNew(true);
+                    setIsFetchingCompany(false);
                     return;
                 }
                 setCompanyInfo(data);
+                setIsFetchingCompany(false);
                 console.log(`data from Company: ${data}`);
             }
         };
         fetchData();
     }, [])
+
+    if(isFetchingCompany){
+        return(
+            <Box sx={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh"}}>
+                <CircularProgress/>
+            </Box>
+        )
+    }
+
     return (
         
         <Container maxWidth="md" sx={{mb:3}}>

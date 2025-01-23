@@ -37,12 +37,18 @@ export async function POST(req:NextRequest){
                 companyUnderstanding:z.number(),
             }),
         });
-
+    }else if(schemaName==="checkResponse"){
+        schema=z.object({
+            isSubjectEnd:z.boolean(),
+            interest:z.number(),
+            isInjected:z.boolean(),
+            response:z.string()
+        })    
     }else if (schemaName==="undefined"){
         schema=undefined;
     }
     
-    console.log(schema);
+    
     
     try{
     const response=await openai.chat.completions.create({
