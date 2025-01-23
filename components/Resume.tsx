@@ -66,7 +66,7 @@ export default function Resume() {
             }
         };
         fetchData();
-    }, []);
+    }, [user]);
 
     if(isFetchingResume){
         return(
