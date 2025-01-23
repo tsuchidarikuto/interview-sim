@@ -48,7 +48,7 @@ export async function POST(req:NextRequest){
         schema=undefined;
     }
     
-    console.log(schema);
+    
     
     try{
     const response=await openai.chat.completions.create({

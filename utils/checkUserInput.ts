@@ -30,15 +30,19 @@ export default async function checkUserInput(
                 break;
         }
     
-        const subjectEndMessage = isConversationLimitReached ?
-            "4.ユーザへの返答を生成しなさい。ただし簡単な相槌と、次の質問に移る旨を伝えるのみにしなさい。":
-        (
-            isLastSubject ? 
-                "4.ユーザへの返答を生成しなさい。ただしisSubjectEndがtrueの場合は簡単な相槌と、面接を終了する旨を伝えるのみにしなさい。" :
-                "4.ユーザへの返答を生成しなさい。ただしisSubjectEndがtrueの場合は簡単な相槌と、次の質問に移る旨を伝えるのみにしなさい。"
-        )
+        const subjectEndMessage = (() => {
+            if (isConversationLimitReached) {
+            return isLastSubject 
+                ? "4.ユーザへの返答を生成しなさい。ただし簡単な相槌と、面接を終了する旨を伝えるのみにしてください。" 
+                : "4.ユーザへの返答を生成しなさい。ただし簡単な相槌と、次の質問に移る旨を伝えるのみにしなさい。";
+            } else {
+            return isLastSubject 
+                ? "4.ユーザへの返答を生成しなさい。ただしisSubjectEndがtrueの場合は簡単な相槌と、面接を終了する旨を伝えるのみにしなさい。" 
+                : "4.ユーザへの返答を生成しなさい。ただしisSubjectEndがtrueの場合は簡単な相槌と、次の質問に移る旨を伝えるのみにしなさい。";
+            }
+        })();
                 
-        console.log(subjectEndMessage)
+    
 
         const systemPrompt = `あなたは面接官の役です。
             入力される会話履歴のUserからのの最新の応答に対して、
@@ -48,8 +52,8 @@ export default async function checkUserInput(
                 ${subjectEndMessage}
 
                 #必須項目
-                話題リストは別で準備しているため、あなたが次の話題を考える必要はありません。次の話題に映る場合(isSubjectEndがtrue)は「次の質問にうつります」みたいなことだけ言って
-                中身のない解答や、失礼な態度の解答は遠慮なくいinteresting:1を付け、次の話題に切り替えましょう
+                話題リストは別で準備しているため、あなたが次の話題を考える必要はありません。
+                中身のない解答や、失礼な態度の解答は遠慮なくいinteresting:1を付けましょう
 
                 結果は以下のjson形式で返してください。
                 {
@@ -67,9 +71,9 @@ export default async function checkUserInput(
 
         
         `
-        console.log(prompt);
+        
         const result = JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'checkResponse'));      
-        console.log(result)
+        
         return result;
         }
         catch(e){
