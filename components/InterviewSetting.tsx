@@ -15,14 +15,13 @@ import {
     Radio,
 } from '@mui/material';
 
-import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useContext, FormEvent } from 'react';
 import { getInfo, updateInfo, addInfo } from '@/utils/handleFirebase';
 import { SettingTypes } from '@/types';
 import { AuthContext } from '@/provider/AuthContext';
 
 export default function InterviewSetting() {
-    const { push } = useRouter();
+    
     const { user } = useContext(AuthContext);
 
     const [settingInfo, setSettingInfo] = useState<SettingTypes[]>([
