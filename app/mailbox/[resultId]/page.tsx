@@ -11,8 +11,7 @@ import ResultChart from '@/components/resultChart';
 import {
     Card,
     CardHeader,
-    CardContent,
-    CardActions,
+    CardContent, 
     Avatar,
     Typography,
     Chip,
