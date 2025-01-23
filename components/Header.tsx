@@ -13,6 +13,10 @@ import { HistoryTypes } from '@/types';
 import EmailIcon from '@mui/icons-material/Email';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { firestore } from '@/firebase';
+
+
 interface HeaderProps {
   title: string;
 }
@@ -25,23 +29,36 @@ export default function Header({ title }: HeaderProps) {
   const [unreadedCount,setUnreadedCount] = useState<number>(0)
 
   useEffect(() => {
-    const countUnreaded = history.filter(item => !item.isRead).length;
-    setUnreadedCount(countUnreaded);
-  }, [history]);
+    if (!user) {
+      setUnreadedCount(0);
+        setHistory([]); // ユーザーがログアウトしたら履歴をリセット
+      return;
+    }
 
-  useEffect(() => {
-          
-          const fetchHistory = async () => {
-            console.log(user)
-              if (user) {
-                  const result = await getHistory(user.uid);
-                  if (result) {
-                      setHistory(result.interviewResultHistory);                  
-                  }
-              }
-          };
-          fetchHistory();
-      }, [user]);
+    const q = query(
+        collection(firestore, 'history'),
+        where('uid', '==', user.uid)
+      );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newHistory:HistoryTypes[] = [];
+      snapshot.forEach((doc) => {
+        newHistory.push( {
+          id:doc.id,
+          ...(doc.data() as Omit<HistoryTypes, 'id'>),
+        } );
+      });
+      setHistory(newHistory);
+    }, (error) => {
+        console.error("Error fetching history: ", error);
+      });
+      return () => unsubscribe();
+  }, [user]);
+
+    useEffect(() => {
+        const countUnreaded = history.filter(item => !item.isRead).length;
+        setUnreadedCount(countUnreaded);
+      }, [history]);
 
   return (
     <AppBar position="sticky">
