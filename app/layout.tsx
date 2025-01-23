@@ -33,7 +33,7 @@ export default function RootLayout({
     <AuthProvider>
         <Provider>
           <ThemeProvider theme={theme}>          
-            <Header title="InterviewSim" />              
+            <Header title="" />              
               {children}                        
             <Footer/>          
           </ThemeProvider>

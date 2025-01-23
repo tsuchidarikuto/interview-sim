@@ -7,7 +7,6 @@ import { signOut } from 'firebase/auth';
 import { AuthContext } from '@/provider/AuthContext';
 import { auth } from '@/firebase';
 
-import {getHistory} from "@/utils/handleFirebase"
 import { HistoryTypes } from '@/types';
 
 import EmailIcon from '@mui/icons-material/Email';
@@ -65,43 +64,50 @@ export default function Header({ title }: HeaderProps) {
       <Toolbar >
         {isLogin ? (
           
-          <Link href="/" passHref>
-            <Box sx={{display:"flex",alignItems:"center"}}>
-            <Typography variant="h6">
-              {title}
-            </Typography>
-            <Box sx={{ backgroundImage: 'url(/avatar_logo.svg)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',height:40,width:50}}/>
-          </Box>
-          </Link>):
+            <Link href="/" passHref>            
+            <Box 
+              sx={{ 
+              backgroundImage: 'url(/titleLogo.svg)', 
+              backgroundSize: 'contain', 
+              backgroundRepeat: 'no-repeat', 
+              backgroundPosition: 'center', 
+              height: { xs: 28, sm: 50 }, 
+              width: { xs: 100, sm: 150 }, 
+              marginRight: 'auto' 
+              }} 
+            />          
+            </Link>):
         (
           <Typography variant="h6">
-            {title} 
+            <strong>{title} </strong>
           </Typography>
         )}
 
         <div style={{ flexGrow: 1 }} />
         {isLogin && (
           <>
-            <Typography variant='body2' sx= {{mt:1}}>{user.email}</Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <Button onClick={() => signOut(auth)}>
-              <LogoutOutlinedIcon sx={{  cursor: 'pointer' }} color = "secondary" />
-            </Button>        
-            </Box>    
+            <Typography variant='body2' sx={{ mt: { xs: 1, sm: 0 }, fontSize: { xs: '0.75rem', sm: '1rem' } }}>
+              {user.email}
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', mx: { xs: 0, sm: 1 } }}>
+              <Button onClick={() => signOut(auth)}>
+          <LogoutOutlinedIcon sx={{ cursor: 'pointer', fontSize: { xs: '1.25rem', sm: '1.5rem' } }} color="secondary" />
+              </Button>
+            </Box>
           </>
         )}
         {isLogin && (
           <>
-        
-        <Link href="/mailbox" passHref>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <Badge color="error" badgeContent={unreadedCount}>
-              <EmailIcon sx={{ cursor: 'pointer' }} />
-            </Badge>
-          </Box>
-        </Link>
-        </>
+            <Link href="/mailbox" passHref>
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', mx: { xs: 0, sm: 1 } }}>
+          <Badge color="error" badgeContent={unreadedCount}>
+            <EmailIcon sx={{ cursor: 'pointer', fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
+          </Badge>
+              </Box>
+            </Link>
+          </>
         )}
+        
       </Toolbar>
     </AppBar>
   );
