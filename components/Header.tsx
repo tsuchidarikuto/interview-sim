@@ -1,11 +1,14 @@
 'use client';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect,useState } from 'react';
 import Link from 'next/link';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box ,Badge} from '@mui/material';
 import { signOut } from 'firebase/auth';
 
 import { AuthContext } from '@/provider/AuthContext';
 import { auth } from '@/firebase';
+
+import {getHistory} from "@/utils/handleFirebase"
+import { HistoryTypes } from '@/types';
 
 import EmailIcon from '@mui/icons-material/Email';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
@@ -17,6 +20,28 @@ interface HeaderProps {
 export default function Header({ title }: HeaderProps) {
   const { user } = useContext(AuthContext);
   const isLogin = !!user; 
+  const [history, setHistory] = useState<HistoryTypes[]>([])
+
+  const [unreadedCount,setUnreadedCount] = useState<number>(0)
+
+  useEffect(() => {
+    const countUnreaded = history.filter(item => !item.isRead).length;
+    setUnreadedCount(countUnreaded);
+  }, [history]);
+
+  useEffect(() => {
+          
+          const fetchHistory = async () => {
+            console.log(user)
+              if (user) {
+                  const result = await getHistory(user.uid);
+                  if (result) {
+                      setHistory(result.interviewResultHistory);                  
+                  }
+              }
+          };
+          fetchHistory();
+      }, [user]);
 
   return (
     <AppBar position="sticky">
@@ -53,7 +78,9 @@ export default function Header({ title }: HeaderProps) {
         
         <Link href="/mailbox" passHref>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <EmailIcon sx={{ cursor: 'pointer' }} />
+            <Badge color="error" badgeContent={unreadedCount}>
+              <EmailIcon sx={{ cursor: 'pointer' }} />
+            </Badge>
           </Box>
         </Link>
         </>
