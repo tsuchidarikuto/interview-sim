@@ -185,8 +185,8 @@ export default function Interview() {
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '80vh' }}>
-      <Container sx={{height:"90%" ,flex: 1,overflow: "auto",padding: "20px",display: "flex", flexDirection: "column",gap: "16px",}}>      
+    <Container maxWidth="md" sx={{ mt: 5, mb: 4, height: '90vh' }}>
+      <Container sx={{height:"85%" ,flex: 1,overflow: "auto",padding: "20px",display: "flex", flexDirection: "column",gap: "16px",}}>      
           {[...conversation, ...currentConversation].map((item,index) => (
             <MessageBubble key={index} role={item.role}>
               {item.role=== "system" &&
@@ -206,28 +206,32 @@ export default function Interview() {
         <div ref={messagesEndRef}></div>
         </Container>
       <Box sx={{display:"flex"}}>
-      <TextField
-        inputRef={inputRef}
-        fullWidth
-        disabled={isEnd || isSend}
-        value={userMessage}              
-        onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setUserMessage(event.target.value)}
-        placeholder="解答を入力"              
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' && !event.shiftKey && userMessage) {
-            event.preventDefault();
-            handleSubmit(userMessage);
-          }
-        }}
-          />
-          <IconButton
-              color="primary"
-              disabled={isEnd || isSend || !userMessage}
-              onClick={()=>handleSubmit(userMessage)}
-          >
-              <SendIcon />
-          </IconButton>
-        </Box>
+        <TextField
+          inputRef={inputRef}
+          fullWidth
+          disabled={isEnd || isSend}
+          value={userMessage}              
+          onChange={(event:React.ChangeEvent<HTMLInputElement>)=>setUserMessage(event.target.value)}
+          placeholder="解答を入力"              
+          onKeyDown={(event) => {
+        if (event.key === 'Enter' && !event.shiftKey && userMessage) {
+          event.preventDefault();
+          handleSubmit(userMessage);
+        }
+          }}
+          multiline
+          minRows={3} 
+          maxRows={3}         
+        />
+        <IconButton
+          color="primary"
+          disabled={isEnd || isSend || !userMessage}
+          onClick={()=>handleSubmit(userMessage)}
+          sx={{ alignSelf: 'flex-start', mt: 1, color: 'black' }}
+        >
+          <SendIcon sx={{color:"black"}}/>
+        </IconButton>
+      </Box>
           
           
           

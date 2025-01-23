@@ -84,7 +84,7 @@ export default function CenteredTabs() {
       </Box>
       
       
-                        <Box sx ={{display:"flex",justifyContent:"center"}}>
+                        <Box sx ={{display:"flex",justifyContent:"center",mb:3}}>
                             <Button                
                                 size="large"                
                                 variant="contained"
