@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
     <head>    
-    <meta property="og:image" content="/og-image.jpg"/>
+    <meta property="og:image" content="/og-image.png"/>
     </head>
     <body className="Paper_v2" style={{height:"100vH"}}>
     <AuthProvider>
