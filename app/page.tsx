@@ -56,7 +56,7 @@ export default function CenteredTabs() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 3, mb: 4, }}>    
+    <Container maxWidth="md" sx={{  mb: 4, }}>    
       <Box sx={{display:"flex",justifyContent:"center",alignItems:"center"}}>
           <Typography variant="h4" component="div" sx={{textAlign:'center', mb:1}}>
             <strong>MenTRY</strong>
@@ -87,7 +87,7 @@ export default function CenteredTabs() {
       </Box>
       
       
-                        <Box sx ={{display:"flex",justifyContent:"center", mb:10}}>
+                        <Box sx ={{display:"flex",justifyContent:"center", mb:13}}>
                             <Button
                                 size="large"
                                 variant="contained"
