@@ -4,6 +4,7 @@ import { interviewResultTypes, CompanyTypes, ResumeTypes, SettingTypes, Conversa
 import { formatDate } from "@/utils/formatDate";
 
 export async function addToHistory(
+    totalScore:number,
     result: interviewResultTypes,
     company: CompanyTypes,
     resume: ResumeTypes,
@@ -15,6 +16,7 @@ export async function addToHistory(
     try {
         await addDoc(collection(firestore, 'history'), {
             uid: uid,
+            totalScore:totalScore,
             isRead: false,
             time: formatDate(),
             result,

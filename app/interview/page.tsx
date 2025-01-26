@@ -154,8 +154,9 @@ export default function Interview() {
             
       if (result) {
         setInterviewResult(result);
+        const totalScore = result.score.technical + result.score.communication + result.score.teamwork + result.score.logicalThinking + result.score.learningDesire + result.score.companyUnderstanding;
         setProgress(80);
-        addToHistory(result, company, resume, setting, conversation, interestShift,user.uid);
+        addToHistory(totalScore,result, company, resume, setting, conversation, interestShift,user.uid);
         setProgress(100);
         push('/mailbox');
       } 
