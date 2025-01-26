@@ -18,7 +18,8 @@ import {
     Divider,
     Box,
     Button,
-    CircularProgress
+    CircularProgress,
+    Stack
 } from '@mui/material';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import BuildIcon from '@mui/icons-material/Build';
@@ -61,7 +62,30 @@ export default function Page() {
         );
     }
 
-    const { result, company, resume, setting, time,interestShift } = selectedHistory;
+    async function addRanking(){
+        try {
+            if (!user) return;
+            const rid = Array.isArray(resultId) ? resultId[0] : resultId;
+            if (!rid) return;
+            const docRef = doc(firestore, 'history', rid);
+            const snapShot = await getDoc(docRef);
+            const data = snapShot.data();
+            if (!data) return;
+            await updateDoc(docRef, { isRakedIn: true }); 
+            setSelectedHistory((prev) => {
+                if (!prev) return prev;
+                return {
+                    ...prev,
+                    isRankedIn: true,
+                };
+            });
+            console.log(selectedHistory?.isRankedIn)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const { isRankedIn,result, company, resume, setting, time,interestShift } = selectedHistory;
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
@@ -82,7 +106,7 @@ export default function Page() {
                     }
                 />
                 <CardContent>
-                    <Box sx={{ maxHeight: 600, overflowY: 'auto', pr: 2 }}>
+                    <Box sx={{ height: "60vh", overflowY: 'auto', pr: 2 }}>
                         <Typography variant="h6" gutterBottom>
                             {resume.name} 様
                         </Typography>
@@ -174,14 +198,17 @@ export default function Page() {
                 </CardContent>
                 
             </Card>
-            <Box sx={{mt:3}}>
-            <Link href="/mailbox" passHref>
+            <Stack direction="row" spacing={1} sx={{mt:1}}>                                
+                    <Link href="/mailbox" passHref>
                         <Button variant="contained" >MailBoxへ</Button>
                     </Link>
                     <Link href="/" passHref>
-                        <Button variant="contained" sx={{ml:2}}>ホームへ</Button>
+                        <Button variant="contained" >ホームへ</Button>
                     </Link>
-            </Box>
+                    {!isRankedIn ||
+                        <Button variant ="outlined" onClick={addRanking}>ランキングに追加 </Button>
+                    }
+            </Stack>
         </Box>
     );
 }

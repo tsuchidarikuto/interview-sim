@@ -77,6 +77,7 @@ export type interviewResultTypes={
 export type HistoryTypes ={
     id?:string;
     time:string;
+    isRankedIn:boolean;
     totalScore:number;
     isRead:boolean;
     company:CompanyTypes;

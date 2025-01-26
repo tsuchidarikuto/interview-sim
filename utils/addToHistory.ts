@@ -17,6 +17,7 @@ export async function addToHistory(
         await addDoc(collection(firestore, 'history'), {
             uid: uid,
             totalScore:totalScore,
+            IsRankedIn:false,
             isRead: false,
             time: formatDate(),
             result,
