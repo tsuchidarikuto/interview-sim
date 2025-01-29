@@ -16,7 +16,7 @@ import { PreparationInterview } from '@/utils/PreparationInterview';
 export default function CenteredTabs() {
   const { user } = useContext(AuthContext);
   const { push } = useRouter();
-  const [value, setValue] = useState("1");
+  const [tabValue, setTabValue] = useState("1");
   const [isLoadInterview,setIsLoadInterview] = useState<boolean>(false);
   const [,setQuestions]=useAtom(questionsAtom);
   const [,setResume] = useAtom (resumeAtom);
@@ -25,7 +25,7 @@ export default function CenteredTabs() {
   const [progress, setProgress] = useState(0);
 
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue);
+    setTabValue(newValue);
   };
 
   const handleStartInterview = async () => {
@@ -68,7 +68,7 @@ export default function CenteredTabs() {
         
       
       <Box sx = {{ height:"60vh", overflowY: "auto"}}>
-      <TabContext value={value} >
+      <TabContext value={tabValue} >
       <Box sx={{ borderBottom: 1, borderColor: 'divider', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>
       <TabList onChange={handleChange} aria-label="lab API tabs example" centered>
             <Tab label="プロフィール" value="1" />

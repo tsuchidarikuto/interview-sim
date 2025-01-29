@@ -108,6 +108,14 @@ export default function Header({ title }: HeaderProps) {
           </>
         )}
         
+        <Link href="/ranking" passHref>
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', mx: { xs: 0, sm: 1 } }}>
+          
+            <EmailIcon sx={{ cursor: 'pointer', fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
+          
+              </Box>
+            </Link>
+        
       </Toolbar>
     </AppBar>
   );

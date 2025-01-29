@@ -89,3 +89,10 @@ export type HistoryTypes ={
 
 
 }
+
+export type RankingTypes ={
+    uid:string;
+    name:string;
+    difficulty:string;
+    totalScore:number;
+}

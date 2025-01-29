@@ -71,7 +71,7 @@ export default function Page() {
             const snapShot = await getDoc(docRef);
             const data = snapShot.data();
             if (!data) return;
-            await updateDoc(docRef, { isRakedIn: true }); 
+            await updateDoc(docRef, { isRankedIn: true }); 
             setSelectedHistory((prev) => {
                 if (!prev) return prev;
                 return {
@@ -205,7 +205,7 @@ export default function Page() {
                     <Link href="/" passHref>
                         <Button variant="contained" >ホームへ</Button>
                     </Link>
-                    {!isRankedIn ||
+                    {isRankedIn ||
                         <Button variant ="outlined" onClick={addRanking}>ランキングに追加 </Button>
                     }
             </Stack>
