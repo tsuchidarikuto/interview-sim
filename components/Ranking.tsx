@@ -82,10 +82,10 @@ export default function Ranking({ ranking, isFetching, difficulty }: RankingProp
                             }}
                         >
                             <Typography variant="h6">
-                                <strong>Your Score ({difficulty})</strong>
+                                <strong>Your Best ({difficulty})</strong>
                             </Typography>                            
                             <Typography variant="body1" sx={{ mt: 1 }}>
-                                スコア: {userBestRanking.totalScore}
+                                Score: {userBestRanking.totalScore}
                             </Typography>
                         </Box>
                     )}

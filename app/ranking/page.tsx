@@ -77,7 +77,7 @@ export default function Page() {
       <Typography variant="h5" sx={{ mb: 2 }}>
         <strong>Ranking</strong>
       </Typography>
-      <Box sx={{ height: "60vh"}}>
+      <Box sx={{ height: "vh"}}>
         <TabContext value={tabValue}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', position: 'sticky', top: 0, backgroundColor: '#fff'}}>
             <TabList onChange={handleChange} centered>
