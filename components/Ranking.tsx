@@ -41,7 +41,8 @@ export default function Ranking({ ranking, isFetching, difficulty }: RankingProp
                     <CircularProgress />
                 </Box>
             ) : (
-                <CardContent sx={{ height:"60vh", overflowY: 'auto' }}>
+                <CardContent >
+                    <Box sx={{ height:"50vh", overflowY: 'auto' }}>
                     {filteredRanking.map((item, index) => (
                         <React.Fragment key={index}>
                             <Box
@@ -68,27 +69,32 @@ export default function Ranking({ ranking, isFetching, difficulty }: RankingProp
                                 <Divider variant="middle" />
                             )}
                         </React.Fragment>
+                        
                     ))}
-                    {userBestRanking && (
+                    </Box>
+                    
                         <Box
                             sx={{
                                 p: 2,
                                 mt: 3,
-                                backgroundColor: 'rgba(165, 165, 165, 0.2)',
+                                backgroundColor: '#fff',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                textAlign: 'center'
+                                textAlign: 'center',
+                                border: '2px solid black'
                             }}
                         >
+                            
                             <Typography variant="h6">
                                 <strong>Your Best ({difficulty})</strong>
-                            </Typography>                            
-                            <Typography variant="body1" sx={{ mt: 1 }}>
-                                Score: {userBestRanking.totalScore}
                             </Typography>
+                            <Typography variant="body1" sx={{ mt: 1 }}>
+                                {userBestRanking ? `Score: ${userBestRanking.totalScore}` : 'データはまだありません'}
+                            </Typography>
+                            
                         </Box>
-                    )}
+                    
                 </CardContent>
             )}
         </Card>
