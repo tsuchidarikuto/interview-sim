@@ -28,6 +28,7 @@ export default function Header({ title }: HeaderProps) {
       return;
     }
 
+    //未読の数を取得しhistoryに反映させる
     const q = query(collection(firestore, 'history'), where('uid', '==', user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const newHistory = snapshot.docs.map((doc) => ({
@@ -42,6 +43,7 @@ export default function Header({ title }: HeaderProps) {
     return () => unsubscribe();
   }, [user]);
 
+  //表示する未読数の更新
   useEffect(() => {
     setUnreadedCount(history.filter((item) => !item.isRead).length);
   }, [history]);
