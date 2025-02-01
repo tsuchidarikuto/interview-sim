@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardHeader, CardContent, Typography, CardActions, Button } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
+import { Card, Box, Typography, Button } from '@mui/material';
+import { Edit, Delete, CheckCircle, RadioButtonUnchecked, Verified, School, Code } from '@mui/icons-material';
 import Link from 'next/link';
 import type { ResumeTypes, SelectedResumeTypes } from '@/types';
 
@@ -12,15 +12,41 @@ interface ResumeCardProps {
 }
 
 const ResumeCard: React.FC<ResumeCardProps> = ({ resume, selectedResume, handleDelete, handleSelect }) => (
-    <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', border: selectedResume.selectedResumeId === resume.id ? '2px solid black' : undefined, width: '100%'}}>
-        <CardHeader title={resume.name} />
-        <CardContent>
-            <Typography variant="body2"><strong>年齢:</strong> {resume.age}</Typography>
-            <Typography variant="body2"><strong>最終学歴:</strong> {resume.education}</Typography>
-            <Typography variant="body2"><strong>プログラミング経験:</strong> {resume.programming}</Typography>
-        </CardContent>
-        <CardActions sx={{ mt: 'auto', justifyContent: 'space-between' }}>
-            <Link href={`/resume/${resume.id}`}>
+    <Card
+        variant="outlined"
+        sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            border: selectedResume.selectedResumeId === resume.id ? '2px solid black' : undefined,
+            width: '100%',
+            height: 200,
+        }}
+    >
+        <Box sx={{ p: 1.5, height:50}}>
+            <Typography variant="h5"><strong>{resume.name || 'undefined'}</strong></Typography>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column',gap:1,mt:1}}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <School sx={{ mx: 2 }} />
+                <Typography noWrap variant="body2">
+                    {resume.education || 'undefined'}
+                </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Code sx={{ mx: 2 }} />
+                <Typography noWrap variant="body2">
+                    {resume.programming || 'undefined'}
+                </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Verified sx={{ mx: 2 }} />
+                <Typography noWrap variant="body2">
+                    {resume.qualification || 'undefined'}
+                </Typography>
+            </Box>
+        </Box>
+        <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'flex-end', gap: 1,mb:1 ,mr:1}}>
+            <Link href={`/resume/${resume.id}`} passHref>
                 <Button variant="outlined" size="small" startIcon={<Edit />}>
                     編集
                 </Button>
@@ -35,13 +61,16 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, selectedResume, handleD
                 削除
             </Button>
             <Button
-                variant={selectedResume.selectedResumeId === resume.id ? "contained" : "outlined"}
+                variant={selectedResume.selectedResumeId === resume.id ? 'contained' : 'outlined'}
                 size="small"
+                startIcon={
+                    selectedResume.selectedResumeId === resume.id ? <CheckCircle /> : <RadioButtonUnchecked />
+                }
                 onClick={() => handleSelect(resume.id)}
             >
-                {selectedResume.selectedResumeId === resume.id ? "選択中" : "選択"}
+                {selectedResume.selectedResumeId === resume.id ? '選択中' : '選択'}
             </Button>
-        </CardActions>
+        </Box>
     </Card>
 );
 
