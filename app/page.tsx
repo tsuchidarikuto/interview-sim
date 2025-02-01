@@ -1,7 +1,7 @@
 'use client';
 import { useState, useContext } from 'react';
 import { Box, Tab, Typography, Container, Button } from '@mui/material';
-import Company from '@/components/Company';
+import Company from '@/components/SelectedCompany';
 import Resume from '@/components/SelectedResume';
 import { TabList, TabContext, TabPanel } from '@mui/lab';
 import InterviewSetting from '@/components/InterviewSetting';
