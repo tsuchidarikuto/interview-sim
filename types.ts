@@ -96,3 +96,15 @@ export type RankingTypes ={
     difficulty:string;
     totalScore:number;
 }
+
+export type SelectedResumeTypes = {
+    uid:string;
+    id:string;
+    selectedResumeId:string;
+}
+
+export type SelectedCompanyTypes = {
+    uid:string;
+    id:string;
+    selectedCompanyId:string;
+}
