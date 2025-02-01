@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 
 import React, { useState, useEffect, useContext, FormEvent } from 'react';
-import { getInfo, updateInfo, addInfo } from '@/utils/handleFirebase';
+import { getArrayDataFromFirestore, updateDataOnFirestore, addDataToFireStore } from '@/utils/handleFirebase';
 import { SettingTypes } from '@/types';
 import { AuthContext } from '@/provider/AuthContext';
 
@@ -51,9 +51,9 @@ export default function InterviewSetting() {
             }
 
             if (isNew) {
-                await addInfo<SettingTypes>('setting', settingInfo[0], user.uid);
+                await addDataToFireStore<SettingTypes>('setting', settingInfo[0], user.uid);
             } else {
-                await updateInfo<SettingTypes>('setting', settingInfo[0]);
+                await updateDataOnFirestore<SettingTypes>('setting', settingInfo[0]);
             }
             setIsLoading(false);
         } catch (e) {
@@ -66,7 +66,7 @@ export default function InterviewSetting() {
     useEffect(() => {
         const fetchData = async (): Promise<void> => {
             if (user) {
-                const data = await getInfo<SettingTypes>('setting', user.uid);
+                const data = await getArrayDataFromFirestore<SettingTypes>('setting', user.uid);
                 if (data.length === 0) {
                     setIsNew(true);                                        
                     setSettingInfo([{

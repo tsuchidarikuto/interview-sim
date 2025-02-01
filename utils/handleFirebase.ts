@@ -2,7 +2,7 @@
 import { collection, getDocs, query ,updateDoc,doc, where,addDoc} from '@firebase/firestore';
 import { firestore } from '@/firebase';
 
-export const getInfo = async <T,>(collectionName: string,uid:string): Promise<T[]> => {
+export const getArrayDataFromFirestore = async <T,>(collectionName: string,uid:string): Promise<T[]> => {
   try {
     const q = query(
       collection(firestore, collectionName),
@@ -29,7 +29,7 @@ export const getInfo = async <T,>(collectionName: string,uid:string): Promise<T[
   }
 };
 
-export const updateInfo = async <T extends{id:string}>(collectionName: string, data: T): Promise<void> => {  
+export const updateDataOnFirestore = async <T extends{id:string}>(collectionName: string, data: T): Promise<void> => {  
   try {
     await updateDoc(doc(firestore, collectionName, data.id), data);
     console.log('Document successfully updated!');
@@ -37,7 +37,8 @@ export const updateInfo = async <T extends{id:string}>(collectionName: string, d
     console.error('Error updating document:', e);
   }
 }
-export const addInfo = async <T>(collectionName: string, data: T, uid: string): Promise<void> => {
+
+export const addDataToFireStore = async <T>(collectionName: string, data: T, uid: string): Promise<void> => {
   try {
     await addDoc(collection(firestore, collectionName), {
       ...data,

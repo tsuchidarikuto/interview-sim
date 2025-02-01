@@ -4,7 +4,7 @@ import { Box,CircularProgress, Button, TextField,  Container, Stack, MenuItem } 
 import Grid from "@mui/material/Grid2";
 import { useEffect, useState ,FormEvent,useContext} from 'react';
 import { ResumeTypes } from '@/types';
-import { getInfo ,updateInfo,addInfo} from '@/utils/handleFirebase';
+import { getArrayDataFromFirestore ,updateDataOnFirestore,addDataToFireStore} from '@/utils/handleFirebase';
 import { AuthContext } from '@/provider/AuthContext';
 
 
@@ -37,9 +37,9 @@ export default function Resume() {
         try{
             if(user){
                 if(isNew){
-                    await addInfo<ResumeTypes>('resumes',resumeInfo[0],user.uid);
+                    await addDataToFireStore<ResumeTypes>('resumes',resumeInfo[0],user.uid);
                 }else{
-                    await updateInfo<ResumeTypes>('resumes',resumeInfo[0]);
+                    await updateDataOnFirestore<ResumeTypes>('resumes',resumeInfo[0]);
                 }
                 setIsLoading(false);
             }
@@ -55,7 +55,7 @@ export default function Resume() {
     useEffect(() => {
         const fetchData = async () => {
             if(user){
-                const data = await getInfo<ResumeTypes>('resumes',user.uid);
+                const data = await getArrayDataFromFirestore<ResumeTypes>('resumes',user.uid);
                 if (data.length === 0) {
                     setIsNew(true);
                     setIsFetchingResume(false);

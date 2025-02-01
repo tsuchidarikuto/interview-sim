@@ -1,6 +1,6 @@
 'use client'
 import CallOpenai from "@/utils/callOpenai";
-import { getInfo } from '@/utils/handleFirebase';
+import { getArrayDataFromFirestore } from '@/utils/handleFirebase';
 import { ResumeTypes, CompanyTypes, SettingTypes } from '@/types';
 
 
@@ -16,13 +16,13 @@ export async function PreparationInterview(
     try{
         
     
-    const resumeInfo = await getInfo<ResumeTypes>('resumes',uid);
+    const resumeInfo = await getArrayDataFromFirestore<ResumeTypes>('resumes',uid);
     setResume(resumeInfo[0])
     setProgress(20);
-    const companyInfo = await getInfo<CompanyTypes>('company',uid);
+    const companyInfo = await getArrayDataFromFirestore<CompanyTypes>('company',uid);
     setCopmany(companyInfo[0])
     setProgress(30);
-    const settingInfo = await getInfo<SettingTypes>('setting',uid);
+    const settingInfo = await getArrayDataFromFirestore<SettingTypes>('setting',uid);
     setSetting(settingInfo[0])
     setProgress(40);
 

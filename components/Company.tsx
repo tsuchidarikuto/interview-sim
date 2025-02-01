@@ -1,7 +1,7 @@
 import React,{useContext} from 'react';
 import {Box,Button,TextField, CircularProgress,Container, Stack} from '@mui/material';
 import { useEffect, useState } from 'react';
-import {getInfo,updateInfo,addInfo} from '@/utils/handleFirebase';
+import {getArrayDataFromFirestore,updateDataOnFirestore,addDataToFireStore} from '@/utils/handleFirebase';
 import {CompanyTypes} from '@/types';
 import { AuthContext } from '@/provider/AuthContext';
 
@@ -31,10 +31,10 @@ export default function Company() {
         try {
             if(user){
                 if(isNew){
-                    await addInfo<CompanyTypes>('company',companyInfo[0],user.uid);
+                    await addDataToFireStore<CompanyTypes>('company',companyInfo[0],user.uid);
                 }
                 else{
-                    await updateInfo<CompanyTypes>('company',companyInfo[0]);
+                    await updateDataOnFirestore<CompanyTypes>('company',companyInfo[0]);
                 }
                 setIsLoading(false);
             }
@@ -47,7 +47,7 @@ export default function Company() {
     useEffect(() => {
         const fetchData = async () => {
             if(user){
-                const data = await getInfo<CompanyTypes>('company',user.uid);
+                const data = await getArrayDataFromFirestore<CompanyTypes>('company',user.uid);
                 if(data.length===0){
                     setIsNew(true);
                     setIsFetchingCompany(false);

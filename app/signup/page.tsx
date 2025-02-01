@@ -3,7 +3,7 @@ import {useState, FormEvent} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 import { Typography,Container,Card,TextField,Button } from '@mui/material';
-import { addInfo} from '@/utils/handleFirebase';
+import { addDataToFireStore} from '@/utils/handleFirebase';
 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebase';
@@ -20,7 +20,7 @@ export default function Page() {
         try{
             
             const userCredential =  await createUserWithEmailAndPassword(auth,email,password);
-            await addInfo<ResumeTypes>(
+            await addDataToFireStore<ResumeTypes>(
                 'resumes',
                 {            
                     uid:"",
@@ -40,7 +40,7 @@ export default function Page() {
                 ,userCredential.user.uid
             )
             
-            await addInfo<CompanyTypes>(
+            await addDataToFireStore<CompanyTypes>(
                 'company',
                 {
                     uid:'',
@@ -56,7 +56,7 @@ export default function Page() {
                 userCredential.user.uid
             )
 
-            await addInfo<SettingTypes>(
+            await addDataToFireStore<SettingTypes>(
                 'setting',
                 {
                     uid:'',
