@@ -23,25 +23,25 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, selectedResume, handleD
         }}
     >
         <Box sx={{ p: 1.5, height:50}}>
-            <Typography variant="h5"><strong>{resume.name || 'undefined'}</strong></Typography>
+            <Typography variant="h5"><strong>{resume.name || '未記入'}</strong></Typography>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column',gap:1,mt:1}}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <School sx={{ mx: 2 }} />
                 <Typography noWrap variant="body2">
-                    {resume.education || 'undefined'}
+                    {resume.education || '未記入'}
                 </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Code sx={{ mx: 2 }} />
                 <Typography noWrap variant="body2">
-                    {resume.programming || 'undefined'}
+                    {resume.programming || '未記入'}
                 </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Verified sx={{ mx: 2 }} />
                 <Typography noWrap variant="body2">
-                    {resume.qualification || 'undefined'}
+                    {resume.qualification || '未記入'}
                 </Typography>
             </Box>
         </Box>
