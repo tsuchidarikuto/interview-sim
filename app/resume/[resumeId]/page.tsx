@@ -61,6 +61,7 @@ export default function ResumeEditPage() {
         } else {
           await updateDataOnFirestore<ResumeTypes>("resumes", resume)
         }
+        push("/resume");
       }
     } catch (e) {
       console.error('Error updating document:', e)
@@ -107,15 +108,21 @@ export default function ResumeEditPage() {
               <TextField multiline rows={3}  fullWidth size="medium" id="志望理由" label="志望理由" variant="outlined" value={resume.reason} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, reason: event.target.value })} />
             </Stack>
           </Box>
-          <Stack direction="row" spacing={2}>
-            {isLoading ? <CircularProgress /> : <Button type="submit" disabled={isLoading} variant="outlined">保存する</Button>}
+            <Stack direction="row" spacing={2}>
+            {isLoading ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100px' }}>
+              <CircularProgress />
+              </Box>
+            ) : (
+              <Button type="submit" disabled={isLoading} variant="outlined" sx={{ width: '100px' }}>保存する</Button>
+            )}
             <Link href="/resume" passHref>
-              <Button variant="contained" >一覧に戻る</Button>
+              <Button variant="contained">一覧に戻る</Button>
             </Link>
             <Link href="/" passHref>
-              <Button variant="contained" >ホームへ</Button>
+              <Button variant="contained">ホームへ</Button>
             </Link>
-          </Stack>
+            </Stack>
         </form>
       </Container>
     </Container>

@@ -80,15 +80,7 @@ export default function ResumesPage() {
         currentPage * itemsPerPage
     )
 
-    if (isFetchingResumes) {
-        return (
-            <Container sx={{ py: 8 }}>
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-                    <CircularProgress />
-                </Box>
-            </Container>
-        )
-    }
+   
 
     return (
         <Container sx={{ py: 5 }}>
@@ -127,33 +119,43 @@ export default function ResumesPage() {
                         <MenuItem value="18">18件表示</MenuItem>
                         <MenuItem value="27">27件表示</MenuItem>
                     </Select>
-                    <div style={{ flexGrow: 1 }} />
-                    <Link href="/resume/new">
+                    <div style={{ flexGrow: 1 }} />                    
+                    <Typography sx={{ p: 2 }}>{currentPage} / {pageCount}</Typography>
+                </Box>
+            </Box>
+            {isFetchingResumes ? (
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <Grid container spacing={2}>
+                    {paginatedResumes.map((resume) => (
+                        <Grid size={{xs:12,sm:6,md:4}} key={resume.id}>
+                            <ResumeCard
+                                resume={resume}
+                                selectedResume={selectedResume}
+                                handleDelete={handleDelete}
+                                handleSelect={handleSelect}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
+            )}
+            <Box sx={{ display: "flex", justifyContent: "space-between", my: 2, alignItems: "center", gap: 1 }}>         
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>         
+                <Link href="/" passHref>
+                        <Button variant="contained" >ホームへ</Button>
+                </Link>
+                <Link href="/resume/new">
                         <Button
                             variant="contained"
-                            startIcon={<AddCircle />}
-                            sx={{ fontSize: { sm: "1.25rem", xs: "1rem" }, width: { xs: "100%", sm: "auto" } }}
+                            startIcon={<AddCircle />}                            
                         >
                             新規作成
                         </Button>
-                    </Link>
-                </Box>
-            </Box>
-            <Grid container spacing={2}>
-                {paginatedResumes.map((resume) => (
-                    <Grid size={{xs:12,sm:6,md:4}} key={resume.id}>
-                        <ResumeCard
-                            resume={resume}
-                            selectedResume={selectedResume}
-                            handleDelete={handleDelete}
-                            handleSelect={handleSelect}
-                        />
-                    </Grid>
-                ))}
-            </Grid>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 4 }}>
-                <Typography>{currentPage} / {pageCount} ページ</Typography>
-                <Box sx={{ display: "flex", gap: 2 }}>
+                </Link>
+            </Box>       
+                <Box sx={{ display: "flex", gap: 1 }}>
                     <Button
                         variant="outlined"
                         size="small"
@@ -172,6 +174,8 @@ export default function ResumesPage() {
                     </Button>
                 </Box>
             </Box>
+            
+            
         </Container>
     )
 }
