@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 
 import React, { useState, useEffect, useContext, FormEvent } from 'react';
-import { getArrayDataFromFirestore, updateDataOnFirestore, addDataToFireStore } from '@/utils/handleFirebase';
+import { getArrayDataFromFirestore, updateDataOnFirestore, addDataToFirestore } from '@/utils/handleFirebase';
 import { SettingTypes } from '@/types';
 import { AuthContext } from '@/provider/AuthContext';
 
@@ -51,7 +51,7 @@ export default function InterviewSetting() {
             }
 
             if (isNew) {
-                await addDataToFireStore<SettingTypes>('setting', settingInfo[0], user.uid);
+                await addDataToFirestore<SettingTypes>('setting', settingInfo[0], user.uid);
             } else {
                 await updateDataOnFirestore<SettingTypes>('setting', settingInfo[0]);
             }
