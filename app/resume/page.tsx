@@ -103,24 +103,36 @@ export default function ResumesPage() {
                     プロフィール一覧
                 </Typography>                
             </Box>
-            <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", mb: 4, alignItems: "center" }}>
-                <Box sx={{ display: "flex", width: "100%", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },                    
+                    mb: 4,
+                    alignItems: "flex-start",
+                }}
+            >
+                <Box
+                    sx={{
+                        display: "flex",                        
+                        gap: 2,
+                        flexDirection: { xs: "column", sm: "row" },
+                        width:"50%"
+                    }}
+                >
                     <TextField
+                        fullWidth
                         placeholder="検索..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        
                     />
                     <Select
                         value={itemsPerPage.toString()}
-                        onChange={(e) => setItemsPerPage(Number(e.target.value))}                        
+                        onChange={(e) => setItemsPerPage(Number(e.target.value))}
                     >
                         <MenuItem value="9">9件表示</MenuItem>
                         <MenuItem value="18">18件表示</MenuItem>
                         <MenuItem value="27">27件表示</MenuItem>
                     </Select>
-                    <div style={{ flexGrow: 1 }} />                    
-                    <Typography sx={{ p: 2 }}>{currentPage} / {pageCount}</Typography>
                 </Box>
             </Box>
             {isFetchingResumes ? (
