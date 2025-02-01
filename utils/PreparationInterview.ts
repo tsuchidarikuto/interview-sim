@@ -1,7 +1,7 @@
 'use client'
 import CallOpenai from "@/utils/callOpenai";
-import { getArrayDataFromFirestore } from '@/utils/handleFirebase';
-import { ResumeTypes, CompanyTypes, SettingTypes } from '@/types';
+import { getArrayDataFromFirestore, getDataFromFirestoreWithId } from '@/utils/handleFirebase';
+import { ResumeTypes, CompanyTypes, SettingTypes, SelectedResumeTypes, SelectedCompanyTypes } from '@/types';
 
 
 export async function PreparationInterview(
@@ -15,19 +15,23 @@ export async function PreparationInterview(
     
     try{
         
+    const selectedResumeId:SelectedResumeTypes[] = await getArrayDataFromFirestore<SelectedResumeTypes>('selectedResume',uid);
+    const selectedCompanyId:SelectedCompanyTypes[] = await getArrayDataFromFirestore<SelectedCompanyTypes>('selectedCompany',uid);
     
-    const resumeInfo = await getArrayDataFromFirestore<ResumeTypes>('resumes',uid);
-    setResume(resumeInfo[0])
     setProgress(20);
-    const companyInfo = await getArrayDataFromFirestore<CompanyTypes>('company',uid);
-    setCopmany(companyInfo[0])
-    setProgress(30);
-    const settingInfo = await getArrayDataFromFirestore<SettingTypes>('setting',uid);
-    setSetting(settingInfo[0])
+    
+    const resumeDataFromFirestore = await getDataFromFirestoreWithId<ResumeTypes>('resumes',selectedResumeId[0].id)            
+    const companyDataFromFirestore = await getDataFromFirestoreWithId<CompanyTypes>('resumes',selectedCompanyId[0].id)    
+    const settingDataFromFirestore = await getArrayDataFromFirestore<SettingTypes>('setting',uid);
+
+    setResume(resumeDataFromFirestore)
+    setCopmany(companyDataFromFirestore)
+    setSetting(settingDataFromFirestore[0])
+    
     setProgress(40);
 
 
-    if (resumeInfo.length === 0 || companyInfo.length === 0 || settingInfo.length === 0) {
+    if (!resumeDataFromFirestore || !companyDataFromFirestore || !settingDataFromFirestore ) {
         return [];
     }
 
@@ -37,7 +41,7 @@ export async function PreparationInterview(
         type: ""
     }
 
-    switch (settingInfo[0].difficulty) {
+    switch (settingDataFromFirestore[0].difficulty) {
         case "簡単":
             settingDetail.difficulty = "簡単です。大きく深堀はしないように、ある程度気になる部分だけ聞いてください";
             break;
@@ -52,7 +56,7 @@ export async function PreparationInterview(
             break;
     }
 
-    switch (settingInfo[0].interviewType) {
+    switch (settingDataFromFirestore[0].interviewType) {
         case "技術面接":
             settingDetail.type = "技術面接です。プログラミングの経験や研究成果について聞いてください";
             break;
@@ -69,7 +73,7 @@ export async function PreparationInterview(
     const minQuestions = 3;
     const maxQuestions = 20;
 
-    const duration = settingInfo[0].duration;
+    const duration = settingDataFromFirestore[0].duration;
     const ratio = (Math.log(duration) - Math.log(minDuration)) / (Math.log(maxDuration) - Math.log(minDuration));
     const rawQuestions = minQuestions + ratio * (maxQuestions - minQuestions);
     let numberOfQuestions = Math.round(rawQuestions);
@@ -85,7 +89,7 @@ export async function PreparationInterview(
         **設定:**
 
         *   面接の難易度: ${settingDetail.difficulty}
-        *   面接時間: ${settingInfo[0].duration}分
+        *   面接時間: ${settingDataFromFirestore[0].duration}分
         *   面接のタイプ: ${settingDetail.type}
         *   評価基準: ['技術力','コミュニケーション力','チームワーク','論理的思考力','学習意欲','企業理解・志望動機']
 
@@ -104,33 +108,33 @@ export async function PreparationInterview(
     const prompt = `
         #応募者の情報
         ##研究成果
-            ${resumeInfo[0].research}
+            ${resumeDataFromFirestore.research}
         ##プログラミングの経験・使用言語
-            ${resumeInfo[0].programming}
+            ${resumeDataFromFirestore.programming}
         ##自己PR
-            ${resumeInfo[0].selfPR}
+            ${resumeDataFromFirestore.selfPR}
         ##学生時代に頑張ったこと
-            ${resumeInfo[0].bestAtStu}
+            ${resumeDataFromFirestore.bestAtStu}
         ##志望動機
-            ${resumeInfo[0].reason}
+            ${resumeDataFromFirestore.reason}
         ##資格
-            ${resumeInfo[0].qualification}   
+            ${resumeDataFromFirestore.qualification}   
     
         #会社情報
         ##会社名
-            ${companyInfo[0].name}
+            ${companyDataFromFirestore.name}
         ##採用ポジション
-            ${companyInfo[0].position}
+            ${companyDataFromFirestore.position}
         ##必須スキルセット
-            ${companyInfo[0].skillset}
+            ${companyDataFromFirestore.skillset}
         ##主力製品・サービス
-            ${companyInfo[0].product}
+            ${companyDataFromFirestore.product}
         ##社風
-            ${companyInfo[0].culture}
+            ${companyDataFromFirestore.culture}
         ##会社のミッション・ビジョン
-            ${companyInfo[0].mission}
+            ${companyDataFromFirestore.mission}
         ##その他特記事項
-            ${companyInfo[0].others}
+            ${companyDataFromFirestore.others}
     `;
 
     setProgress(80);
