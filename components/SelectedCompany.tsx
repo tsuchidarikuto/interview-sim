@@ -20,7 +20,8 @@ export default function SelectedCompany() {
                 const selectedDataFromFirestore = await getArrayDataFromFirestore<SelectedCompanyTypes>("selectedCompany", user.uid);
                 if (selectedDataFromFirestore.length > 0) {
                     const selectedCompanyIdFromFirestore = selectedDataFromFirestore[0].selectedCompanyId;          
-                    const companyData = await getDataFromFirestoreWithId<CompanyTypes>("companys", selectedCompanyIdFromFirestore);
+                    const companyData = await getDataFromFirestoreWithId<CompanyTypes>("company", selectedCompanyIdFromFirestore);
+                    console.log(companyData);
                     setCompany(companyData);
                     setSelectedCompanyId(selectedCompanyIdFromFirestore);
                 }
@@ -58,72 +59,18 @@ export default function SelectedCompany() {
     const displayValue = (value: string | undefined) => value && value.trim() !== "" ? value : "未記入";
 
     return (
-        <Container maxWidth="md" sx={{ py: 4 }}>
-            <Paper elevation={3} sx={{ p: 4 }}>
-                
-                <Box sx={{ 
-                    display: "flex", 
-                    flexDirection: { xs: "column", sm: "row" },
-                    justifyContent: "flex-end", 
-                    gap: 2,
-                    mt: 1
-                }}>
-                    <Typography 
-                    variant="h4" 
-                    sx={{ 
-                        flexGrow: 1, 
-                        fontWeight: "bold",                                                       
-                        mb: {xs:0,sm:2}
-                    }}
+        <Container disableGutters maxWidth={false} sx={{ width: "100%", px: 0, mx: 0 }}>
+            <Paper variant="outlined" sx={{ p: 3 }}>
+                <Typography
+                    variant="h5"
+                    sx={{ fontWeight: "bold" }}
                 >
                     {displayValue(company.name)}
-                    </Typography>
-                    <Box sx={{ display: "flex", gap: 2 }}>
-                        <Link href={"/company"} passHref>
-                            <Button 
-                                variant="outlined" 
-                                sx={{ 
-                                    minWidth: "100px",
-                                    '&:hover': { backgroundColor: '#f5f5f5' }
-                                }}
-                            >
-                                一覧へ
-                            </Button>
-                        </Link>
-                        <Link href={`/company/${selectedCompanyId}`} passHref>
-                            <Button 
-                                variant="contained" 
-                                startIcon={<Edit />}
-                                sx={{ 
-                                    minWidth: "100px",
-                                    '&:hover': { opacity: 0.9 }
-                                }}
-                            >
-                                編集
-                            </Button>
-                        </Link>
-                    </Box>
-                </Box>
-                <Divider sx={{my:2}}/>
-
-                <Grid container spacing={3} sx={{ mb: 3 }}>
-                    <Grid size={6}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
-                            会社名
-                        </Typography>
-                        <Typography variant="body1">
-                            {displayValue(company.name)}
-                        </Typography>
-                    </Grid>
-                    <Grid size={6}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
-                            採用ポジション
-                        </Typography>
-                        <Typography variant="body1">
-                            {displayValue(company.position)}
-                        </Typography>
-                    </Grid>
-                </Grid>
+                </Typography>
+                <Typography variant="body1" color="textSecondary">
+                    {displayValue(company.position)}
+                </Typography>
+                <Divider sx={{ my: 2 }} />              
 
                 <Box sx={{ mb: 3 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
@@ -161,7 +108,7 @@ export default function SelectedCompany() {
                     </Typography>
                 </Box>
 
-                <Box sx={{ mb: 3 }}>
+                <Box >
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
                         その他特記事項
                     </Typography>
@@ -169,8 +116,33 @@ export default function SelectedCompany() {
                         {displayValue(company.others)}
                     </Typography>
                 </Box>
-                
             </Paper>
+
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+                <Link href={"/company"} passHref>
+                    <Button
+                        variant="outlined"
+                        sx={{
+                            minWidth: "100px",
+                            "&:hover": { backgroundColor: "#f5f5f5" }
+                        }}
+                    >
+                        一覧へ
+                    </Button>
+                </Link>
+                <Link href={`/company/${selectedCompanyId}`} passHref>
+                    <Button
+                        variant="contained"
+                        startIcon={<Edit />}
+                        sx={{
+                            minWidth: "100px",
+                            "&:hover": { opacity: 0.9 }
+                        }}
+                    >
+                        編集
+                    </Button>
+                </Link>
+            </Box>
         </Container>
     );
 }

@@ -50,7 +50,7 @@ export default function SelectedResume() {
 
     const longTextStyle = {
         display: "-webkit-box",
-        WebkitLineClamp: 3,
+        WebkitLineClamp: 1,
         WebkitBoxOrient: "vertical",
         overflow: "hidden"
     };
@@ -58,85 +58,25 @@ export default function SelectedResume() {
     const displayValue = (value: string | undefined) => value && value.trim() !== "" ? value : "未記入";
 
     return (
-        <Container maxWidth="md" sx={{ py: 4 }}>
-            <Paper elevation={3} sx={{ p: 4 }}>
+        <Container disableGutters maxWidth={false} sx={{ width: "100%", px: 0 ,mx:0,pb:0}}>
+                    <Paper variant="outlined" sx={{ p: 3 }}>
                 
-                <Box sx={{ 
-                    display: "flex", 
-                    flexDirection: { xs: "column", sm: "row" },
-                    justifyContent: "flex-end", 
-                    gap: 2,
-                    mt: 1
-                }}>
                     <Typography 
-                    variant="h4" 
+                    variant="h5" 
                     sx={{ 
-                        flexGrow: 1, 
-                        fontWeight: "bold",                                                       
-                        mb: {xs:0,sm:2}
+                        flexGrow: 1,      
+                        fontWeight:"bold"                                                                                                
                     }}
                 >
                     {displayValue(resume.name)}
                     </Typography>
-                    <Box sx={{ display: "flex", gap: 2 }}>
-                        <Link href={"/resume"} passHref>
-                            <Button 
-                                variant="outlined" 
-                                sx={{ 
-                                    minWidth: "100px",
-                                    '&:hover': { backgroundColor: '#f5f5f5' }
-                                }}
-                            >
-                                一覧へ
-                            </Button>
-                        </Link>
-                        <Link href={`/resume/${selectedResumeId}`} passHref>
-                            <Button 
-                                variant="contained" 
-                                startIcon={<Edit />}
-                                sx={{ 
-                                    minWidth: "100px",
-                                    '&:hover': { opacity: 0.9 }
-                                }}
-                            >
-                                編集
-                            </Button>
-                        </Link>
-                    </Box>
-                </Box>
-                <Divider sx={{my:2}}/>
-
-                <Grid container spacing={3} sx={{ mb: 3 }}>
-                    <Grid size={6}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
-                            年齢
-                        </Typography>
-                        <Typography variant="body1">
-                            {displayValue(resume.age?.toString())}
-                        </Typography>
-                    </Grid>
-                    <Grid size={6}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
-                            性別
-                        </Typography>
-                        <Typography variant="body1">
-                            {{
-                                1: "男",
-                                2: "女",
-                                3: "その他"
-                            }[resume.sex] || "不明"}
-                        </Typography>
-                    </Grid>
-                </Grid>
-
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
-                        最終学歴
-                    </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" color="textSecondary">
                         {displayValue(resume.education)}
                     </Typography>
-                </Box>
+                    
+                
+                <Divider sx={{my:2}}/>
+
 
                 <Box sx={{ mb: 3 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
@@ -163,16 +103,7 @@ export default function SelectedResume() {
                     <Typography variant="body1" sx={longTextStyle}>
                         {displayValue(resume.research)}
                     </Typography>
-                </Box>
-
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
-                        資格
-                    </Typography>
-                    <Typography variant="body1">
-                        {displayValue(resume.qualification)}
-                    </Typography>
-                </Box>
+                </Box>                
 
                 <Box sx={{ mb: 3 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
@@ -183,7 +114,7 @@ export default function SelectedResume() {
                     </Typography>
                 </Box>
 
-                <Box sx={{ mb: 3 }}>
+                <Box >
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
                         志望理由
                     </Typography>
@@ -191,8 +122,34 @@ export default function SelectedResume() {
                         {displayValue(resume.reason)}
                     </Typography>
                 </Box>
+                </Paper>
+                <Box sx={{ display: "flex", gap: 2 ,mt:2}}>
+                        <Link href={"/resume"} passHref>
+                            <Button 
+                                variant="outlined" 
+                                sx={{ 
+                                    minWidth: "100px",
+                                    '&:hover': { backgroundColor: '#f5f5f5' }
+                                }}
+                            >
+                                一覧へ
+                            </Button>
+                        </Link>
+                        <Link href={`/resume/${selectedResumeId}`} passHref>
+                            <Button 
+                                variant="contained" 
+                                startIcon={<Edit />}
+                                sx={{ 
+                                    minWidth: "100px",
+                                    '&:hover': { opacity: 0.9 }
+                                }}
+                            >
+                                編集
+                            </Button>
+                        </Link>
+                    </Box>
                 
-            </Paper>
+            
         </Container>
     );
 }
