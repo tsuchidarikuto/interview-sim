@@ -1,20 +1,15 @@
 'use client';
-import React, { useContext, useEffect,useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AppBar, Toolbar, Typography, Button, Box ,Badge} from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Badge, IconButton } from '@mui/material';
 import { signOut } from 'firebase/auth';
-
 import { AuthContext } from '@/provider/AuthContext';
-import { auth } from '@/firebase';
-
+import { auth, firestore } from '@/firebase';
 import { HistoryTypes } from '@/types';
-
 import EmailIcon from '@mui/icons-material/Email';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { firestore } from '@/firebase';
-
 
 interface HeaderProps {
   title: string;
@@ -22,92 +17,80 @@ interface HeaderProps {
 
 export default function Header({ title }: HeaderProps) {
   const { user } = useContext(AuthContext);
-  const isLogin = !!user; 
-  const [history, setHistory] = useState<HistoryTypes[]>([])
-
-  const [unreadedCount,setUnreadedCount] = useState<number>(0)
+  const isLogin = !!user;
+  const [history, setHistory] = useState<HistoryTypes[]>([]);
+  const [unreadedCount, setUnreadedCount] = useState<number>(0);
 
   useEffect(() => {
     if (!user) {
       setUnreadedCount(0);
-        setHistory([]); // ユーザーがログアウトしたら履歴をリセット
+      setHistory([]);
       return;
     }
-
-    const q = query(
-        collection(firestore, 'history'),
-        where('uid', '==', user.uid)
-      );
-
+    const q = query(collection(firestore, 'history'), where('uid', '==', user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newHistory:HistoryTypes[] = [];
-      snapshot.forEach((doc) => {
-        newHistory.push( {
-          id:doc.id,
-          ...(doc.data() as Omit<HistoryTypes, 'id'>),
-        } );
-      });
+      const newHistory = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<HistoryTypes, 'id'>),
+      }));
       setHistory(newHistory);
     }, (error) => {
-        console.error("Error fetching history: ", error);
-      });
-      return () => unsubscribe();
+      console.error('Error fetching history: ', error);
+    });
+    return () => unsubscribe();
   }, [user]);
 
-    useEffect(() => {
-        const countUnreaded = history.filter(item => !item.isRead).length;
-        setUnreadedCount(countUnreaded);
-      }, [history]);
+  useEffect(() => {
+    setUnreadedCount(history.filter((item) => !item.isRead).length);
+  }, [history]);
 
   return (
     <AppBar position="sticky">
-      <Toolbar >
-        {isLogin ? (
-          
-            <Link href="/" passHref>            
-            <Box 
-              sx={{ 
-              backgroundImage: 'url(/titleLogo.svg)', 
-              backgroundSize: 'contain', 
-              backgroundRepeat: 'no-repeat', 
-              backgroundPosition: 'center', 
-              height: { xs: 28, sm: 50 }, 
-              width: { xs: 100, sm: 150 }, 
-              marginRight: 'auto' 
-              }} 
-            />          
-            </Link>):
-        (
-          <Typography variant="h6">
-            <strong>{title} </strong>
-          </Typography>
-        )}
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>        
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {isLogin ? (
+            <Link href="/" passHref>
+              <Box
+                sx={{
+                  backgroundImage: 'url(/titleLogo.svg)',
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center',
+                  height: { xs: 32, sm: 50 },
+                  width: { xs: 110, sm: 160 },
+                  cursor: 'pointer',
+                }}
+              />
+            </Link>
+          ) : (
+            <Typography variant="h6" color="inherit">
+              <strong>{title}</strong>
+            </Typography>
+          )}
+        </Box>
 
-        <div style={{ flexGrow: 1 }} />
         {isLogin && (
-          <>
-            <Typography variant='body2' sx={{ mt: { xs: 1, sm: 0 }, fontSize: { xs: '0.75rem', sm: '1rem' } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="subtitle1" color="inherit" sx={{ display: { xs: 'none', sm: 'block' } }}>
               {user.email}
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', mx: { xs: 0, sm: 1 } }}>
-              <Button onClick={() => signOut(auth)}>
-          <LogoutOutlinedIcon sx={{ cursor: 'pointer', fontSize: { xs: '1.25rem', sm: '1.5rem' } }} color="secondary" />
-              </Button>
-            </Box>
-          </>
-        )}
-        {isLogin && (
-          <>
+            <IconButton onClick={() => signOut(auth)} color="inherit">
+              <LogoutOutlinedIcon fontSize="medium" />
+            </IconButton>
             <Link href="/mailbox" passHref>
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', mx: { xs: 0, sm: 1 } }}>
-          <Badge color="error" badgeContent={unreadedCount}>
-            <EmailIcon sx={{ cursor: 'pointer', fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
-          </Badge>
-              </Box>
+              <IconButton color="inherit">
+                <Badge badgeContent={unreadedCount} color="error">
+                  <EmailIcon fontSize="medium" />
+                </Badge>
+              </IconButton>
             </Link>
-          </>
+            <Link href="/ranking" passHref>
+              <IconButton color="inherit">
+                <EmojiEventsIcon fontSize="medium" />
+              </IconButton>
+            </Link>
+          </Box>
         )}
-        
       </Toolbar>
     </AppBar>
   );

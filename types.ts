@@ -89,3 +89,22 @@ export type HistoryTypes ={
 
 
 }
+
+export type RankingTypes ={
+    uid:string;
+    name:string;
+    difficulty:string;
+    totalScore:number;
+}
+
+export type SelectedResumeTypes = {
+    uid:string;
+    id:string;
+    selectedResumeId:string;
+}
+
+export type SelectedCompanyTypes = {
+    uid:string;
+    id:string;
+    selectedCompanyId:string;
+}

@@ -1,5 +1,5 @@
 import {atom} from 'jotai';
-import {questionTypes,interviewResultTypes, CompanyTypes,ResumeTypes,SettingTypes} from '@/types';
+import {questionTypes,interviewResultTypes, CompanyTypes,ResumeTypes,SettingTypes,RankingTypes} from '@/types';
 
 export const questionsAtom = atom<questionTypes[]>([]);
 
@@ -18,9 +18,11 @@ export const interviewResultAtom = atom<interviewResultTypes>({
         learningDesire:0,
         companyUnderstanding:0
     }
-})
+});
 
 
-export const companyAtom = atom<CompanyTypes>()
-export const resumeAtom = atom<ResumeTypes>()
-export const settingAtom = atom<SettingTypes>()
+export const companyAtom = atom<CompanyTypes>();
+export const resumeAtom = atom<ResumeTypes>();
+export const settingAtom = atom<SettingTypes>();
+
+export const rankingAtom = atom<RankingTypes[]>([]);

@@ -1,8 +1,8 @@
 'use client';
-import { collection, getDocs, query ,updateDoc,doc, where,addDoc} from '@firebase/firestore';
+import { collection, getDocs, query ,updateDoc,doc, where,addDoc,getDoc, deleteDoc} from '@firebase/firestore';
 import { firestore } from '@/firebase';
 
-export const getInfo = async <T,>(collectionName: string,uid:string): Promise<T[]> => {
+export const getArrayDataFromFirestore = async <T,>(collectionName: string,uid:string): Promise<T[]> => {
   try {
     const q = query(
       collection(firestore, collectionName),
@@ -29,7 +29,20 @@ export const getInfo = async <T,>(collectionName: string,uid:string): Promise<T[
   }
 };
 
-export const updateInfo = async <T extends{id:string}>(collectionName: string, data: T): Promise<void> => {  
+export const getDataFromFirestoreWithId = async <T>(collectionName:string,dataId:string):Promise<T | null> =>{
+ try{
+  const docRef = doc(firestore,collectionName,dataId);
+  const snapShot = await getDoc(docRef);
+  console.log(snapShot);
+  const data = {...snapShot.data(),id:snapShot.id }as T;
+  console.log(data);
+  return data;
+ }catch{
+  return null;
+ } 
+}
+
+export const updateDataOnFirestore = async <T extends{id:string}>(collectionName: string, data: T): Promise<void> => {  
   try {
     await updateDoc(doc(firestore, collectionName, data.id), data);
     console.log('Document successfully updated!');
@@ -37,7 +50,8 @@ export const updateInfo = async <T extends{id:string}>(collectionName: string, d
     console.error('Error updating document:', e);
   }
 }
-export const addInfo = async <T>(collectionName: string, data: T, uid: string): Promise<void> => {
+
+export const addDataToFirestore = async <T>(collectionName: string, data: T, uid: string): Promise<void> => {
   try {
     await addDoc(collection(firestore, collectionName), {
       ...data,
@@ -49,6 +63,15 @@ export const addInfo = async <T>(collectionName: string, data: T, uid: string): 
   }
 }
 
+export const deleteDataOnFirestore = async (collectionName:string,dataId:string):Promise<boolean>=>{
+  try{
+    await deleteDoc(doc(firestore,collectionName,dataId));
+    return true;
+  }catch(e){
+    console.log("Error during delete");
+    return false;
+  }
+}
 
 
 export async function getHistory(uid:string) {
@@ -74,4 +97,4 @@ export async function getHistory(uid:string) {
         } catch (e) {
             console.error('Error getting document:', e);
         }
-    };
+};

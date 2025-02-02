@@ -66,9 +66,10 @@ export async function POST(req:NextRequest){
         response_format: schema ? zodResponseFormat(schema,'scheema') : undefined,
     });
     return NextResponse.json(response);//中間APIのレスポンスを返す
-}catch(e){
+} catch (e) {
     console.log(`Error in API end point: ${e}`);
-}
+    return NextResponse.json({ error: e }, { status: 500 });
+  }
 
 
 }
