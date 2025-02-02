@@ -82,26 +82,25 @@ export default function InterviewSetting() {
             }
         };
         fetchData();
-    }, []);
+    }, [user]);
 
-    if (isFetchingSetting) {
-        return (
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
-                <CircularProgress/>
-            </Box>            
-        );
-    }
+
 
     return (
         // Wrapping the entire content in a Box with a smaller font size.
         <Box >
-            <Card variant="outlined" sx={{ p: 1, pb: 0 }}>
+            <Card variant="outlined" sx={{ p: 1, pb: 0 ,height:370}}>
                 <CardHeader 
                     title="面接設定" 
                     subheader="選択した履歴書と企業情報を確認・編集できます。" 
                     sx={{ pb: 1 }}
                 />
                 <CardContent sx={{ py: 0 }}>
+                    {isFetchingSetting ?
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 280 }}>
+                        <CircularProgress/>
+                    </Box>    
+                    :(
                     <form onSubmit={handleSubmit}>
                         <Stack spacing={1.5}>
                             <Box>
@@ -173,7 +172,7 @@ export default function InterviewSetting() {
                                 </Button>
                             )}
                         </Stack>
-                    </form>
+                    </form>)}
                 </CardContent>
             </Card>
         </Box>
