@@ -87,8 +87,10 @@ export default function CenteredTabs() {
 				</Grid>
 				<Grid size={{xs:12,sm:12,md:6}} >
 					<Stack spacing={2}>
-					<InterviewSetting />
-					<MailboxAbstract/>
+						<InterviewSetting />
+						<Box sx={{ display: { xs: 'none', md: 'block' } }}>
+							<MailboxAbstract />
+						</Box>
 					</Stack>
 				</Grid>
 				<Grid size={12}>

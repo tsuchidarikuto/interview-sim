@@ -76,10 +76,7 @@ export default function SelectedResume() {
                         {/* 履歴書の名前 */}
                         <Typography
                             variant="h5"
-                            sx={{
-                                flexGrow: 1,
-                                fontWeight: "bold",
-                            }}
+                            sx={longTextStyle}
                         >
                             {displayValue(resume.name)}
                         </Typography>
@@ -96,7 +93,7 @@ export default function SelectedResume() {
                             >
                                 プログラミング経験・使用言語
                             </Typography>
-                            <Typography variant="body1">
+                            <Typography variant="body1" sx={longTextStyle}>
                                 {displayValue(resume.programming)}
                             </Typography>
                         </Box>

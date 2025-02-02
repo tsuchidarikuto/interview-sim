@@ -60,14 +60,14 @@ export default function SelectedCompany() {
                                 <CircularProgress />
                             </Paper>
                         ) : (<>
-            <Paper variant="outlined" sx={{ p: 3 }}>
+            <Paper variant="outlined" sx={{ p: 3 ,height:540}}>
                 <Typography
                     variant="h5"
-                    sx={{ fontWeight: "bold" }}
+                    sx={longTextStyle}
                 >
                     {displayValue(company.name)}
                 </Typography>
-                <Typography variant="body1" color="textSecondary">
+                <Typography variant="body1" color="textSecondary" sx={longTextStyle}>
                     {displayValue(company.position)}
                 </Typography>
                 <Divider sx={{ my: 2 }} />              
@@ -76,7 +76,7 @@ export default function SelectedCompany() {
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
                         必須スキルセット
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={longTextStyle}>
                         {displayValue(company.skillset)}
                     </Typography>
                 </Box>
@@ -85,7 +85,7 @@ export default function SelectedCompany() {
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
                         主力製品・サービス
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={longTextStyle}>
                         {displayValue(company.product)}
                     </Typography>
                 </Box>
@@ -94,7 +94,7 @@ export default function SelectedCompany() {
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
                         社風
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={longTextStyle}>
                         {displayValue(company.culture)}
                     </Typography>
                 </Box>

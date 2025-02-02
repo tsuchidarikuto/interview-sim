@@ -89,11 +89,12 @@ export default function InterviewSetting() {
     return (
         // Wrapping the entire content in a Box with a smaller font size.
         <Box >
-            <Card variant="outlined" sx={{ p: 1, pb: 0 ,height:370}}>
+            <Card variant="outlined" sx={{ p: 1, pb: 0, height: 370 }}>
                 <CardHeader 
                     title="面接設定" 
                     subheader="選択した履歴書と企業情報を確認・編集できます。" 
-                    sx={{ pb: 1 }}
+                    sx={{ pb: 1 }}                    
+                    subheaderTypographyProps={{ sx: { fontSize: { xs: '0.8rem', sm: '1rem' } } }}
                 />
                 <CardContent sx={{ py: 0 }}>
                     {isFetchingSetting ?
