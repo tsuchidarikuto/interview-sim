@@ -14,7 +14,7 @@ export default function ResumeAndCompanyTab() {
 	};
 
     return(
-        <Card variant="outlined" sx={{p:1,pb:0}}>
+        <Card variant="outlined" sx={{p:1,pb:0,height:740}}>
             <CardHeader title="履歴書と企業情報" subheader="選択した履歴書と企業情報を確認・編集できます。" sx={{pb:0}}/>
             
             <CardContent sx={{py:0}}>
