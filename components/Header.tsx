@@ -1,7 +1,7 @@
 'use client';
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AppBar, Toolbar, Typography, Button, Box, Badge } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Badge, IconButton } from '@mui/material';
 import { signOut } from 'firebase/auth';
 import { AuthContext } from '@/provider/AuthContext';
 import { auth, firestore } from '@/firebase';
@@ -27,8 +27,6 @@ export default function Header({ title }: HeaderProps) {
       setHistory([]);
       return;
     }
-
-    //未読の数を取得しhistoryに反映させる
     const q = query(collection(firestore, 'history'), where('uid', '==', user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const newHistory = snapshot.docs.map((doc) => ({
@@ -39,94 +37,59 @@ export default function Header({ title }: HeaderProps) {
     }, (error) => {
       console.error('Error fetching history: ', error);
     });
-
     return () => unsubscribe();
   }, [user]);
 
-  //表示する未読数の更新
   useEffect(() => {
     setUnreadedCount(history.filter((item) => !item.isRead).length);
   }, [history]);
 
   return (
     <AppBar position="sticky">
-      <Toolbar>
-        {isLogin ? (
-          <Link href="/" passHref>
-            <Box
-              sx={{
-                backgroundImage: 'url(/titleLogo.svg)',
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-                height: { xs: 28, sm: 50 },
-                width: { xs: 100, sm: 150 },
-                marginRight: 'auto',
-              }}
-            />
-          </Link>
-        ) : (
-          <Typography variant="h6">
-            <strong>{title}</strong>
-          </Typography>
-        )}
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>        
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {isLogin ? (
+            <Link href="/" passHref>
+              <Box
+                sx={{
+                  backgroundImage: 'url(/titleLogo.svg)',
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center',
+                  height: { xs: 32, sm: 50 },
+                  width: { xs: 110, sm: 160 },
+                  cursor: 'pointer',
+                }}
+              />
+            </Link>
+          ) : (
+            <Typography variant="h6" color="inherit">
+              <strong>{title}</strong>
+            </Typography>
+          )}
+        </Box>
 
-        <div style={{ flexGrow: 1 }} />
         {isLogin && (
-          <>
-            <Typography
-              variant="body2"
-              sx={{ mt: { xs: 1, sm: 0 }, fontSize: { xs: '0.75rem', sm: '1rem' } }}
-            >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="subtitle1" color="inherit" sx={{ display: { xs: 'none', sm: 'block' } }}>
               {user.email}
             </Typography>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-                mx: { xs: 0, sm: 1 },
-              }}
-            >
-              <Button onClick={() => signOut(auth)}>
-                <LogoutOutlinedIcon
-                  sx={{ cursor: 'pointer', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
-                  color="secondary"
-                />
-              </Button>
-            </Box>
+            <IconButton onClick={() => signOut(auth)} color="inherit">
+              <LogoutOutlinedIcon fontSize="medium" />
+            </IconButton>
             <Link href="/mailbox" passHref>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: '100%',
-                  mx: { xs: 0, sm: 1 },
-                }}
-              >
-                <Badge color="error" badgeContent={unreadedCount}>
-                  <EmailIcon sx={{ cursor: 'pointer', fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
+              <IconButton color="inherit">
+                <Badge badgeContent={unreadedCount} color="error">
+                  <EmailIcon fontSize="medium" />
                 </Badge>
-              </Box>
+              </IconButton>
             </Link>
             <Link href="/ranking" passHref>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: '100%',
-                  mx: { xs: 0, sm: 1 },
-                }}
-              >
-                <EmojiEventsIcon
-                  sx={{ cursor: 'pointer', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
-                />
-              </Box>
+              <IconButton color="inherit">
+                <EmojiEventsIcon fontSize="medium" />
+              </IconButton>
             </Link>
-          </>
+          </Box>
         )}
       </Toolbar>
     </AppBar>
