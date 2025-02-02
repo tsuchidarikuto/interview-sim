@@ -107,6 +107,14 @@ export default function SelectedCompany() {
                         {displayValue(company.mission)}
                     </Typography>
                 </Box>
+                <Box >
+                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
+                        その他特記事項
+                    </Typography>
+                    <Typography variant="body1" sx={longTextStyle}>
+                        {displayValue(company.others)}
+                    </Typography>
+                </Box>
 
                 
             </Paper>

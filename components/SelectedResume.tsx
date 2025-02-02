@@ -86,6 +86,14 @@ export default function SelectedResume() {
                         {displayValue(resume.programming)}
                     </Typography>
                 </Box>
+                <Box sx={{mb:3}}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
+                        研究
+                    </Typography>
+                    <Typography variant="body1" sx={longTextStyle}>
+                        {displayValue(resume.research)}
+                    </Typography>
+                </Box>
 
                 <Box sx={{ mb: 3 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
