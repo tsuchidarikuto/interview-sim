@@ -1,6 +1,6 @@
 'use client';
 import { useState, useContext } from 'react';
-import { Box, Tab, Typography, Container, Button } from '@mui/material';
+import { Box, Stack, Typography, Container, Button } from '@mui/material';
 
 import InterviewSetting from '@/components/InterviewSetting';
 import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
@@ -11,6 +11,7 @@ import { AuthContext } from "@/provider/AuthContext";
 import { PreparationInterview } from '@/utils/PreparationInterview';
 import ResumeAndCompanyTab from '@/components/ResumeAndCompanyTab';
 import Grid from '@mui/material/Grid2'
+import MailboxAbstract from '@/components/MailboxAbstract';
 
 export default function CenteredTabs() {
 	const { user } = useContext(AuthContext);
@@ -84,8 +85,11 @@ export default function CenteredTabs() {
 				<Grid size={{xs:12,sm:12,md:6}}>
 					<ResumeAndCompanyTab/>
 				</Grid>
-				<Grid size={{xs:12,sm:12,md:6}}>
+				<Grid size={{xs:12,sm:12,md:6}} >
+					<Stack spacing={2}>
 					<InterviewSetting />
+					<MailboxAbstract/>
+					</Stack>
 				</Grid>
 				<Grid size={12}>
 				<Button 
