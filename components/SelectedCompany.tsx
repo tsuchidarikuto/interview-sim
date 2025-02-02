@@ -31,23 +31,10 @@ export default function SelectedCompany() {
         fetchCompany();
     }, [user]);
 
-    if (isFetchingCompany) {
-        return (
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
+   
 
-    if (!company) {
-        return (
-            <Container maxWidth="md">
-                <Paper elevation={3} sx={{ p: 4, mt: 4, textAlign: "center" }}>
-                    <Typography variant="h6">企業データが見つかりませんでした。</Typography>
-                </Paper>
-            </Container>
-        );
-    }
+    
+
 
     const longTextStyle = {
         display: "-webkit-box",
@@ -59,7 +46,20 @@ export default function SelectedCompany() {
     const displayValue = (value: string | undefined) => value && value.trim() !== "" ? value : "未記入";
 
     return (
-        <Container disableGutters maxWidth={false} sx={{ width: "100%", px: 0, mx: 0 }}>
+        <Container disableGutters maxWidth={false} sx={{width: "100%", px: 0, mx: 0,height:"100%"}}>
+            {(isFetchingCompany || !company) ? (
+                            <Paper
+                                variant="outlined"
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    height: 540,
+                                }}
+                            >
+                                <CircularProgress />
+                            </Paper>
+                        ) : (<>
             <Paper variant="outlined" sx={{ p: 3 }}>
                 <Typography
                     variant="h5"
@@ -144,6 +144,8 @@ export default function SelectedCompany() {
                     </Button>
                 </Link>
             </Box>
+            </>
+        )}
         </Container>
     );
 }
