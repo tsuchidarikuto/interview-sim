@@ -89,7 +89,7 @@ export default function InterviewSetting() {
     return (
         // Wrapping the entire content in a Box with a smaller font size.
         <Box >
-            <Card variant="outlined" sx={{ p: 1, pb: 0, height: 370 }}>
+            <Card variant="outlined" sx={{ p: 1, pb: 0, height:{xs:390,sm:370,md:370}  }}>
                 <CardHeader 
                     title="面接設定" 
                     subheader="選択した履歴書と企業情報を確認・編集できます。" 
@@ -102,12 +102,14 @@ export default function InterviewSetting() {
                         <CircularProgress/>
                     </Box>    
                     :(
+                        
                     <form onSubmit={handleSubmit}>
-                        <Stack spacing={1.5}>
-                            <Box>
+                        <Stack spacing={1.5} >
+                            <Box >
                             <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 0 }}>
                                     難易度
                                 </Typography>
+                                <Box sx={{display:"flex",justifyContent:"center",width:"100%"}}>
                                 <TextField
                                     select
                                     fullWidth
@@ -119,17 +121,20 @@ export default function InterviewSetting() {
                                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                                         setSettingInfo((prev) => [{ ...prev[0], difficulty: event.target.value }])
                                     }
+                                    sx={{width:"90%"}}
                                 >
                                     <MenuItem value={'簡単'}>簡単</MenuItem>
                                     <MenuItem value={'普通'}>普通</MenuItem>
                                     <MenuItem value={'難しい'}>難しい</MenuItem>
                                     <MenuItem value={'激ムズ'}>激ムズ</MenuItem>
                                 </TextField>
+                                </Box>
                             </Box>
                             <Box>
                                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 0 }}>
                                     面接の長さ: {settingInfo[0].duration}分
                                 </Typography>
+                                <Box sx={{display:"flex",justifyContent:"center",width:"100%"}}>
                                 <Slider
                                     value={settingInfo[0].duration}
                                     defaultValue={30}
@@ -141,12 +146,15 @@ export default function InterviewSetting() {
                                     onChange={(_, newValue) =>
                                         setSettingInfo((prev) => [{ ...prev[0], duration: newValue as number }])
                                     }
+                                    sx={{width:"85%"}}
                                 />
+                                </Box>
                             </Box>
                             <Box>
                             <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 0 }}>
                                     面接形式
                                 </Typography>
+                                <Box sx={{display:"flex",justifyContent:"center",width:"100%"}}>
                                 <FormControl>
                                     <RadioGroup
                                         row
@@ -154,12 +162,14 @@ export default function InterviewSetting() {
                                         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                                             setSettingInfo((prev) => [{ ...prev[0], interviewType: event.target.value }])
                                         }
+                                        
                                     >
                                         <FormControlLabel value="複合面接" control={<Radio />} label="複合面接" />
                                         <FormControlLabel value="技術面接" control={<Radio />} label="技術面接" />
                                         <FormControlLabel value="行動面接" control={<Radio />} label="行動面接" />
                                     </RadioGroup>
                                 </FormControl>
+                                </Box>
                             </Box>
                             {isLoading ? (
                                 <CircularProgress />
