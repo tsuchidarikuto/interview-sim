@@ -108,14 +108,7 @@ export default function SelectedCompany() {
                     </Typography>
                 </Box>
 
-                <Box >
-                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
-                        その他特記事項
-                    </Typography>
-                    <Typography variant="body1">
-                        {displayValue(company.others)}
-                    </Typography>
-                </Box>
+                
             </Paper>
 
             <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
@@ -132,14 +125,14 @@ export default function SelectedCompany() {
                 </Link>
                 <Link href={`/company/${selectedCompanyId}`} passHref>
                     <Button
-                        variant="contained"
+                        variant="outlined"
                         startIcon={<Edit />}
                         sx={{
                             minWidth: "100px",
                             "&:hover": { opacity: 0.9 }
                         }}
                     >
-                        編集
+                        編集・詳細
                     </Button>
                 </Link>
             </Box>

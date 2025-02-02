@@ -96,14 +96,7 @@ export default function SelectedResume() {
                     </Typography>
                 </Box>
 
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
-                        研究成果
-                    </Typography>
-                    <Typography variant="body1" sx={longTextStyle}>
-                        {displayValue(resume.research)}
-                    </Typography>
-                </Box>                
+                      
 
                 <Box sx={{ mb: 3 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
@@ -137,14 +130,14 @@ export default function SelectedResume() {
                         </Link>
                         <Link href={`/resume/${selectedResumeId}`} passHref>
                             <Button 
-                                variant="contained" 
+                                variant="outlined" 
                                 startIcon={<Edit />}
                                 sx={{ 
                                     minWidth: "100px",
                                     '&:hover': { opacity: 0.9 }
                                 }}
                             >
-                                編集
+                                編集・詳細
                             </Button>
                         </Link>
                     </Box>
