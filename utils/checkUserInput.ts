@@ -38,7 +38,7 @@ export default async function checkUserInput(
             } else {
             return isLastSubject 
                 ? "4.ユーザへの返答を生成しなさい。ただしisSubjectEndがtrueの場合は簡単な相槌と、面接を終了する旨を伝えるのみにしなさい。" 
-                : "4.ユーザへの返答を生成しなさい。ただしisSubjectEndがtrueの場合は簡単な相槌と、次の質問に移る旨を伝えるのみにしなさい。";
+                : "4.ユーザへの返答を生成しなさい。ただしisSubjectEndがtrueの場合は簡単な相槌と、次の質問に移る旨を伝えるのみにしなさい。<必須>相槌のみ、あなたは質問を考えない</必須>";
             }
         })();
                 
