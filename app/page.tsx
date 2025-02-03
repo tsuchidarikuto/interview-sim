@@ -21,7 +21,7 @@ export default function CenteredTabs() {
 	const [, setQuestions] = useAtom(questionsAtom);
 	const [, setResume] = useAtom(resumeAtom);
 	const [, setCompany] = useAtom(companyAtom);
-	const [, setSetting] = useAtom(settingAtom);
+	const [setting, setSetting] = useAtom(settingAtom);
 	const [progress, setProgress] = useState(0);
 
 	// タブ切り替え
@@ -36,13 +36,21 @@ export default function CenteredTabs() {
 			}
 
 			// 面接準備の処理（質問リストの生成、履歴書・会社情報のセットなど）
-			await PreparationInterview(setProgress, setQuestions, setResume, setCompany, setSetting, user.uid);
+			const selectedInterviewMode = await PreparationInterview(setProgress, setQuestions, setResume, setCompany, setSetting, user.uid);
 
 			// プログレスを100%に設定して完了状態を示す
 			setProgress(100);
 
-			// 面接ページへ遷移
-			push('/interview/speach');
+			
+			// 面接モードに応じてpush先を変更
+			if(selectedInterviewMode==="voice"){
+				push('/interview/speach');
+			} else if(selectedInterviewMode==="chat"){
+				push('/interview/chat')
+			} else{
+				push('/')
+				console.error("error during page navigation")
+			}
 		} catch (e) {
 			// 面接準備中に何らかのエラーが発生した場合はログに出力
 			console.error('Error during preparation:', e);

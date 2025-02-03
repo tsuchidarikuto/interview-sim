@@ -148,8 +148,8 @@ export async function PreparationInterview(
     setQuestions(parsedQuestionList.questions)
     
 
-    
-    return;
+    //ページ遷移用に面接モードを返す
+    return settingDataFromFirestore[0].interviewMode;
 }catch(e){
     console.error('Error during preparation:', e);
     return ;

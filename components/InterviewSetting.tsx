@@ -234,7 +234,7 @@ export default function InterviewSetting() {
                                 </Box>
                             </Stack>
                             {isLoading ? (
-                                <CircularProgress />
+                                <CircularProgress sx={{ width: 'fit-content', alignSelf: 'left', mt: 2 }}/>
                             ) : (
                                 <Button
                                     type="submit"
