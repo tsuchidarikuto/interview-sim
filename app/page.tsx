@@ -42,7 +42,7 @@ export default function CenteredTabs() {
 			setProgress(100);
 
 			// 面接ページへ遷移
-			push('/interview');
+			push('/interview/speach');
 		} catch (e) {
 			// 面接準備中に何らかのエラーが発生した場合はログに出力
 			console.error('Error during preparation:', e);
