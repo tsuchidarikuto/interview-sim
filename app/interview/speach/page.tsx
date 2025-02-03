@@ -181,6 +181,7 @@ export default function Interview() {
 	}
 
 	if (isInjected) {
+		enqueue("プロンプトインジェクションが検知されました。面接を中止します。二度としないでください");
 		return (
 			<Box
 				sx={{
@@ -192,20 +193,35 @@ export default function Interview() {
 					backgroundColor: "black",
 				}}
 			>
-				<Stack spacing={3} alignItems="center">
-					<CenteredAvatar src="/warningBackGround.svg" alt="warning" />
-					<Typography variant="body1" sx={{ textAlign: "center", color: "white" }}>
-						<strong>
-							プロンプトインジェクションが検知されました。<br />
-							面接を中止します。
-						</strong>
-					</Typography>
-					<Link href="/" passHref>
-						<Button variant="outlined" sx={{ color: "white", borderColor: "white" }}>
-							反省してホームに戻る
-						</Button>
-					</Link>
-				</Stack>
+				<Box
+					sx={{
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						height: "100vh",
+						width: "100vw",
+						backgroundImage: 'url(/warningBackGround.svg)',
+						backgroundSize: "contain",
+						backgroundRepeat: "no-repeat",
+						backgroundPosition: "center",
+					}}
+				>
+					<Stack>
+						<Box sx={{ height: "50vh" }} />
+						<Typography variant="body1" sx={{ textAlign: "center", color: "white" }}>
+							<strong>
+								プロンプトインジェクションが検知されました。<br />面接を中止します。
+							</strong>
+						</Typography>
+						<Link href="/" passHref>
+							<Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+								<Button variant="outlined" sx={{ mt: 3, color: "white", borderColor: "white" }}>
+									反省してホームに戻る
+								</Button>
+							</Box>
+						</Link>
+					</Stack>
+				</Box>
 			</Box>
 		);
 	}
