@@ -77,6 +77,6 @@ export default async function checkUserInput(
         return result;
         }
         catch(e){
-            throw new Error("応答の生成中にエラーが発生しました。")
+            throw new Error(`応答の生成中にエラーが発生しました。${e}`)
         }
 }
