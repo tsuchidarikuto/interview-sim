@@ -3,7 +3,7 @@
 export default async function CallOpenai(model: string,system:string,prompt: string,schemaName:string) {
     try {
         
-        const response = await fetch('api/openai', {
+        const response = await fetch('/api/openai', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
