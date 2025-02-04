@@ -3,6 +3,7 @@ import { useState } from "react";
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
 export async function SpeachToText():Promise<string>{
+
     // 環境変数からキーとリージョンを取得
     const key = process.env.NEXT_PUBLIC_SPEECH_KEY || "";
     const region = process.env.NEXT_PUBLIC_SPEECH_REGION || "";
@@ -19,15 +20,15 @@ export async function SpeachToText():Promise<string>{
     return new Promise<string>((resolve) => {
         recognizer.recognizeOnceAsync(
             (result: SpeechSDK.SpeechRecognitionResult) => {
-                if (result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                if (result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {                    
                     resolve(result.text);
-                } else {
+                } else {                    
                     resolve("error");
-                }
+                }                
                 recognizer.close();
             },
-            (error: any) => {
-                resolve("error");
+            (error: any) => {                
+                resolve("error");                
                 recognizer.close();
             }
         );
