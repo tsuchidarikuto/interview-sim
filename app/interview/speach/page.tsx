@@ -15,6 +15,7 @@ import {
 	resumeAtom,
 	companyAtom,
 	settingAtom,
+	isRecordingAtom
 } from "@/atoms/state";
 import { useState, useEffect, useContext, useRef } from "react";
 import { ConversationTypes, interviewResultTypes } from "@/types";
@@ -28,8 +29,11 @@ import LinearProgressWithLabel from "@/components/LinearProgressWithLabel";
 import Link from "next/link";
 import { SpeachToText } from "@/utils/handleAzureSpeach";
 import { useSpeechQueue } from "@/utils/useSpeechQueue";
+import MicFeedbackButton from "@/components/MicFeedbackButton";
+
 
 export default function Interview() {
+	const [,setIsRecording] = useAtom(isRecordingAtom)
 	const { push } = useRouter();
 	const { user } = useContext(AuthContext);
 	const [questions] = useAtom(questionsAtom);
@@ -49,7 +53,7 @@ export default function Interview() {
 	const [isInterviewEnd, setIsInterviewEnd] = useState<boolean>(false);
 	const [analysisProgress, setAnalysisProgress] = useState<number>(0);
 	const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  
+
   // Extract the enqueue function from the speech queue hook
 	const { enqueue } = useSpeechQueue();
 
@@ -117,8 +121,11 @@ export default function Interview() {
 	}, [isSubjectEnd]);
 
 	// ユーザーの入力送信処理
-	async function handleListenUserSpeach() {
+	async function handleListenUserSpeach() {		
+		setIsRecording(true);
 		const message = await SpeachToText();
+		setIsRecording(false);
+		setIsRecording
 		const updatedConversation = [...currentConversation, { role: "user", message }];
 		setCurrentConversation(updatedConversation);
 
@@ -242,9 +249,11 @@ export default function Interview() {
 		>
 			<CenteredAvatar src={`/avatar_${avatarInterest}.svg`} alt="system" />
 			<Box sx={{ mt: 3 }}>
-				<Button variant="contained" size="large" onClick={handleListenUserSpeach}>
-					録音
-				</Button>
+				<MicFeedbackButton
+					handleListenUserSpeach={handleListenUserSpeach}
+				>
+
+				</MicFeedbackButton>
 			</Box>
 			<Box sx={{ mt: 2 }}>
 				{isInterviewEnd && (
