@@ -53,6 +53,7 @@ export default function Interview() {
 	const [isInterviewEnd, setIsInterviewEnd] = useState<boolean>(false);
 	const [analysisProgress, setAnalysisProgress] = useState<number>(0);
 	const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+	const [currentInterest,setCurrentInterest] =useState<number>(3)
 
   // Extract the enqueue function from the speech queue hook
 	const { enqueue } = useSpeechQueue();
@@ -60,7 +61,7 @@ export default function Interview() {
 	// 会話の回数制限
 	const conversationLimit =
 		setting?.difficulty === "激ムズ"
-			? 5
+			? 2
 			: setting?.difficulty === "難しい"
 			? 3
 			: setting?.difficulty === "普通"
@@ -89,8 +90,9 @@ export default function Interview() {
 
 	// 話題終了時の処理
 	useEffect(() => {
-		async function speakNextQuestion(){
+		async function speakNextQuestion(){			
 			await enqueue(questions[questionIndex + 1].question);
+			setCurrentInterest(3);
 		}
 
 		if (isSubjectEnd) {
@@ -114,6 +116,7 @@ export default function Interview() {
 						interest: 3,
 					},
 				]);
+				
 				speakNextQuestion();
 			}
 			setIsSubjectEnd(false);
@@ -124,8 +127,13 @@ export default function Interview() {
 	async function handleListenUserSpeach() {		
 		setIsRecording(true);
 		const message = await SpeachToText();
-		setIsRecording(false);
-		setIsRecording
+		
+		//エラー字は音声だけ出力し戻る。インクリメントや会話履歴の保存等は行わない。
+		if(message==="error"){
+			enqueue("すみません、聞き取れませんでした。もう一度話してください。");
+			return;
+		}
+				
 		const updatedConversation = [...currentConversation, { role: "user", message }];
 		setCurrentConversation(updatedConversation);
 
@@ -138,6 +146,7 @@ export default function Interview() {
 				isLastSubject,
 				isConversationLimitReached
 			);
+			setCurrentInterest(checkedResponse.interest);//アイコン変更用のstateを更新
 			setIsInjected(checkedResponse.isInjected);
 			setIsSubjectEnd(checkedResponse.isSubjectEnd);
 			setInterestShift((prev) => [...prev, checkedResponse.interest]);
@@ -153,10 +162,12 @@ export default function Interview() {
 			await enqueue(checkedResponse.response);
 		}
 		setConversationCount((prev) => prev + 1);
+		setIsRecording(false);
 	}
-
+	//分析開始処理
 	async function handleStartAnalyzing() {
 		try {
+			setIsAnalyzing(true);
 			if (!user) throw new Error("User is not found");
 			if (!company) throw new Error("Company information is not found");
 			if (!resume) throw new Error("Resume information is not found");
@@ -186,7 +197,7 @@ export default function Interview() {
 			console.error("Error during analysis:", e);
 		}
 	}
-
+	//プロンプトインジェクション対策
 	if (isInjected) {
 		enqueue("プロンプトインジェクションが検知されました。面接を中止します。二度としないでください");
 		return (
@@ -233,8 +244,8 @@ export default function Interview() {
 		);
 	}
 
-	const currentSystem = currentConversation.find((msg) => msg.role === "system");
-	const avatarInterest = currentSystem?.interest || 3;
+	
+	
 
 	return (
 		<Container
@@ -247,7 +258,7 @@ export default function Interview() {
 				height: "100vh",
 			}}
 		>
-			<CenteredAvatar src={`/avatar_${avatarInterest}.svg`} alt="system" />
+			<CenteredAvatar src={`/avatar_${currentInterest}.svg`} alt="system" />
 			<Box sx={{ mt: 3 }}>
 				<MicFeedbackButton
 					handleListenUserSpeach={handleListenUserSpeach}
