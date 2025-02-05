@@ -8,12 +8,15 @@ import {
 import { useSpeechQueue } from "@/utils/useSpeechQueue";
 import Link from "next/link";
 import { useEffect } from "react";
+import { stopAudio } from "@/utils/handleAzureSpeach";
 
 
 export default function Warning () {
     const {clearQueue,enqueue} = useSpeechQueue();
     
     useEffect(()=>{
+        stopAudio();
+        
         clearQueue();
         enqueue("プロンプトインジェクションが検知されました。面接を中止します。");
     },[]
