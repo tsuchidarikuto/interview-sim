@@ -1,6 +1,6 @@
 "use client"
 import { useRef } from "react";
-import { TextToSpeach } from "./handleAzureSpeach";
+import { TextToSpeach ,stopAudio} from "./handleAzureSpeach";
 import { useAtom } from "jotai";
 import { isPlayingAudioAtom } from "@/atoms/state";
 
@@ -50,6 +50,18 @@ export const useSpeechQueue = () => {
         });
     };
 
-    // enqueue関数を返す
-    return { enqueue };
-};
+    
+    
+    
+    const clearQueue = () => {
+        // キュー内のタスクをすべてクリア
+        queue.current = [];
+        stopAudio();
+                  
+        setIsPlayingAudio(false);
+        isProcessing.current = false;
+        
+      };
+    
+      return { enqueue, clearQueue };
+    };
