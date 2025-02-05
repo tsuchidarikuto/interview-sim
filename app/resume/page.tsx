@@ -21,7 +21,7 @@ export default function ResumesPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(9)
     const [isFetchingResumes, setIsFetchingResumes] = useState(true)
-    const [isLoading, setIsLoading] = useState(false)
+    const [, setIsLoading] = useState(false)
 
     useEffect(() => {
         const fetchResumes = async () => {

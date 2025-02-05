@@ -16,7 +16,6 @@ import {
     CardContent,
     CardHeader,
     Checkbox,
-    CardMedia
 } from '@mui/material';
 import React, { useState, useEffect, useContext, FormEvent } from 'react';
 import { getArrayDataFromFirestore, updateDataOnFirestore, addDataToFirestore } from '@/utils/handleFirebase';

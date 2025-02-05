@@ -25,7 +25,6 @@ import analyzeInterviewResult from "@/utils/analyzeInterviewResult";
 import { addToHistory } from "@/utils/addToHistory";
 import { AuthContext } from "@/provider/AuthContext";
 import checkUserInput from "@/utils/checkUserInput";
-import { styled } from "@mui/system";
 import LinearProgressWithLabel from "@/components/LinearProgressWithLabel";
 import { SpeachToText, stopAudio } from "@/utils/handleAzureSpeach";
 import { useSpeechQueue } from "@/utils/useSpeechQueue";

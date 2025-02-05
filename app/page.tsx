@@ -22,7 +22,7 @@ export default function CenteredTabs() {
 	const [, setQuestions] = useAtom(questionsAtom);
 	const [, setResume] = useAtom(resumeAtom);
 	const [, setCompany] = useAtom(companyAtom);
-	const [setting, setSetting] = useAtom(settingAtom);
+	const [, setSetting] = useAtom(settingAtom);
 	const [progress, setProgress] = useState(0);
 
 	

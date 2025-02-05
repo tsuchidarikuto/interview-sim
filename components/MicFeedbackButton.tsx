@@ -15,7 +15,7 @@ export default function MicFeedbackButton({
     // マイク入力の音量を保持する state
     const [micVolume, setMicVolume] = useState<number>(0);
     // 録音状態（ボタンの disable 状態などと連動させる場合に利用）
-    const [isRecording, setIsRecording] = useAtom(isRecordingAtom);
+    const [isRecording, ] = useAtom(isRecordingAtom);
     const [isPlayingAudio,] = useAtom(isPlayingAudioAtom);
 
     useEffect(() => {

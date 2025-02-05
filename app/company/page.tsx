@@ -21,7 +21,7 @@ export default function CompanysPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(9)
     const [isFetchingCompanys, setIsFetchingCompanys] = useState(true)
-    const [isLoading, setIsLoading] = useState(false)
+    const [, setIsLoading] = useState(false)
 
     useEffect(() => {
         const fetchCompanys = async () => {

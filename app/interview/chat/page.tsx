@@ -31,7 +31,7 @@ import checkUserInput from "@/utils/checkUserInput";
 import { styled } from "@mui/system";
 import SendIcon from "@mui/icons-material/Send";
 import "@/styles/chat.scss";
-import Link from "next/link";
+
 
 export default function Interview() {
 	const { push } = useRouter();

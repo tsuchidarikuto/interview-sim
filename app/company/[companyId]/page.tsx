@@ -2,10 +2,10 @@
 
 import { useState, useEffect, FormEvent, useContext } from "react"
 import { useParams,useRouter } from "next/navigation"
-import { Box, CircularProgress, Button, TextField, Container, Stack, MenuItem, Typography } from '@mui/material'
+import { Box, CircularProgress, Button, TextField, Container, Stack, Typography } from '@mui/material'
 import Grid from "@mui/material/Grid2"
 import type { CompanyTypes } from "@/types"
-import { getArrayDataFromFirestore, updateDataOnFirestore, addDataToFirestore ,getDataFromFirestoreWithId} from "@/utils/handleFirebase"
+import {  updateDataOnFirestore, addDataToFirestore ,getDataFromFirestoreWithId} from "@/utils/handleFirebase"
 import { AuthContext } from "@/provider/AuthContext"
 import Link from 'next/link';
 

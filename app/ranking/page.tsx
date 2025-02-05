@@ -6,9 +6,7 @@ import {
   Tab,
   Box,
   Typography,
-  Button,
-  CircularProgress,
-  Tabs
+  Button  
 } from '@mui/material';
 import { HistoryTypes } from '@/types';
 import { AuthContext } from '@/provider/AuthContext';
@@ -25,7 +23,7 @@ export default function Page() {
   const [ranking, setRanking] = useAtom(rankingAtom);
   const [isFetching, setIsFetching] = useState(true);
   const { user } = useContext(AuthContext);
-  const [bestUserRanking, setBestUserRanking] = useState<RankingTypes>();
+  const [, setBestUserRanking] = useState<RankingTypes>();
 
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     setTabValue(newValue);

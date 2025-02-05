@@ -1,6 +1,6 @@
 "use client";
 
-import {Tab,Card,CardHeader,CardContent,Box} from '@mui/material'
+import {Tab,Card,CardHeader,CardContent} from '@mui/material'
 import { TabList, TabContext, TabPanel } from '@mui/lab';
 import { useState } from 'react';
 import SelectedResume from '@/components/SelectedResume';

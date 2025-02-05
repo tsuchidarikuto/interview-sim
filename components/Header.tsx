@@ -1,7 +1,7 @@
 'use client';
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AppBar, Toolbar, Typography, Button, Box, Badge, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Badge, IconButton } from '@mui/material';
 import { signOut } from 'firebase/auth';
 import { AuthContext } from '@/provider/AuthContext';
 import { auth, firestore } from '@/firebase';

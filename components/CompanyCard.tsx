@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Box, Typography, Button } from '@mui/material';
-import { Edit, Delete, CheckCircle, RadioButtonUnchecked, Business, Work, Build, LocalOffer, Group, Flag, Info } from '@mui/icons-material';
+import { Edit, Delete, CheckCircle, RadioButtonUnchecked,Work, Build, LocalOffer } from '@mui/icons-material';
 import Link from 'next/link';
 import type { CompanyTypes, SelectedCompanyTypes } from '@/types';
 

@@ -7,12 +7,11 @@ import {
 } from "@mui/material";
 import { useSpeechQueue } from "@/utils/useSpeechQueue";
 import Link from "next/link";
-import { useEffect } from "react";
-import { stopAudio } from "@/utils/handleAzureSpeach";
+
 
 
 export default function Warning () {
-    const {clearQueue,enqueue} = useSpeechQueue();
+
     
     
    
