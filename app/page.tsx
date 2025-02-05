@@ -1,6 +1,6 @@
 'use client';
-import { useState, useContext } from 'react';
-import { Box, Stack, Typography, Container, Button } from '@mui/material';
+import { useState, useContext ,useEffect} from 'react';
+import { Box,  Typography, Container, Button } from '@mui/material';
 
 import InterviewSetting from '@/components/InterviewSetting';
 import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
@@ -11,7 +11,8 @@ import { AuthContext } from "@/provider/AuthContext";
 import { PreparationInterview } from '@/utils/PreparationInterview';
 import ResumeAndCompanyTab from '@/components/ResumeAndCompanyTab';
 import Grid from '@mui/material/Grid2'
-import MailboxAbstract from '@/components/MailboxAbstract';
+import { stopAudio } from '@/utils/handleAzureSpeach';
+
 
 export default function CenteredTabs() {
 	const { user } = useContext(AuthContext);
@@ -24,7 +25,10 @@ export default function CenteredTabs() {
 	const [setting, setSetting] = useAtom(settingAtom);
 	const [progress, setProgress] = useState(0);
 
-	// タブ切り替え
+	
+	useEffect(()=>{
+		stopAudio()
+	},[])
 	
 	// 面接開始時の動作
 	const handleStartInterview = async () => {
