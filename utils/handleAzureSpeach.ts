@@ -65,7 +65,7 @@ export async function TextToSpeach(text: string): Promise<boolean> {
       // HTMLAudioElement で再生（自前再生）
       audioPlayer = new Audio(url);
       // 再生速度を早くする（例: 1.5倍速）
-      audioPlayer.playbackRate = 1.5;
+      audioPlayer.playbackRate = 1.1;
       
       audioPlayer.onended = () => {
         resolve(true);
