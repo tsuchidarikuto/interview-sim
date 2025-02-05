@@ -14,13 +14,8 @@ import { stopAudio } from "@/utils/handleAzureSpeach";
 export default function Warning () {
     const {clearQueue,enqueue} = useSpeechQueue();
     
-    useEffect(()=>{
-        stopAudio();
-        
-        clearQueue();
-        enqueue("プロンプトインジェクションが検知されました。面接を中止します。");
-    },[]
-)   
+    
+   
     return (
         <Box
             sx={{

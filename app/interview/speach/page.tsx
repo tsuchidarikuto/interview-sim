@@ -2,7 +2,7 @@
 import {
 	Box,
 	Button,
-	
+	Stack,
 	Container,
 	Card,
 	Typography,
@@ -130,6 +130,9 @@ export default function Interview() {
 
 	useEffect(()=>{
 		if(isInjected){
+			stopAudio();
+        
+        clearQueue();        
 			push('/warning')
 		}
 	},[isInjected])
@@ -266,12 +269,14 @@ export default function Interview() {
 								<LinearProgressWithLabel value={analysisProgress} />
 							</Box>
 						) : (
-							<>
+							<Card sx={{p:6}}>
+							<Stack spacing={3}>
 							<Typography>面接は終了です。</Typography>
 							<Button variant="contained" size="large" onClick={handleStartAnalyzing}>
 								分析開始
 							</Button>
-							</>
+							</Stack>
+							</Card>
 						)}
 					</Backdrop>
 				)}

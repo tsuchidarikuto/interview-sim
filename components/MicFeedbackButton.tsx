@@ -57,38 +57,39 @@ export default function MicFeedbackButton({
 
     return (
         <>
-        <Button
-  variant="contained"
-  size="large"
-  disabled={isPlayingAudio || isRecording} // どちらかが true の場合、ボタンは無効化
-  sx={{
-    transform: (isPlayingAudio || !isRecording) ? "none" : `scale(${scale})`,
-    transition: "transform 0.1s ease-out",
-    backgroundColor: isRecording ? "red" : undefined,
-    borderRadius:"50%",
-    height: "70px",
-    width: "70px",
-    // disabled 状態のスタイルを上書き
-    "&.Mui-disabled": {
-      backgroundColor: isRecording ? "red" : "gray", 
-      opacity: 1, // opacity の変更が不要なら 1 にする
-      color: "#fff", // テキストやアイコンの色
-    borderRadius: "50%",
-    height:"70px",
-    width:"70px"
-  },
-}}
-  onClick={() => {
-    handleListenUserSpeach();
-  }}
->
-  <MicIcon fontSize="large" />
-</Button>
-{(isPlayingAudio || isRecording)||
-    <Typography variant = "body1" sx={{mt:1}}>
-    Click me !
-</Typography>}
-</>
+            <Button
+                variant="contained"
+                size="large"
+                disabled={isPlayingAudio || isRecording} // どちらかが true の場合、ボタンは無効化
+                sx={{
+                    transform: (isPlayingAudio || !isRecording) ? "none" : `scale(${scale})`,
+                    transition: "transform 0.1s ease-out",
+                    backgroundColor: isRecording ? "red" : undefined,
+                    borderRadius: "50%",
+                    height: "70px",
+                    width: "70px",
+                    // disabled 状態のスタイルを上書き
+                    "&.Mui-disabled": {
+                        backgroundColor: isRecording ? "red" : "gray",
+                        opacity: 1, // opacity の変更が不要なら 1 にする
+                        color: "#fff", // テキストやアイコンの色
+                        borderRadius: "50%",
+                        height: "70px",
+                        width: "70px"
+                    },
+                }}
+                onClick={() => {
+                    handleListenUserSpeach();
+                }}
+            >
+                <MicIcon fontSize="large" />
+            </Button>
+            {(isPlayingAudio || isRecording) || (
+                <Typography variant="body1" sx={{ mt: 1, color: "gray" }}>
+                    Click me!
+                </Typography>
+            )}
+        </>
 
     );
 }

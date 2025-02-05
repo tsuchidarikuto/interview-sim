@@ -10,6 +10,7 @@ import {
 	Backdrop,
 	Button,
 	IconButton,
+	Card
 } from "@mui/material";
 import { useAtom } from "jotai";
 import {
@@ -224,51 +225,12 @@ export default function Interview() {
 		}
 	}
 
-	// プロンプトインジェクションが検知された場合のUI表示
-	if (isInjected) {
-		return (
-			<Box
-				sx={{
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					height: "100vh",
-					width: "100%",
-					backgroundColor: "black",
-				}}
-			>
-				<Box
-					sx={{
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-						height: "100vh",
-						width: "100vw",
-						backgroundImage: 'url(/warningBackGround.svg)',
-						backgroundSize: "contain",
-						backgroundRepeat: "no-repeat",
-						backgroundPosition: "center",
-					}}
-				>
-					<Stack>
-						<Box sx={{ height: "50vh" }} />
-						<Typography variant="body1" sx={{ textAlign: "center", color: "white" }}>
-							<strong>
-								プロンプトインジェクションが検知されました。<br />面接を中止します。
-							</strong>
-						</Typography>
-						<Link href="/" passHref>
-							<Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-								<Button variant="outlined" sx={{ mt: 3, color: "white", borderColor: "white" }}>
-									反省してホームに戻る
-								</Button>
-							</Box>
-						</Link>
-					</Stack>
-				</Box>
-			</Box>
-		);
-	}
+	useEffect(()=>{
+		if(isInjected){
+			
+			push('/warning')
+		}
+	},[isInjected])
 
 	// UIのメインレンダリング部分
 	return (
@@ -349,9 +311,14 @@ export default function Interview() {
 								<LinearProgressWithLabel value={analysisProgress} />
 							</Box>
 						) : (
+							<Card sx={{p:6}}>
+							<Stack spacing={3}>
+							<Typography>面接は終了です。</Typography>
 							<Button variant="contained" size="large" onClick={handleStartAnalyzing}>
 								分析開始
 							</Button>
+							</Stack>
+							</Card>
 						)}
 					</Backdrop>
 				)}
