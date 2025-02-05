@@ -298,18 +298,18 @@ export default function Interview() {
 				{isInterviewEnd && (
 					<Backdrop open={true} sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}>
 						{isAnalyzing ? (
-							<Box
+							<Card
 								sx={{
 									display: "flex",
 									flexDirection: "column",
 									alignItems: "center",
-									width: "100%",
-									margin: 10,
+									width: "80%",
+									p: 3,
 								}}
 							>
 								<Typography>分析中...</Typography>
 								<LinearProgressWithLabel value={analysisProgress} />
-							</Box>
+							</Card>
 						) : (
 							<Card sx={{p:6}}>
 							<Stack spacing={3}>
