@@ -40,7 +40,7 @@ export function AuthProvider({children}: {children:ReactNode}){
         }
     },[user,pathname,loading]);
     
-    console.log(user);
+    
 
     return (
         <AuthContext.Provider value ={{user}}>{children}</AuthContext.Provider>
