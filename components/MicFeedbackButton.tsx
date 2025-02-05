@@ -64,15 +64,19 @@ export default function MicFeedbackButton({
     transform: (isPlayingAudio || !isRecording) ? "none" : `scale(${scale})`,
     transition: "transform 0.1s ease-out",
     backgroundColor: isRecording ? "red" : undefined,
-    height: "60px",
-    width: "60px",
+    borderRadius:"50%",
+    height: "70px",
+    width: "70px",
     // disabled 状態のスタイルを上書き
     "&.Mui-disabled": {
       backgroundColor: isRecording ? "red" : "gray", 
       opacity: 1, // opacity の変更が不要なら 1 にする
       color: "#fff", // テキストやアイコンの色
-    },
-  }}
+    borderRadius: "50%",
+    height:"70px",
+    width:"70px"
+  },
+}}
   onClick={() => {
     handleListenUserSpeach();
   }}
