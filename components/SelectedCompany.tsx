@@ -5,8 +5,8 @@ import { AuthContext } from "@/provider/AuthContext";
 import type { CompanyTypes, SelectedCompanyTypes } from "@/types";
 import { getArrayDataFromFirestore, getDataFromFirestoreWithId } from "@/utils/handleFirebase";
 import Link from "next/link";
-import { Edit, ArrowBack } from "@mui/icons-material";
-import Grid from "@mui/material/Grid2";
+import { Edit, GridView } from "@mui/icons-material";
+
 
 export default function SelectedCompany() {
     const { user } = useContext(AuthContext);
@@ -31,12 +31,7 @@ export default function SelectedCompany() {
         fetchCompany();
     }, [user]);
 
-   
-
-    
-
-
-    const longTextStyle = {
+   const longTextStyle = {
         display: "-webkit-box",
         WebkitLineClamp: 3,
         WebkitBoxOrient: "vertical",
@@ -123,6 +118,7 @@ export default function SelectedCompany() {
                 <Link href={"/company"} passHref>
                     <Button
                         variant="outlined"
+                        startIcon={<GridView />}
                         sx={{
                             minWidth: "100px",
                             "&:hover": { backgroundColor: "#f5f5f5" }
