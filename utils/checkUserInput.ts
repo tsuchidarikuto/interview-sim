@@ -11,7 +11,7 @@ export default async function checkUserInput(
     ){
         try{
         let continueInstraction = ""        
-
+        console.log(isConversationLimitReached);
         if (!settingInfo) {
             return;
         }

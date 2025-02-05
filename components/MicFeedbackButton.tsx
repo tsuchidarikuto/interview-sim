@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import { Button, Typography } from "@mui/material";
+import { Button, Typography ,Box} from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
 import { useAtom } from "jotai";
 import { isPlayingAudioAtom ,isRecordingAtom} from "@/atoms/state";
@@ -56,7 +56,7 @@ export default function MicFeedbackButton({
     const scale = 1 + micVolume / 50; // 調整値はお好みで変更してください
 
     return (
-        <>
+        <Box sx={{height:150}}>
             <Button
                 variant="contained"
                 size="large"
@@ -89,7 +89,7 @@ export default function MicFeedbackButton({
                     Click me!
                 </Typography>
             )}
-        </>
+        </Box>
 
     );
 }

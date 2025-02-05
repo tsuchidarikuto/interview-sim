@@ -63,7 +63,7 @@ export default function Interview() {
 	// 会話の回数制限
 	const conversationLimit =
 		setting?.difficulty === "激ムズ"
-			? 2
+			? 4
 			: setting?.difficulty === "難しい"
 			? 3
 			: setting?.difficulty === "普通"
@@ -152,7 +152,7 @@ export default function Interview() {
 		const updatedConversation = [...currentConversation, { role: "user", message }];
 		setCurrentConversation(updatedConversation);
 
-		const isConversationLimitReached = conversationCount + 1 === conversationLimit;
+		const isConversationLimitReached = conversationCount+1 >= conversationLimit;
 
 		if (questions) {
 			const checkedResponse = await checkUserInput(
