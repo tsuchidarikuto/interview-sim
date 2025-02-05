@@ -49,7 +49,13 @@ export default function MailBox() {
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', p: 2, minHeight: '80vh' }}>
-            <Typography variant="h5"><strong>MailBox</strong></Typography>
+            <Box sx={{ my: 2 }}>
+                <Typography variant="h4"><strong>MailBox</strong></Typography>                
+                <Typography variant="subtitle1" color="text.secondary">
+                    新着メッセージと履歴をチェックしてみましょう
+                </Typography>
+            </Box>
+            
             
             <Card variant="outlined" sx={{height:"60vh"}}>
                 {isFetching ? (
