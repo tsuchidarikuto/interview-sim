@@ -2,9 +2,9 @@
 import {
 	Box,
 	Button,
-	Avatar,
+	
 	Container,
-	Stack,
+	Card,
 	Typography,
 	Backdrop
 } from "@mui/material";
@@ -15,7 +15,8 @@ import {
 	resumeAtom,
 	companyAtom,
 	settingAtom,
-	isRecordingAtom
+	isRecordingAtom,
+	isPlayingAudioAtom
 } from "@/atoms/state";
 import { useState, useEffect, useContext, useRef } from "react";
 import { ConversationTypes, interviewResultTypes } from "@/types";
@@ -26,10 +27,11 @@ import { AuthContext } from "@/provider/AuthContext";
 import checkUserInput from "@/utils/checkUserInput";
 import { styled } from "@mui/system";
 import LinearProgressWithLabel from "@/components/LinearProgressWithLabel";
-import Link from "next/link";
-import { SpeachToText } from "@/utils/handleAzureSpeach";
+import { SpeachToText, stopAudio } from "@/utils/handleAzureSpeach";
 import { useSpeechQueue } from "@/utils/useSpeechQueue";
 import MicFeedbackButton from "@/components/MicFeedbackButton";
+
+
 
 
 export default function Interview() {
@@ -53,10 +55,10 @@ export default function Interview() {
 	const [isInterviewEnd, setIsInterviewEnd] = useState<boolean>(false);
 	const [analysisProgress, setAnalysisProgress] = useState<number>(0);
 	const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-	const [currentInterest,setCurrentInterest] =useState<number>(3)
+	const [currentInterest,setCurrentInterest] =useState<number>(3);
+	const [,setIsPlayingAudio]=useAtom(isPlayingAudioAtom);
 
-  // Extract the enqueue function from the speech queue hook
-	const { enqueue } = useSpeechQueue();
+	const { enqueue,clearQueue } = useSpeechQueue();
 
 	// 会話の回数制限
 	const conversationLimit =
@@ -68,24 +70,27 @@ export default function Interview() {
 			? 2
 			: 1;
 
-	const CenteredAvatar = styled(Avatar)(({ theme }) => ({
-		width: 200,
-		height: 200,
-	}));
+	
 
 	// 初回レンダリング時に最初の質問を設定
 	useEffect(() => {
+		setIsPlayingAudio(true);
 		async function speakFirstQuestion() {
 			if (hasSpokenFirstQuestion.current) return;
 			hasSpokenFirstQuestion.current = true;
 			await enqueue(questions[0].question);
 		}
 		if (questions?.length) {
+		
 			setCurrentConversation([
 				{ role: "system", message: questions[0].question, interest: 3 },
 			]);
 			speakFirstQuestion();
 		}
+		return () => {
+			stopAudio();
+			clearQueue();			
+		};
 	}, []);
 
 	// 話題終了時の処理
@@ -123,6 +128,12 @@ export default function Interview() {
 		}
 	}, [isSubjectEnd]);
 
+	useEffect(()=>{
+		if(isInjected){
+			push('/warning')
+		}
+	},[isInjected])
+
 	// ユーザーの入力送信処理
 	async function handleListenUserSpeach() {		
 		setIsRecording(true);
@@ -159,7 +170,7 @@ export default function Interview() {
 					interest: checkedResponse.interest,
 				},
 			]);
-			// Use enqueue from useSpeechQueue instead of calling TextToSpeach directly
+			
 			setIsRecording(false);
 			await enqueue(checkedResponse.response);
 		}
@@ -199,53 +210,7 @@ export default function Interview() {
 			console.error("Error during analysis:", e);
 		}
 	}
-	//プロンプトインジェクション対策
-	if (isInjected) {
-		enqueue("プロンプトインジェクションが検知されました。面接を中止します。二度としないでください");
-		return (
-			<Box
-				sx={{
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					height: "100vh",
-					width: "100%",
-					backgroundColor: "black",
-				}}
-			>
-				<Box
-					sx={{
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-						height: "100vh",
-						width: "100vw",
-						backgroundImage: 'url(/warningBackGround.svg)',
-						backgroundSize: "contain",
-						backgroundRepeat: "no-repeat",
-						backgroundPosition: "center",
-					}}
-				>
-					<Stack>
-						<Box sx={{ height: "50vh" }} />
-						<Typography variant="body1" sx={{ textAlign: "center", color: "white" }}>
-							<strong>
-								プロンプトインジェクションが検知されました。<br />面接を中止します。
-							</strong>
-						</Typography>
-						<Link href="/" passHref>
-							<Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-								<Button variant="outlined" sx={{ mt: 3, color: "white", borderColor: "white" }}>
-									反省してホームに戻る
-								</Button>
-							</Box>
-						</Link>
-					</Stack>
-				</Box>
-			</Box>
-		);
-	}
-
+	
 	
 	
 
@@ -257,17 +222,31 @@ export default function Interview() {
 				flexDirection: "column",
 				alignItems: "center",
 				justifyContent: "center",
-				height: "100vh",
+				height: "80vh",
 			}}
 		>
-			<CenteredAvatar src={`/avatar_${currentInterest}.svg`} alt="system" />
-			<Box sx={{ mt: 3 }}>
+			<Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+				<Card
+					sx={{						                                
+						backgroundImage: `url(/avatar_${currentInterest}.svg)`,
+						backgroundSize: 'contain',
+						backgroundRepeat: 'no-repeat',
+						backgroundPosition: 'center',
+						height:300,
+						width: 300,
+						border:"6px solid #555555",
+						borderRadius:"7%"
+					}}
+				/>
+			</Box>
+			<Box sx={{ mt: 5 }}>
 				<MicFeedbackButton
 					handleListenUserSpeach={handleListenUserSpeach}
 				>
-
 				</MicFeedbackButton>
 			</Box>
+
+			
 			<Box sx={{ mt: 2 }}>
 				{isInterviewEnd && (
 					<Backdrop open={true} sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -285,9 +264,12 @@ export default function Interview() {
 								<LinearProgressWithLabel value={analysisProgress} />
 							</Box>
 						) : (
+							<>
+							<Typography>面接は終了です。</Typography>
 							<Button variant="contained" size="large" onClick={handleStartAnalyzing}>
 								分析開始
 							</Button>
+							</>
 						)}
 					</Backdrop>
 				)}
