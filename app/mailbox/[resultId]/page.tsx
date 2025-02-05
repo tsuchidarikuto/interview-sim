@@ -24,6 +24,7 @@ import {
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import BuildIcon from '@mui/icons-material/Build';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import { Settings} from '@mui/icons-material';
 import InterestShiftChart from '@/components/InterestShiftChart';
 
 export default function Page() {
@@ -100,25 +101,18 @@ export default function Page() {
                     subheader={`${time}`}
                     action={
                         <Chip
-                            label={result.isPass ? 'Passed' : 'Not Passed'}
+                            label={result.isPass ? 'Passed' : 'Failed'}
                             color={result.isPass ? 'success' : 'error'}
                         />
                     }
                 />
                 <CardContent>
                     <Box sx={{ height: "60vh", overflowY: 'auto', pr: 2 }}>
-                        <Typography variant="h6" gutterBottom>
+                        <Typography variant="h6" sx={{my:2}}>
                             {resume.name} 様
                         </Typography>
     
-                        <Typography >
-                            この度は{company.name}の{company.position}職の選考にご応募いただき、
-                            誠にありがとうございます。
-                        </Typography>
-                        <br/>                           
-                        <Typography variant="subtitle1" fontWeight="bold">
-                            面接結果
-                        </Typography>
+                        
                         <Typography sx={{ whiteSpace: 'pre-line' }}>
                             {result.isPass 
                                 ? "この度は、選考にご参加いただき、誠にありがとうございました。\n\n" +
@@ -169,12 +163,16 @@ export default function Page() {
                         <Typography variant="subtitle1" fontWeight="bold">
                             面接情報
                         </Typography>
-                        <Box sx={{ my: 2 }}>                            
+                        
+                                
+                                
+                                                            
+                        <Box sx={{ my: 2 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                 <BuildIcon sx={{ mr: 1 }} />
                                 <span>面接形式: {setting.interviewType}</span>
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center',mb:1}}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                 <FitnessCenterIcon sx={{ mr: 1 }} />
                                 <span>難易度: {setting.difficulty}</span>
                             </Box>
@@ -182,10 +180,14 @@ export default function Page() {
                                 <AccessAlarmIcon sx={{ mr: 1 }} />
                                 <span>面接時間: {setting.duration}</span>
                             </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                <Settings sx={{mr:1}}/>
+                                <span>面接モード: {setting.interviewMode === 'voice' ? '音声' : 'チャット'}</span>
+                            </Box>
                         </Box>
     
                         <Typography >
-                            人事部   {company.name}
+                            {company.name}
                         </Typography>
                         <Divider sx={{ my: 3 }} />
                         <Typography variant="subtitle1" fontWeight="bold">
