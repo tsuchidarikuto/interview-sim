@@ -131,6 +131,7 @@ export default function Interview() {
 		//エラー字は音声だけ出力し戻る。インクリメントや会話履歴の保存等は行わない。
 		if(message==="error"){
 			enqueue("すみません、聞き取れませんでした。もう一度話してください。");
+			setIsRecording(false);
 			return;
 		}
 				
