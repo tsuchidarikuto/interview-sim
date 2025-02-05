@@ -102,6 +102,7 @@ export default function CenteredTabs() {
 						
 				</Grid>
 				<Grid size={12}>
+				{user &&
 				<Button 
 					size="large"
 					variant="contained"					
@@ -110,7 +111,7 @@ export default function CenteredTabs() {
 					sx={{mb:5}}
 				>
 					面接開始
-				</Button>
+				</Button>}
 				</Grid>
 			</Grid>
 			
