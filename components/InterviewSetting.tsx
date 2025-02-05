@@ -14,16 +14,16 @@ import {
     Radio,
     Card,
     CardContent,
-    CardHeader
+    CardHeader,
+    Checkbox,
+    CardMedia
 } from '@mui/material';
-
 import React, { useState, useEffect, useContext, FormEvent } from 'react';
 import { getArrayDataFromFirestore, updateDataOnFirestore, addDataToFirestore } from '@/utils/handleFirebase';
 import { SettingTypes } from '@/types';
 import { AuthContext } from '@/provider/AuthContext';
 
 export default function InterviewSetting() {
-    
     const { user } = useContext(AuthContext);
 
     const [settingInfo, setSettingInfo] = useState<SettingTypes[]>([
@@ -33,11 +33,11 @@ export default function InterviewSetting() {
             difficulty: '難しい',
             duration: 30,
             interviewType: '',
-        },
+            interviewMode: 'voice'
+        }
     ]);
 
     const [isLoading, setIsLoading] = useState(false);
-    
     const [isNew, setIsNew] = useState(false);
     const [isFetchingSetting, setIsFetchingSetting] = useState(true);
 
@@ -66,14 +66,7 @@ export default function InterviewSetting() {
             if (user) {
                 const data = await getArrayDataFromFirestore<SettingTypes>('setting', user.uid);
                 if (data.length === 0) {
-                    setIsNew(true);                                        
-                    setSettingInfo([{
-                        uid: user.uid,
-                        id: '',
-                        difficulty: '難しい',
-                        duration: 30,
-                        interviewType: '複合面接',
-                    }]);
+                    setIsNew(true);
                     setIsFetchingSetting(false);
                     return;
                 }
@@ -84,106 +77,176 @@ export default function InterviewSetting() {
         fetchData();
     }, [user]);
 
-
+    const handleModeSelect = (mode: "voice" | "chat") => {
+        setSettingInfo((prev) => [{ ...prev[0], interviewMode: mode }]);
+    };
 
     return (
-        // Wrapping the entire content in a Box with a smaller font size.
-        <Box >
-            <Card variant="outlined" sx={{ p: 1, pb: 0, height:{xs:390,sm:370,md:370}  }}>
-                <CardHeader 
-                    title="面接設定" 
-                    subheader="選択した履歴書と企業情報を確認・編集できます。" 
-                    sx={{ pb: 1 }}                    
+        <Box>
+            <Card variant="outlined" sx={{ p: 1, pb: 0, height: { md: 740 } }}>
+                <CardHeader
+                    title="面接設定"
+                    subheader="面接の形式を設定できます。"
                     subheaderTypographyProps={{ sx: { fontSize: { xs: '0.8rem', sm: '1rem' } } }}
                 />
-                <CardContent sx={{ py: 0 }}>
-                    {isFetchingSetting ?
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 280 }}>
-                        <CircularProgress/>
-                    </Box>    
-                    :(
-                        
-                    <form onSubmit={handleSubmit}>
-                        <Stack spacing={1.5} >
-                            <Box >
-                            <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 0 }}>
-                                    難易度
-                                </Typography>
-                                <Box sx={{display:"flex",justifyContent:"center",width:"100%"}}>
-                                <TextField
-                                    select
-                                    fullWidth
-                                    required
-                                    size="medium"
-                                    id="difficulty"
-                                    variant="standard"
-                                    value={settingInfo[0].difficulty}
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                        setSettingInfo((prev) => [{ ...prev[0], difficulty: event.target.value }])
-                                    }
-                                    sx={{width:"90%"}}
-                                >
-                                    <MenuItem value={'簡単'}>簡単</MenuItem>
-                                    <MenuItem value={'普通'}>普通</MenuItem>
-                                    <MenuItem value={'難しい'}>難しい</MenuItem>
-                                    <MenuItem value={'激ムズ'}>激ムズ</MenuItem>
-                                </TextField>
+                <CardContent sx={{ pt: 3 }}>
+                    {isFetchingSetting ? (
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 545 }}>
+                            <CircularProgress />
+                        </Box>
+                    ) : (
+                        <form onSubmit={handleSubmit}>
+                            <Stack spacing={6}>
+                                <Box>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 0 }}>
+                                        難易度
+                                    </Typography>
+                                    <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                                        <TextField
+                                            select
+                                            fullWidth
+                                            required
+                                            size="medium"
+                                            id="difficulty"
+                                            variant="standard"
+                                            value={settingInfo[0].difficulty}
+                                            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                                                setSettingInfo((prev) => [{ ...prev[0], difficulty: event.target.value }])
+                                            }
+                                            sx={{ width: "90%" }}
+                                        >
+                                            <MenuItem value={'簡単'}>簡単</MenuItem>
+                                            <MenuItem value={'普通'}>普通</MenuItem>
+                                            <MenuItem value={'難しい'}>難しい</MenuItem>
+                                            <MenuItem value={'激ムズ'}>激ムズ</MenuItem>
+                                        </TextField>
+                                    </Box>
                                 </Box>
-                            </Box>
-                            <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 0 }}>
-                                    面接の長さ: {settingInfo[0].duration}分
-                                </Typography>
-                                <Box sx={{display:"flex",justifyContent:"center",width:"100%"}}>
-                                <Slider
-                                    value={settingInfo[0].duration}
-                                    defaultValue={30}
-                                    step={5}
-                                    marks
-                                    min={5}
-                                    max={60}
-                                    valueLabelDisplay="auto"
-                                    onChange={(_, newValue) =>
-                                        setSettingInfo((prev) => [{ ...prev[0], duration: newValue as number }])
-                                    }
-                                    sx={{width:"85%"}}
-                                />
+                                <Box>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 0 }}>
+                                        面接の長さ: {settingInfo[0].duration}分
+                                    </Typography>
+                                    <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                                        <Slider
+                                            value={settingInfo[0].duration}
+                                            defaultValue={30}
+                                            step={5}
+                                            marks
+                                            min={5}
+                                            max={60}
+                                            valueLabelDisplay="auto"
+                                            onChange={(_, newValue) =>
+                                                setSettingInfo((prev) => [{ ...prev[0], duration: newValue as number }])
+                                            }
+                                            sx={{ width: "85%" }}
+                                        />
+                                    </Box>
                                 </Box>
-                            </Box>
-                            <Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 0 }}>
-                                    面接形式
-                                </Typography>
-                                <Box sx={{display:"flex",justifyContent:"center",width:"100%"}}>
-                                <FormControl>
-                                    <RadioGroup
-                                        row
-                                        value={settingInfo[0].interviewType}
-                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                            setSettingInfo((prev) => [{ ...prev[0], interviewType: event.target.value }])
-                                        }
-                                        
-                                    >
-                                        <FormControlLabel value="複合面接" control={<Radio />} label="複合面接" />
-                                        <FormControlLabel value="技術面接" control={<Radio />} label="技術面接" />
-                                        <FormControlLabel value="行動面接" control={<Radio />} label="行動面接" />
-                                    </RadioGroup>
-                                </FormControl>
+                                <Box>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 0 }}>
+                                        面接形式
+                                    </Typography>
+                                    <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                                        <FormControl>
+                                            <RadioGroup
+                                                row
+                                                value={settingInfo[0].interviewType}
+                                                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                                                    setSettingInfo((prev) => [{ ...prev[0], interviewType: event.target.value }])
+                                                }
+                                            >
+                                                <FormControlLabel value="複合面接" control={<Radio />} label="複合面接" />
+                                                <FormControlLabel value="技術面接" control={<Radio />} label="技術面接" />
+                                                <FormControlLabel value="行動面接" control={<Radio />} label="行動面接" />
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </Box>
                                 </Box>
-                            </Box>
+                                <Box>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#000", mb: 1 }}>
+                                        面接モードの選択
+                                    </Typography>
+                                    <Box sx={{ display: "flex", justifyContent: "center", width: "100%", gap: 2 }}>
+                                        <Card
+                                            variant="outlined"
+                                            sx={{
+                                                position: "relative",
+                                                cursor: "pointer",
+                                                border:
+                                                    settingInfo[0].interviewMode === "voice"
+                                                        ? "3px solid #000000"
+                                                        : "1px solid rgba(0, 0, 0, 0.12)",
+                                                width: "100%",
+                                                height: 180
+                                            }}
+                                            onClick={() => handleModeSelect("voice")}
+                                        >
+                                            <Checkbox checked={settingInfo[0].interviewMode === "voice"} sx={{pb:0,px:1.5}}/>
+                                            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+				                                <Box
+					                                sx={{						                                
+												        backgroundImage: 'url(/speech.svg)',
+												        backgroundSize: 'contain',
+												        backgroundRepeat: 'no-repeat',
+												        backgroundPosition: 'center',
+												        height: 100,
+												        width: 100,
+											        }}
+										        />
+                                                
+									        </Box>
+                                            <Typography variant="body1" sx={{textAlign:"center",p:1,fontWeight:"bold"}}>
+                                                音声
+                                            </Typography>
+                                        </Card>
+                                        <Card
+                                            variant="outlined"
+                                            sx={{
+                                                position: "relative",
+                                                cursor: "pointer",
+                                                border:
+                                                    settingInfo[0].interviewMode === "chat"
+                                                        ? "3px solid #000000"
+                                                        : "1px solid rgba(0, 0, 0, 0.12)",
+                                                width: "100%",
+                                                height: 180
+                                            }}
+                                            onClick={() => handleModeSelect("chat")}
+                                        >
+                                            <Checkbox checked={settingInfo[0].interviewMode === "chat"} sx={{pb:0,px:1.5}}/>
+                                            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+				                                <Box
+					                                sx={{						                                
+												        backgroundImage: 'url(/chat.svg)',
+												        backgroundSize: 'contain',
+												        backgroundRepeat: 'no-repeat',
+												        backgroundPosition: 'center',
+												        height: 100,
+												        width: 100,
+											        }}
+										        />
+									        </Box>
+                                            <Typography variant="body1" sx={{textAlign:"center",p:1,fontWeight:"bold"}}>
+                                                チャット
+                                            </Typography>
+                                        </Card>
+                                    </Box>
+                                </Box>
+                            </Stack>
                             {isLoading ? (
-                                <CircularProgress />
+                                <CircularProgress sx={{ width: 'fit-content', alignSelf: 'left', mt: 2 }}/>
                             ) : (
-                                <Button 
-                                    type="submit" 
-                                    variant="outlined" 
-                                    sx={{ width: 'fit-content', alignSelf: 'left' }}
+                                <Button
+                                    type="submit"
+                                    variant="outlined"
+                                    sx={{ width: 'fit-content', alignSelf: 'left', mt: 2 }}
                                 >
                                     保存する
                                 </Button>
                             )}
-                        </Stack>
-                    </form>)}
+                        </form>
+                    )}
+                    
                 </CardContent>
             </Card>
         </Box>

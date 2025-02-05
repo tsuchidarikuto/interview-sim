@@ -26,3 +26,6 @@ export const resumeAtom = atom<ResumeTypes>();
 export const settingAtom = atom<SettingTypes>();
 
 export const rankingAtom = atom<RankingTypes[]>([]);
+
+export const isRecordingAtom = atom <boolean>(false);
+export const isPlayingAudioAtom = atom<boolean>(false);

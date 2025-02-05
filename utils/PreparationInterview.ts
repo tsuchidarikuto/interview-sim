@@ -17,12 +17,13 @@ export async function PreparationInterview(
         
     const selectedResumeId:SelectedResumeTypes[] = await getArrayDataFromFirestore<SelectedResumeTypes>('selectedResume',uid);
     const selectedCompanyId:SelectedCompanyTypes[] = await getArrayDataFromFirestore<SelectedCompanyTypes>('selectedCompany',uid);
-    
+    console.log(selectedResumeId);
     setProgress(20);
     
-    const resumeDataFromFirestore = await getDataFromFirestoreWithId<ResumeTypes>('resumes',selectedResumeId[0].id)            
-    const companyDataFromFirestore = await getDataFromFirestoreWithId<CompanyTypes>('resumes',selectedCompanyId[0].id)    
+    const resumeDataFromFirestore = await getDataFromFirestoreWithId<ResumeTypes>('resumes',selectedResumeId[0].selectedResumeId)            
+    const companyDataFromFirestore = await getDataFromFirestoreWithId<CompanyTypes>('company',selectedCompanyId[0].selectedCompanyId)    
     const settingDataFromFirestore = await getArrayDataFromFirestore<SettingTypes>('setting',uid);
+    console.log(resumeDataFromFirestore);
 
     setResume(resumeDataFromFirestore)
     setCopmany(companyDataFromFirestore)
@@ -85,6 +86,8 @@ export async function PreparationInterview(
         面接内容は面接の難易度と面接のタイプに合わせて適切な質問をしてください。
         質問の量は面接時間に合わせてください。
         ただし質問の数は${numberOfQuestions}個にしてください。
+        ただし、最初の質問には必ず挨拶を含めること
+        
         質問の順番は一般的な面接の流れに沿ってください。
         **設定:**
 
@@ -97,13 +100,13 @@ export async function PreparationInterview(
             {
                 questions:[{
                     id: <質問id>,
-                    question: "<質問内容>"
+                    question: "<質問内容(端的に一つのことについて聞く)>"
                 },]
             }
 
 
     `;
-    console.log(systemPrompt);
+    
 
     const prompt = `
         #応募者の情報
@@ -136,19 +139,19 @@ export async function PreparationInterview(
         ##その他特記事項
             ${companyDataFromFirestore.others}
     `;
-
+    console.log(prompt)
     setProgress(80);
 
     const questionList = await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt,"questions");
     setProgress(90);
-    console.log(questionList)
+    
     const parsedQuestionList = JSON.parse(questionList)
-    console.log(parsedQuestionList)
+    
     setQuestions(parsedQuestionList.questions)
     
 
-    
-    return;
+    //ページ遷移用に面接モードを返す
+    return settingDataFromFirestore[0].interviewMode;
 }catch(e){
     console.error('Error during preparation:', e);
     return ;

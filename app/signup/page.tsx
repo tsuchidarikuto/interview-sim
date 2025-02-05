@@ -67,7 +67,8 @@ export default function Page() {
             id: "",
             difficulty: "普通",
             duration: 30,
-            interviewType: "複合面接"
+            interviewType: "複合面接",
+            interviewMode:"voice"
           };
           await addDataToFirestore<SettingTypes>("setting", settingData, userCredential.user.uid);
     

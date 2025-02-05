@@ -1,6 +1,6 @@
 'use client';
-import { useState, useContext } from 'react';
-import { Box, Stack, Typography, Container, Button } from '@mui/material';
+import { useState, useContext ,useEffect} from 'react';
+import { Box,  Typography, Container, Button } from '@mui/material';
 
 import InterviewSetting from '@/components/InterviewSetting';
 import LinearProgressWithLabel from '@/components/LinearProgressWithLabel';
@@ -11,7 +11,8 @@ import { AuthContext } from "@/provider/AuthContext";
 import { PreparationInterview } from '@/utils/PreparationInterview';
 import ResumeAndCompanyTab from '@/components/ResumeAndCompanyTab';
 import Grid from '@mui/material/Grid2'
-import MailboxAbstract from '@/components/MailboxAbstract';
+import { stopAudio } from '@/utils/handleAzureSpeach';
+
 
 export default function CenteredTabs() {
 	const { user } = useContext(AuthContext);
@@ -21,10 +22,13 @@ export default function CenteredTabs() {
 	const [, setQuestions] = useAtom(questionsAtom);
 	const [, setResume] = useAtom(resumeAtom);
 	const [, setCompany] = useAtom(companyAtom);
-	const [, setSetting] = useAtom(settingAtom);
+	const [setting, setSetting] = useAtom(settingAtom);
 	const [progress, setProgress] = useState(0);
 
-	// タブ切り替え
+	
+	useEffect(()=>{
+		stopAudio()
+	},[])
 	
 	// 面接開始時の動作
 	const handleStartInterview = async () => {
@@ -36,13 +40,21 @@ export default function CenteredTabs() {
 			}
 
 			// 面接準備の処理（質問リストの生成、履歴書・会社情報のセットなど）
-			await PreparationInterview(setProgress, setQuestions, setResume, setCompany, setSetting, user.uid);
+			const selectedInterviewMode = await PreparationInterview(setProgress, setQuestions, setResume, setCompany, setSetting, user.uid);
 
 			// プログレスを100%に設定して完了状態を示す
 			setProgress(100);
 
-			// 面接ページへ遷移
-			push('/interview');
+			
+			// 面接モードに応じてpush先を変更
+			if(selectedInterviewMode==="voice"){
+				push('/interview/speach');
+			} else if(selectedInterviewMode==="chat"){
+				push('/interview/chat')
+			} else{
+				push('/')
+				console.error("error during page navigation")
+			}
 		} catch (e) {
 			// 面接準備中に何らかのエラーが発生した場合はログに出力
 			console.error('Error during preparation:', e);
@@ -85,15 +97,12 @@ export default function CenteredTabs() {
 				<Grid size={{xs:12,sm:12,md:6}}>
 					<ResumeAndCompanyTab/>
 				</Grid>
-				<Grid size={{xs:12,sm:12,md:6}} >
-					<Stack spacing={2}>
+				<Grid size={{xs:12,sm:12,md:6}} >					
 						<InterviewSetting />
-						<Box sx={{ display: { xs: 'none', md: 'block' } }}>
-							<MailboxAbstract />
-						</Box>
-					</Stack>
+						
 				</Grid>
 				<Grid size={12}>
+				{user &&
 				<Button 
 					size="large"
 					variant="contained"					
@@ -102,7 +111,7 @@ export default function CenteredTabs() {
 					sx={{mb:5}}
 				>
 					面接開始
-				</Button>
+				</Button>}
 				</Grid>
 			</Grid>
 			

@@ -21,7 +21,7 @@ export const getArrayDataFromFirestore = async <T,>(collectionName: string,uid:s
       ...doc.data(),
       id: doc.id,
     })) as T[];
-    console.log('Fetched data in getInfo:', data); // データをログ出力
+    
     return data;
   } catch (e) {
     console.error('Error fetching data:', e);

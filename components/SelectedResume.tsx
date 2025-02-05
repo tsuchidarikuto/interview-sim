@@ -12,8 +12,8 @@ import { AuthContext } from "@/provider/AuthContext";
 import type { ResumeTypes, SelectedResumeTypes } from "@/types";
 import { getArrayDataFromFirestore, getDataFromFirestoreWithId } from "@/utils/handleFirebase";
 import Link from "next/link";
-import { Edit, ArrowBack } from "@mui/icons-material";
-import Grid from "@mui/material/Grid2";
+import { Edit, GridView,AccountBox } from "@mui/icons-material";
+
 
 export default function SelectedResume() {
     const { user } = useContext(AuthContext);
@@ -74,16 +74,21 @@ export default function SelectedResume() {
                 <>
                     <Paper variant="outlined" sx={{ p: 3, height: 540 }}>
                         {/* 履歴書の名前 */}
-                        <Typography
-                            variant="h5"
-                            sx={longTextStyle}
-                        >
-                            {displayValue(resume.name)}
-                        </Typography>
-                        <Typography variant="body1" color="textSecondary">
-                            {displayValue(resume.education)}
-                        </Typography>
+                        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Box>
+                                <Typography
+                                    variant="h5"
+                                    sx={longTextStyle}
+                                >
+                                    {displayValue(resume.name)}
+                                </Typography>
+                                <Typography variant="body1" color="textSecondary">
+                                    {displayValue(resume.education)}
+                                </Typography>
+                            </Box>
+                            <AccountBox sx={{height:70,width:70,m:0,p:0}}/>
 
+                        </Box>
                         <Divider sx={{ my: 2 }} />
 
                         <Box sx={{ mb: 3 }}>
@@ -150,6 +155,7 @@ export default function SelectedResume() {
                         <Link href={"/resume"} passHref>
                             <Button
                                 variant="outlined"
+                                startIcon={<GridView />}
                                 sx={{
                                     minWidth: "100px",
                                     "&:hover": { backgroundColor: "#f5f5f5" },

@@ -32,6 +32,7 @@ export type SettingTypes={
     difficulty:string;
     duration:number;
     interviewType:string;
+    interviewMode: 'voice' | 'chat';
 }
 
 export type questionTypes={
