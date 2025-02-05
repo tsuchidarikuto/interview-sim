@@ -160,10 +160,11 @@ export default function Interview() {
 				},
 			]);
 			// Use enqueue from useSpeechQueue instead of calling TextToSpeach directly
+			setIsRecording(false);
 			await enqueue(checkedResponse.response);
 		}
 		setConversationCount((prev) => prev + 1);
-		setIsRecording(false);
+		
 	}
 	//分析開始処理
 	async function handleStartAnalyzing() {
