@@ -13,7 +13,7 @@ import { RankingTypes } from '@/types';
 import { useContext } from 'react';
 import { AuthContext } from '@/provider/AuthContext';
 
-interface RankStyle extends React.CSSProperties {}
+type RankStyle = React.CSSProperties;
 
 interface RankingProps {
     ranking: RankingTypes[];
