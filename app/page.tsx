@@ -66,6 +66,7 @@ export default function CenteredTabs() {
 		return (
 			<Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
 				<Box sx={{ width: "90%" }}>
+				<Typography>面接を準備しています...</Typography>
 					<LinearProgressWithLabel value={progress} />
 				</Box>
 			</Box>
