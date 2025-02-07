@@ -72,9 +72,12 @@ export default function Page() {
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 2, minHeight: '80vh' }}>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        <strong>Ranking</strong>
-      </Typography>
+      <Box sx={{ my: 2 }}>
+        <Typography variant="h4"><strong>Ranking</strong></Typography>                
+          <Typography variant="subtitle1" color="text.secondary">
+                          難易度ごとのランキングをチェックしましょう。
+                      </Typography>
+                  </Box>
       <Box sx={{ height: "vh"}}>
         <TabContext value={tabValue}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', position: 'sticky', top: 0, backgroundColor: '#fff'}}>
