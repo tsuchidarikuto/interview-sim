@@ -37,15 +37,15 @@ export default async function checkUserInput(
                 : "4.この話題はこれ終了なので簡単な相槌と、次の話題に移る旨を伝えるのみにしなさい。質問リストは既に用意してあるので、あなたは次の質問を考えなくていいです。";
             } else {
             return isLastSubject 
-                ? "4.isSubjectEndがtrueの場合は「簡単な相槌と、面接を終了する旨を伝えるのみ」falseの場合は「相槌と、深堀質問を1つだけ生成する」にしなさい。"
-                : "4.isSubjectEndがtrueの場合は「簡単な相槌と、次の質問に移る旨を伝えるのみ」falseの場合は「相槌と、深堀質問を1つだけ生成する」にしなさい。";
+                ? "4.命令1で指定した、深堀フラグisSubjectEndについて、これががtrue(深堀する)の場合は「簡単な相槌と、面接を終了する旨を伝えるのみ」false(深堀しない)の場合は「相槌と、深堀質問を1つだけ生成する」にしなさい。"
+                : "4.命令1で指定した、深堀フラグisSubjectEndについて、これががtrue(深堀する)の場合は「簡単な相槌と、次の質問に移る旨を伝えるのみ」false(深堀しない)の場合は「相槌と、深堀質問を1つだけ生成する」にしなさい。";
             }
         })();
         console.log(subjectEndMessage)
                 
     
 
-        const systemPrompt = `あなたは面接官の役です。
+        const systemPrompt = `あなたは面接官の補佐役です。
             入力される会話履歴のUserからのの最新の応答に対して、
                 1.  面接難易度は${continueInstraction}この話題を終わらせるか深堀するかどうかをisSubjectEndフラグとしてboolで返しなさい。終わらせる場合はtrue。
                 2.  ユーザーの回答の興味度を1から5までの数値で返してください。ここで興味度とは、面接官がユーザーの回答に対してどれだけ関心を持っているかを示す指標です。
@@ -61,9 +61,9 @@ export default async function checkUserInput(
                     "isSubjectEnd": <true or false>,
                     "interest": <1-5の整数>,
                     "isInjected": <true or false>
-                    "response": <ユーザへの応答>
+                    "response": <ユーザへの応答(深堀質問をしない場合は、次の話題は考えず、次の話題に移る事のみを伝える)>
                 } `
-                
+        console.log(systemPrompt);
         const prompt = `
         #最新の応答
         ${JSON.stringify(currentConversation[currentConversation.length-1])}
@@ -72,10 +72,10 @@ export default async function checkUserInput(
 
         
         `
-        console.log(prompt);
+        
         
         const result = JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'checkResponse'));      
-        console.log(result);
+        
         return result;
         }
         catch(e){
