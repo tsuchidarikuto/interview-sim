@@ -41,7 +41,7 @@ export default async function checkUserInput(
                 : "4.命令1で指定した、深堀フラグisSubjectEndについて、これががtrue(深堀する)の場合は「簡単な相槌と、次の質問に移る旨を伝えるのみ」false(深堀しない)の場合は「相槌と、深堀質問を1つだけ生成する」にしなさい。";
             }
         })();
-        console.log(subjectEndMessage)
+        
                 
     
 
@@ -63,7 +63,7 @@ export default async function checkUserInput(
                     "isInjected": <true or false>
                     "response": <ユーザへの応答(深堀質問をしない場合は、次の話題は考えず、次の話題に移る事のみを伝える)>
                 } `
-        console.log(systemPrompt);
+        
         const prompt = `
         #最新の応答
         ${JSON.stringify(currentConversation[currentConversation.length-1])}
@@ -74,9 +74,9 @@ export default async function checkUserInput(
         `
         
         
-        const result = JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'checkResponse'));      
-        
+        const result = JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'checkResponse'));              
         return result;
+        
         }
         catch(e){
             throw new Error(`応答の生成中にエラーが発生しました。${e}`)
