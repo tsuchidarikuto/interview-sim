@@ -10,6 +10,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import FeedBackDialog from './FeedbackDialog';
 
 interface HeaderProps {
   title: string;
@@ -73,7 +74,7 @@ export default function Header({ title }: HeaderProps) {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="subtitle1" color="inherit" sx={{ display: { xs: 'none', sm: 'block' } }}>
               {user.email}
-            </Typography>
+            </Typography>            
             <IconButton onClick={() => signOut(auth)} color="inherit">
               <LogoutOutlinedIcon fontSize="medium" />
             </IconButton>
@@ -89,6 +90,7 @@ export default function Header({ title }: HeaderProps) {
                 <EmojiEventsIcon fontSize="medium" />
               </IconButton>
             </Link>
+            <FeedBackDialog/>
           </Box>
         )}
       </Toolbar>
