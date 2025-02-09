@@ -21,7 +21,7 @@ export default function SelectedCompany() {
                 if (selectedDataFromFirestore.length > 0) {
                     const selectedCompanyIdFromFirestore = selectedDataFromFirestore[0].selectedCompanyId;          
                     const companyData = await getDataFromFirestoreWithId<CompanyTypes>("company", selectedCompanyIdFromFirestore);
-                    console.log(companyData);
+                    
                     setCompany(companyData);
                     setSelectedCompanyId(selectedCompanyIdFromFirestore);
                 }
