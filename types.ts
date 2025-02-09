@@ -109,3 +109,9 @@ export type SelectedCompanyTypes = {
     id:string;
     selectedCompanyId:string;
 }
+
+export type FeedbackTypes ={
+    uid:string;
+    id:string;
+    message:string;
+}
