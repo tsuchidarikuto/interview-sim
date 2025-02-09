@@ -15,7 +15,7 @@ import { AuthProvider } from '@/provider/AuthContext';
 
 
 export const metadata: Metadata = {
-  title: "InterviewSim",
+  title: "MenTRY",
   description: "面接をシミュレートするよ",
 };
 
