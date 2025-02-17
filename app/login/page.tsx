@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Container,Typography,TextField,Card,Button } from '@mui/material';
-
+import {login,signup} from './actions';
 import { auth } from '@/firebase';
 
 export default function Page() {
@@ -28,13 +28,13 @@ export default function Page() {
         <>
         
         <Container maxWidth="md" sx={{mt:5}}>
-        <Typography variant = "h4" align = "center" gutterBottom>ログイン</Typography>
+        <Typography variant = "h4" align = "center" gutterBottom>ログイン・新規登録</Typography>
         <Typography variant="body1" color="text.secondary" align="center">
             InterviewSimを始めるには<br/>
             InterviewSimアカウントにログインして下さい
         </Typography>
         <Card sx={{p:3}} variant='outlined'>
-            <form onSubmit = {handleLogin}>
+            <form >
                 <TextField
                     required
                     label="メールアドレス"
@@ -54,13 +54,34 @@ export default function Page() {
                     sx={{mb:5}}
                 
                 />
-                <Button type="submit" variant='contained' sx={{mb:5,height:55,width:'100%', backgroundColor:'#555'}}>ログイン</Button>
-            </form>
-            <Card variant='outlined'>
-            <Link href="/signup">
-                <Typography variant="body1" align = "center" sx={{textDecoration: 'underline' ,cursor:"pointer",p:5}}>新規登録はこちら</Typography>
-            </Link>
-            </Card>
+                <Button 
+                    formAction ={login}
+                    type="submit" 
+                    variant='contained' 
+                    sx={{
+                        mb:5,
+                        height:55,
+                        width:'100%', 
+                        backgroundColor:'#555'
+                    }}
+                >
+                        ログイン
+                </Button>
+
+                <Button 
+                    formAction ={signup}
+                    variant='contained' 
+                    sx={{
+                        mb:5,
+                        height:55,
+                        width:'100%', 
+                        backgroundColor:'#555'
+                    }}
+                >
+                        新規登録
+                </Button>
+                
+            </form>            
             </Card>
         </Container>
 

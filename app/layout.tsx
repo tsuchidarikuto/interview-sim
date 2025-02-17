@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-
 import "./globals.css";
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
-
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ThemeProvider } from "@mui/material/styles"; 
 import {theme} from '@/styles/theme';
 import {Provider} from 'jotai';
-
-import { AuthProvider } from '@/provider/AuthContext';
 
 
 
@@ -29,16 +25,14 @@ export default function RootLayout({
     <head>    
     <meta property="og:image" content="/og-image.png"/>
     </head>
-    <body className="Paper_v2" style={{height:"100vH"}}>
-    <AuthProvider>
+    <body className="Paper_v2" style={{height:"100vH"}}>    
         <Provider>
           <ThemeProvider theme={theme}>          
             <Header title="" />              
               {children}                        
             <Footer/>          
           </ThemeProvider>
-        </Provider>
-        </AuthProvider>
+        </Provider>    
     </body>
   </html>
   );
