@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/client'
 
 import { useSearchParams } from 'next/navigation'
+import { useEffect } from 'react';
 
 
 const getErrorMessage = (error: string) => {
@@ -18,6 +19,9 @@ export default function SignIn() {
     const supabase = createClient()
     const searchParams = useSearchParams()
     const error = searchParams.get('error')
+    const userId = searchParams.get('userId');
+    const userName = searchParams.get('userName');
+    
 
     const handleSignInWithGoogle = async () => {
         const { error } = await supabase.auth.signInWithOAuth({
@@ -32,6 +36,8 @@ export default function SignIn() {
         })
         
     }
+
+    
 
     return (
         
