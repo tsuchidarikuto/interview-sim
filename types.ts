@@ -126,3 +126,8 @@ export type Database = {
       }
     }
   }
+
+  export type UserTypes = {
+    userId:string;
+    name:string;
+  }
