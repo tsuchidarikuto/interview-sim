@@ -1,21 +1,20 @@
-export type ResumeTypes={
-    id:string;
-    uid:string;
-    name:string;
-    birth:string;
-    age:number|string;
-    sex:number;
-    education:string;
-    programming:string;
-    qualification:string;
-    reason:string;
-    selfPR:string;
-    research:string;
-    bestAtStu:string;
+export type ResumeTypes={ 
+    id?:string;
+    uid: string;
+    name: string;
+    education: string;
+    programming: string;
+    qualification: string;
+    birthday: string;
+    age: string;
+    sex: number;
+    selfProduction: string;
+    research: string;
+    studentAchievements: string;
+    reasonForApply: string;
 }
 
-export type CompanyTypes={
-    id:string;
+export type CompanyTypes={    
     uid:string;
     name:string;
     position:string;
@@ -115,3 +114,15 @@ export type FeedbackTypes ={
     id:string;
     message:string;
 }
+
+export type Database = {
+    public: {
+      Tables: {
+        [key: string]: {
+          Row: unknown
+          Insert: unknown
+          Update: unknown
+        }
+      }
+    }
+  }
