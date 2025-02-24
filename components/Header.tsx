@@ -9,19 +9,27 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { createClient } from '@/utils/supabase/client';
 import FeedBackDialog from './FeedbackDialog';
+import { useRouter } from 'next/navigation';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/atoms/state';
 
 export default function Header() {  
     const supabase = createClient();
-    const [user, setUser] = useState<any>(null);
+    const {push} = useRouter();
+    const [user,] = useAtom(userAtom);
 
-    useEffect(() => {
-        const getUser = async () => {
-          const { data: { user } } = await supabase.auth.getUser();
-          console.log(user);
-          setUser(user);
-        };
-        getUser();
-      }, []);
+    
+
+    const doLogout = async () => {
+        try {
+            await supabase.auth.signOut();
+            console.log('Logout successful');
+            push('/login');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    }
+    
 
     return (
         <AppBar position="sticky">
@@ -44,9 +52,9 @@ export default function Header() {
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Typography variant="subtitle1" color="inherit" sx={{ display: { xs: 'none', sm: 'block' } }}>
-                        こんにちは
+                        こんにちは{user?.name}さん
                     </Typography>            
-                    <IconButton color="inherit">
+                    <IconButton color="inherit" onClick={doLogout}>
                         <LogoutOutlinedIcon fontSize="medium" />
                     </IconButton>
                     
