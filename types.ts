@@ -15,18 +15,19 @@ export type ResumeTypes={
 }
 
 export type CompanyTypes={    
+    id?:string;
     uid:string;
     name:string;
     position:string;
-    skillset?:string;
+    skillset:string;
     mission:string;
     product:string;
     culture:string;
-    others?:string;
+    others:string;
 }
 
 export type SettingTypes={
-    id:string;
+    id?:string;
     uid:string;
     difficulty:string;
     duration:number;
@@ -54,37 +55,32 @@ export type ConversationTypes={
 }
 
 
-export type interviewResultTypes={
-    id?:string;
-    uid?:string;    
-    isPass?:boolean;
-    isRead:boolean;
-    feedback :{
-        positive:string;
-        negative:string;
-    }
-    score: {
-        technical:number;
-        communication:number;
-        teamwork:number;
-        logicalThinking:number;
-        learningDesire:number;
-        companyUnderstanding:number;
-    }
-    
-}
+export type interviewResultTypes = {
+    id?: string;
+    uid?: string;
+    isPass?: boolean;
+    isRead: boolean;
+    positiveFeedback: string;
+    negativeFeedback: string;
+    technicalScore: number;
+    communicationScore: number;
+    teamworkScore: number;
+    logicalThinkingScore: number;
+    learningDesireScore: number;
+    companyUnderstandingScore: number;
+};
 
 export type HistoryTypes ={
     id?:string;
-    time:string;
-    isRankedIn:boolean;
+    uid:string;    
+    isRankIn:boolean;
     totalScore:number;
     isRead:boolean;
-    company:CompanyTypes;
-    conversation:ConversationTypes[];
-    result:interviewResultTypes;
-    resume:ResumeTypes;
-    setting:SettingTypes;
+    companyId:string;
+    conversationId:string;
+    interviewResultId:string;
+    resumeId:string;
+    settingId:string;
     interestShift:number[];
 
 
