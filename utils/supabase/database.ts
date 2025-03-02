@@ -29,7 +29,7 @@ export class SupabaseDatabase<T extends object> {
     }
   }
 
-  async getDataById(id: string): Promise<T | null> {
+  async getDataById<T>(id: string): Promise<T | null> {
     const { data, error } = await this.supabase
       .from(this.tableName)
       .select('*')
