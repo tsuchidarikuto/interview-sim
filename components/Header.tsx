@@ -8,7 +8,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { createClient } from '@/utils/supabase/client';
-import FeedBackDialog from './FeedbackDialog';
+
 import { useRouter } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { userAtom } from '@/atoms/state';
@@ -63,7 +63,7 @@ export default function Header() {
                             <EmojiEventsIcon fontSize="medium" />
                         </IconButton>
                     </Link>
-                    <FeedBackDialog/>
+                    
                 </Box>
             </Toolbar>
         </AppBar>
