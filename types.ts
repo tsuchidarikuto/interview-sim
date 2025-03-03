@@ -1,6 +1,6 @@
 export type ResumeTypes={ 
     id?:string;
-    uid: string;
+    uid?: string;
     name: string;
     education: string;
     programming: string;
@@ -8,7 +8,7 @@ export type ResumeTypes={
     birthday: string;
     age: string;
     sex: number;
-    selfProduction: string;
+    selfPromotion: string;
     research: string;
     studentAchievements: string;
     reasonForApply: string;
@@ -16,7 +16,7 @@ export type ResumeTypes={
 
 export type CompanyTypes={    
     id?:string;
-    uid:string;
+    uid?:string;
     name:string;
     position:string;
     skillset:string;
