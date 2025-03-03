@@ -96,13 +96,13 @@ export type RankingTypes ={
 export type SelectedResumeTypes = {
     uid:string;
     id:string;
-    selectedResumeId:string;
+    resumeId:string;
 }
 
 export type SelectedCompanyTypes = {
     uid:string;
     id:string;
-    selectedCompanyId:string;
+    companyId:string;
 }
 
 export type FeedbackTypes ={
