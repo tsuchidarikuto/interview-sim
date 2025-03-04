@@ -17,7 +17,7 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, selectedCompany, han
         sx={{
             display: 'flex',
             flexDirection: 'column',
-            border: selectedCompany.selectedCompanyId === company.id ? '2px solid black' : undefined,
+            border: selectedCompany.companyId === company.id ? '2px solid black' : undefined,
             width: '100%',
             height: 200,
         }}
@@ -52,23 +52,23 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, selectedCompany, han
                 </Button>
             </Link>
             <Button
-                disabled={selectedCompany.selectedCompanyId === company.id}
+                disabled={selectedCompany.companyId === company.id}
                 variant="outlined"
                 size="small"
                 startIcon={<Delete />}
-                onClick={() => handleDelete(company.id)}
+                onClick={() => company.id && handleDelete(company.id)}
             >
                 削除
             </Button>
             <Button
-                variant={selectedCompany.selectedCompanyId === company.id ? 'contained' : 'outlined'}
+                variant={selectedCompany.companyId === company.id ? 'contained' : 'outlined'}
                 size="small"
                 startIcon={
-                    selectedCompany.selectedCompanyId === company.id ? <CheckCircle /> : <RadioButtonUnchecked />
+                    selectedCompany.companyId === company.id ? <CheckCircle /> : <RadioButtonUnchecked />
                 }
-                onClick={() => handleSelect(company.id)}
+                onClick={() => company.id && handleSelect(company.id)}
             >
-                {selectedCompany.selectedCompanyId === company.id ? '選択中' : '選択'}
+                {selectedCompany.companyId === company.id ? '選択中' : '選択'}
             </Button>
         </Box>
     </Card>

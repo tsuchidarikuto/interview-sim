@@ -6,29 +6,36 @@ import Link from "next/link"
 import Grid from "@mui/material/Grid2"
 import { AuthContext } from "@/provider/AuthContext"
 import type { CompanyTypes, SelectedCompanyTypes } from "@/types"
-import { deleteDataOnFirestore, getArrayDataFromFirestore, updateDataOnFirestore } from "@/utils/handleFirebase"
+
 import CompanyCard from "@/components/CompanyCard"
+import { useAtom } from "jotai"
+import { userAtom } from "@/atoms/state"
+import { SupabaseDatabase } from "@/utils/supabase/database"
+import { createClient } from "@/utils/supabase/client"
 
 export default function CompanysPage() {
-    const { user } = useContext(AuthContext)
+    const supabase = createClient();
+    const [user,] = useAtom(userAtom)
     const [companys, setCompanys] = useState<CompanyTypes[]>([])
     const [selectedCompany, setSelectedCompany] = useState<SelectedCompanyTypes>({
         uid: "",
         id: "",
-        selectedCompanyId: "",
+        companyId: "",
     })
     const [searchTerm, setSearchTerm] = useState("")
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(9)
     const [isFetchingCompanys, setIsFetchingCompanys] = useState(true)
     const [, setIsLoading] = useState(false)
+    const companyTable = new SupabaseDatabase<CompanyTypes>("companies",supabase);
+    const selectedCompanyTable = new SupabaseDatabase<SelectedCompanyTypes>("selectedCompanies",supabase);
 
     useEffect(() => {
         const fetchCompanys = async () => {
             try {
                 if (user) {
-                    const companyData = await getArrayDataFromFirestore<CompanyTypes>("company", user.uid)
-                    const selectedData = await getArrayDataFromFirestore<SelectedCompanyTypes>("selectedCompany", user.uid)
+                    const companyData = await companyTable.getArrayDataByUserId(user.uid)
+                    const selectedData = await selectedCompanyTable.getArrayDataByUserId(user.uid)
                     setCompanys(companyData)
                     setSelectedCompany(selectedData[0])
                 }
@@ -45,8 +52,8 @@ export default function CompanysPage() {
         setIsLoading(true)
         try {
             if (user) {
-                await deleteDataOnFirestore("company", id)
-                const companyData = await getArrayDataFromFirestore<CompanyTypes>("company", user.uid)
+                await companyTable.deleteData(id)
+                const companyData = await companyTable.getArrayDataByUserId(user.uid)
                 setCompanys(companyData)
             }
         } catch (error) {
@@ -61,7 +68,7 @@ export default function CompanysPage() {
         try {
             const updated = { ...selectedCompany, selectedCompanyId: id }
             setSelectedCompany(updated)
-            await updateDataOnFirestore<SelectedCompanyTypes>("selectedCompany", updated)
+            await selectedCompanyTable.updateData(id,updated)
         } catch (error) {
             console.error("Error selecting company:", error)
         } finally {
