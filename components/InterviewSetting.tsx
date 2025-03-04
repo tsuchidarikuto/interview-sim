@@ -18,13 +18,16 @@ import {
     Checkbox,
 } from '@mui/material';
 import React, { useState, useEffect, useContext, FormEvent } from 'react';
-import { getArrayDataFromFirestore, updateDataOnFirestore, addDataToFirestore } from '@/utils/handleFirebase';
 import { SettingTypes } from '@/types';
-import { AuthContext } from '@/provider/AuthContext';
+import { SupabaseDatabase } from '@/utils/supabase/database';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/atoms/state';
+import { createClient } from '@/utils/supabase/client';
 
 export default function InterviewSetting() {
-    const { user } = useContext(AuthContext);
-
+    
+    const [user, ]= useAtom(userAtom);
+    const supabase = createClient();
     const [settingInfo, setSettingInfo] = useState<SettingTypes[]>([
         {
             uid: '',
@@ -36,22 +39,30 @@ export default function InterviewSetting() {
         }
     ]);
 
+    const settingTable = new SupabaseDatabase<SettingTypes>("settings", supabase);
+
     const [isLoading, setIsLoading] = useState(false);
     const [isNew, setIsNew] = useState(false);
     const [isFetchingSetting, setIsFetchingSetting] = useState(true);
 
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {        
         event.preventDefault();
         setIsLoading(true);
+        
+
+        
         try {
             if (!user) {
                 throw new Error('User not found');
             }
 
             if (isNew) {
-                await addDataToFirestore<SettingTypes>('setting', settingInfo[0], user.uid);
+                await settingTable.addData(settingInfo[0],user.uid);
             } else {
-                await updateDataOnFirestore<SettingTypes>('setting', settingInfo[0]);
+                if (!settingInfo[0].id) {
+                    throw new Error('Setting ID not found');
+                }
+                await settingTable.updateData(settingInfo[0].id,settingInfo[0]);
             }
             setIsLoading(false);
         } catch (e) {
@@ -63,7 +74,7 @@ export default function InterviewSetting() {
     useEffect(() => {
         const fetchData = async (): Promise<void> => {
             if (user) {
-                const data = await getArrayDataFromFirestore<SettingTypes>('setting', user.uid);
+                const data = await settingTable.getArrayDataByUserId(user.uid);
                 if (data.length === 0) {
                     setIsNew(true);
                     setIsFetchingSetting(false);
