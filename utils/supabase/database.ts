@@ -15,7 +15,7 @@ export class SupabaseDatabase<T extends object> {
   async getArrayDataByUserId(userId: string): Promise<T[]> {
     try {
       const { data, error } = await this.supabase
-        .from(this.tableName)
+        .from(toSnakeCase(this.tableName))
         .select('*')
         .eq('uid', userId)
 
@@ -31,18 +31,17 @@ export class SupabaseDatabase<T extends object> {
     }
   }
 
-  async getDataById<T>(id: string): Promise<T | null> {
+  async getDataById(id: string): Promise<T> {
     const { data, error } = await this.supabase
-      .from(this.tableName)
+      .from(toSnakeCase(this.tableName))
       .select('*')
       .eq('id', id)
       .single()
 
-    if (error) {
-      console.error('Error fetching data:', error)
-      return null
+    if (error || !data) {
+      throw new Error(`Failed to fetch data: ${error?.message || 'Data not found'}`)
     }
-    return data
+    return data as T
   }
 
   /**
@@ -109,7 +108,7 @@ export class SupabaseDatabase<T extends object> {
       const snakeCaseData = convertKeysToSnakeCase(data)
 
       const { error } = await this.supabase
-        .from(this.tableName)
+        .from(toSnakeCase(this.tableName))
         .update(snakeCaseData)
         .eq('id', id)
 
@@ -126,7 +125,7 @@ export class SupabaseDatabase<T extends object> {
   async deleteData(id: string): Promise<void> {
     try {
       const { error } = await this.supabase
-        .from(this.tableName)
+        .from(toSnakeCase(this.tableName))
         .delete()
         .eq('id', id)
 

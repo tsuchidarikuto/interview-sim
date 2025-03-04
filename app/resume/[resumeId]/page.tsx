@@ -18,16 +18,16 @@ export default function ResumeEditPage() {
     uid: "",
     id: "",
     name: "",
-    birth: "",
+    birthday: "",
     age: "",
     sex: 0,
     education: "",
     programming: "",
-    selfPR: "",
+    selfProduction: "",
     research: "",
     qualification: "",
-    bestAtStu: "",
-    reason: "",
+    studentAchievements: "",
+    reasonForApply: "",
   })
   const [isNew, setIsNew] = useState(false)
   const [isLoading, setIsLoading] = useState(false)

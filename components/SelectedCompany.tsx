@@ -21,7 +21,7 @@ export default function SelectedCompany() {
     // Supabaseクライアントの初期化とデータ取得を統合
     useEffect(() => {
         const initClientAndFetchData = async () => {
-            console.log("initcompany")
+            
             try {
                 const client = await createClient();
                 setSupabase(client);
@@ -30,9 +30,10 @@ export default function SelectedCompany() {
                     const selectedCompanyTable = new SupabaseDatabase<SelectedCompanyTypes>("selectedCompanies", client);
                     const companyTable = new SupabaseDatabase<CompanyTypes>("companies", client);
                     
-                    const selectedDataFromDatabase = await selectedCompanyTable.getArrayDataByUserId(user.uid);
-                    if (selectedDataFromDatabase.length > 0) {
-                        const selectedCompanyIdFromDatabase = selectedDataFromDatabase[0].companyId;
+                    const selectedCompanyDataFromDatabase = await selectedCompanyTable.getArrayDataByUserId(user.uid);
+                    console.log(selectedCompanyDataFromDatabase);
+                    if (selectedCompanyDataFromDatabase.length > 0) {
+                        const selectedCompanyIdFromDatabase = selectedCompanyDataFromDatabase[0].companyId;
                         const companyData = await companyTable.getDataById(selectedCompanyIdFromDatabase);
                         if (companyData) {
                             setCompany(companyData);

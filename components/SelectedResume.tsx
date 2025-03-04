@@ -21,29 +21,40 @@ import { useAtom } from "jotai";
 import { SupabaseDatabase } from "@/utils/supabase/database";
 
 export default function SelectedResume() {
-    const [user,] = useAtom(userAtom);    
+    const [user,] = useAtom(userAtom);
+    const [supabase, setSupabase] = useState<any>(null);
     const [resume, setResume] = useState<ResumeTypes | null>(null);
     const [selectedResumeId, setSelectedResumeId] = useState<string | null>("");
     const [isFetchingResume, setIsFetchingResume] = useState<boolean>(true);    
 
     useEffect(() => {
         const initClient = async () => {
-            console.log("initresume")
+            
             try {
                 const client = await createClient();
-                           
+                setSupabase(client);                
                 if (user) {
-                    const resumeTable = new SupabaseDatabase<ResumeTypes>("resumes",client);
                     const selectedResumeTable = new SupabaseDatabase<SelectedResumeTypes>("selectedResumes",client);
-
-                    const selectedDataFromDatabase = await selectedResumeTable.getArrayDataByUserId(user.uid);
-                    if (selectedDataFromDatabase.length > 0) {
-                        const selectedResumeIdFromDatabase = selectedDataFromDatabase[0].resumeId;
-                        const resumeData = await resumeTable.getDataById(selectedResumeIdFromDatabase);
-                        if (resumeData) {
-                            setResume(resumeData);
-                            setSelectedResumeId(selectedResumeIdFromDatabase);
+                    const resumeTable = new SupabaseDatabase<ResumeTypes>("resumes",client);
+                    console.log("User object:", user);
+                    console.log("Fetching selected resumes for user:", user.uid);
+                    try {
+                        console.log("Querying table:", "selected_resumes");
+                        const selectedDataFromDatabase = await selectedResumeTable.getArrayDataByUserId(user.uid);
+                        console.log("Selected resume data:", selectedDataFromDatabase);
+                        if (selectedDataFromDatabase.length > 0) {
+                            console.log("Found selected resume with ID:", selectedDataFromDatabase[0].resumeId);
+                            const resumeData = await resumeTable.getDataById(selectedDataFromDatabase[0].resumeId);
+                            console.log("Resume data:", resumeData);
+                            if (resumeData) {
+                                setResume(resumeData);
+                                setSelectedResumeId(selectedDataFromDatabase[0].resumeId);
+                            }
+                        } else {
+                            console.log("No selected resume found for user:", user.uid);
                         }
+                    } catch (error) {
+                        console.error("Error fetching selected resume:", error);
                     }
                 }
                              
