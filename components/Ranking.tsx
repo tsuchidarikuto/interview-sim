@@ -10,8 +10,9 @@ import {
     Divider
 } from '@mui/material';
 import { RankingTypes } from '@/types';
-import { useContext } from 'react';
-import { AuthContext } from '@/provider/AuthContext';
+import { userAtom } from '@/atoms/state';
+import { useAtom } from 'jotai';
+
 
 type RankStyle = React.CSSProperties;
 
@@ -22,7 +23,7 @@ interface RankingProps {
 }
 
 export default function Ranking({ ranking, isFetching, difficulty }: RankingProps) {
-    const { user } = useContext(AuthContext);
+    const [user,] = useAtom(userAtom);
 
     const getRankStyle = (index: number): RankStyle => {
         if (index === 0) return { color: '#FFD700', fontWeight: 'bold' };

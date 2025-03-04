@@ -9,20 +9,24 @@ import {
   Button  
 } from '@mui/material';
 import { HistoryTypes } from '@/types';
-import { AuthContext } from '@/provider/AuthContext';
-import { firestore } from '@/firebase';
-import { collection, getDocs, query, where, orderBy } from '@firebase/firestore';
+
 import { TabList, TabContext, TabPanel } from '@mui/lab';
-import { rankingAtom } from "@/atoms/state";
+import { rankingAtom, userAtom } from "@/atoms/state";
 import { useAtom } from "jotai";
 import Ranking from "@/components/Ranking";
 import { RankingTypes } from '@/types';
+import { SupabaseDatabase } from '@/utils/supabase/database';
+import { createClient } from '@/utils/supabase/client';
+
 
 export default function Page() {
+  const supabase = createClient();
+  const [user,] = useAtom(userAtom);
   const [tabValue, setTabValue] = useState("1");
   const [ranking, setRanking] = useAtom(rankingAtom);
   const [isFetching, setIsFetching] = useState(true);
-  const { user } = useContext(AuthContext);
+  const historyTable = new SupabaseDatabase<HistoryTypes>("histories",supabase);
+
   const [, setBestUserRanking] = useState<RankingTypes>();
 
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -31,25 +35,11 @@ export default function Page() {
 
   const getRankingData = async () => {
     try {
-      const q = query(
-        collection(firestore, "history"),
-        where('isRankedIn', '==', true),
-        orderBy("totalScore", "desc")
-      );
-      const snapShot = await getDocs(q);
-      if (snapShot.empty) return [];
-      return snapShot.docs.map(doc => {
-        const data = doc.data() as HistoryTypes;
-        return {
-          uid: data.resume.uid,
-          name: data.resume.name,
-          difficulty: data.setting.difficulty,
-          totalScore: data.totalScore
-        };
-      });
+      const rankingDataFromDatabase = await historyTable.getRankingData();
+      return rankingDataFromDatabase;
+      
     } catch (e) {
-      console.error(e);
-      return [];
+      
     }
   };
 

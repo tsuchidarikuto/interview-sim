@@ -138,4 +138,24 @@ export class SupabaseDatabase<T extends object> {
       throw error
     }
   }
+
+  async getRankingData(): Promise<T[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from(toSnakeCase(this.tableName))
+        .select('*')
+        .eq('is_rank_in', true)        
+        .order('total_score', { ascending: false })
+  
+      if (error) {
+        console.error('Error details:', error)
+        throw new Error(`ランキングデータの取得に失敗しました: ${error.message}`)
+      }
+  
+      return (data || []).map(item => convertKeysToCamelCase(item) as T)
+    } catch (error) {
+      console.error('Error fetching ranking data:', error)
+      throw error
+    }
+  }
 }
