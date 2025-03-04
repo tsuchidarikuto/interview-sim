@@ -1,37 +1,56 @@
-import React, { useEffect, useState, useContext } from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Box, Button, CircularProgress, Container, Typography, Paper, Divider } from "@mui/material";
 
-import { AuthContext } from "@/provider/AuthContext";
-import type { CompanyTypes, SelectedCompanyTypes } from "@/types";
-import { getArrayDataFromFirestore, getDataFromFirestoreWithId } from "@/utils/handleFirebase";
+import { useAtom } from "jotai";
+import { CompanyTypes,SelectedCompanyTypes } from "@/types";
+import { SupabaseDatabase } from "@/utils/supabase/database";
 import Link from "next/link";
 import { Edit, GridView , Business} from "@mui/icons-material";
-
+import { userAtom } from "@/atoms/state";
+import { createClient } from "@/utils/supabase/client";
 
 export default function SelectedCompany() {
-    const { user } = useContext(AuthContext);
+    const [user,] = useAtom(userAtom);
+    const [supabase, setSupabase] = useState<any>(null);
     const [company, setCompany] = useState<CompanyTypes | null>(null);
     const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>("");
     const [isFetchingCompany, setIsFetchingCompany] = useState<boolean>(true);
 
+    // Supabaseクライアントの初期化とデータ取得を統合
     useEffect(() => {
-        const fetchCompany = async () => {
-            if (user) {
-                const selectedDataFromFirestore = await getArrayDataFromFirestore<SelectedCompanyTypes>("selectedCompany", user.uid);
-                if (selectedDataFromFirestore.length > 0) {
-                    const selectedCompanyIdFromFirestore = selectedDataFromFirestore[0].selectedCompanyId;          
-                    const companyData = await getDataFromFirestoreWithId<CompanyTypes>("company", selectedCompanyIdFromFirestore);
+        const initClientAndFetchData = async () => {
+            console.log("initcompany")
+            try {
+                const client = await createClient();
+                setSupabase(client);
+                
+                if (user) {
+                    const selectedCompanyTable = new SupabaseDatabase<SelectedCompanyTypes>("selectedCompanies", client);
+                    const companyTable = new SupabaseDatabase<CompanyTypes>("companies", client);
                     
-                    setCompany(companyData);
-                    setSelectedCompanyId(selectedCompanyIdFromFirestore);
+                    const selectedDataFromDatabase = await selectedCompanyTable.getArrayDataByUserId(user.uid);
+                    if (selectedDataFromDatabase.length > 0) {
+                        const selectedCompanyIdFromDatabase = selectedDataFromDatabase[0].companyId;
+                        const companyData = await companyTable.getDataById(selectedCompanyIdFromDatabase);
+                        if (companyData) {
+                            setCompany(companyData);
+                            setSelectedCompanyId(selectedCompanyIdFromDatabase);
+                        }
+                    }
                 }
+            } catch (error) {
+                console.error("データ取得エラー:", error);
+            } finally {
                 setIsFetchingCompany(false);
             }
         };
-        fetchCompany();
+        
+        initClientAndFetchData();
     }, [user]);
 
-   const longTextStyle = {
+    const longTextStyle = {
         display: "-webkit-box",
         WebkitLineClamp: 3,
         WebkitBoxOrient: "vertical",
