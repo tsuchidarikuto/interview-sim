@@ -28,7 +28,7 @@ export type CompanyTypes={
 
 export type SettingTypes={
     id?:string;
-    uid:string;
+    uid?:string;
     difficulty:string;
     duration:number;
     interviewType:string;
@@ -124,6 +124,6 @@ export type Database = {
   }
 
   export type UserTypes = {
-    userId:string;
+    uid:string;
     name:string;
   }
