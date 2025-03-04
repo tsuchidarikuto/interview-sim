@@ -5,13 +5,18 @@ import { useParams,useRouter } from "next/navigation"
 import { Box, CircularProgress, Button, TextField, Container, Stack, MenuItem, Typography } from '@mui/material'
 import Grid from "@mui/material/Grid2"
 import type { ResumeTypes } from "@/types"
-import {  updateDataOnFirestore, addDataToFirestore ,getDataFromFirestoreWithId} from "@/utils/handleFirebase"
-import { AuthContext } from "@/provider/AuthContext"
+
+
 import Link from 'next/link';
+import { useAtom } from "jotai"
+import { userAtom } from "@/atoms/state"
+import { createClient } from "@/utils/supabase/client"
+import { SupabaseDatabase } from "@/utils/supabase/database"
 
 export default function ResumeEditPage() {
+  const supabase = createClient();
   const {push} = useRouter()
-  const { user } = useContext(AuthContext)
+  const [user,] = useAtom(userAtom);
   const params = useParams();
   const resumeId = Array.isArray(params.resumeId) ? params.resumeId[0] : params.resumeId;
   const [resume, setResume] = useState<ResumeTypes>({
@@ -23,7 +28,7 @@ export default function ResumeEditPage() {
     sex: 0,
     education: "",
     programming: "",
-    selfProduction: "",
+    selfPromotion: "",
     research: "",
     qualification: "",
     studentAchievements: "",
@@ -32,11 +37,12 @@ export default function ResumeEditPage() {
   const [isNew, setIsNew] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isFetchingResume, setIsFetchingResume] = useState<boolean>(true)
+  const resumeTable = new SupabaseDatabase<ResumeTypes>("resumes",supabase);
 
   useEffect(() => {
     const fetchresume = async () => {
       if (resumeId !== "new" && user&&resumeId) {
-        const foundresume = await getDataFromFirestoreWithId<ResumeTypes>("resumes", resumeId)
+        const foundresume = await resumeTable.getDataById(resumeId)
         if (foundresume) {
           setResume(foundresume)
         } else {
@@ -57,9 +63,9 @@ export default function ResumeEditPage() {
     try {
       if (user) {
         if (isNew) {
-          await addDataToFirestore<ResumeTypes>("resumes", resume, user.uid)
-        } else {
-          await updateDataOnFirestore<ResumeTypes>("resumes", resume)
+          await resumeTable.addData(resume,user.uid);
+        } else  if(resume.id) {
+          await resumeTable.updateData(resume.id, resume);
         }
         push("/resume");
       }
@@ -103,9 +109,9 @@ export default function ResumeEditPage() {
               <TextField  fullWidth size="medium" id="資格" label="資格" variant="outlined" value={resume.qualification} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, qualification: event.target.value })} />
               <TextField  fullWidth multiline maxRows={4} size="medium" id="研究成果" label="研究成果" variant="outlined" value={resume.research} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, research: event.target.value })} />
               <TextField  fullWidth multiline maxRows={4} size="medium" id="プログラミングの経験・使用言語" label="プログラミングの経験・使用言語" variant="outlined" value={resume.programming} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, programming: event.target.value })} />
-              <TextField multiline rows={3}  fullWidth size="medium" id="自己PR" label="自己PR" variant="outlined" value={resume.selfPR} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, selfPR: event.target.value })} />
-              <TextField multiline rows={3}  fullWidth size="medium" id="学生時代頑張ったこと" label="学生時代頑張ったこと" variant="outlined" value={resume.bestAtStu} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, bestAtStu: event.target.value })} />
-              <TextField multiline rows={3}  fullWidth size="medium" id="志望理由" label="志望理由" variant="outlined" value={resume.reason} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, reason: event.target.value })} />
+              <TextField multiline rows={3}  fullWidth size="medium" id="自己PR" label="自己PR" variant="outlined" value={resume.selfPromotion} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, selfPromotion: event.target.value })} />
+              <TextField multiline rows={3}  fullWidth size="medium" id="学生時代頑張ったこと" label="学生時代頑張ったこと" variant="outlined" value={resume.studentAchievements} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, studentAchievements: event.target.value })} />
+              <TextField multiline rows={3}  fullWidth size="medium" id="志望理由" label="志望理由" variant="outlined" value={resume.reasonForApply} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setResume({ ...resume, reasonForApply: event.target.value })} />
             </Stack>
           </Box>
             <Stack direction="row" spacing={2}>
