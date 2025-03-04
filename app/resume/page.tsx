@@ -4,31 +4,36 @@ import { Container, Button, TextField, Typography, Select, MenuItem, CircularPro
 import { AddCircle, ChevronLeft, ChevronRight } from "@mui/icons-material"
 import Link from "next/link"
 import Grid from "@mui/material/Grid2"
-import { AuthContext } from "@/provider/AuthContext"
 import type { ResumeTypes, SelectedResumeTypes } from "@/types"
-import { deleteDataOnFirestore, getArrayDataFromFirestore, updateDataOnFirestore } from "@/utils/handleFirebase"
 import ResumeCard from "@/components/ResumeCard"
+import { useAtom } from "jotai"
+import { userAtom } from "@/atoms/state"
+import { createClient } from "@/utils/supabase/client"
+import {SupabaseDatabase} from "@/utils/supabase/database";
 
 export default function ResumesPage() {
-    const { user } = useContext(AuthContext)
+    const supabase = createClient();
+    const [user,] =useAtom(userAtom);
     const [resumes, setResumes] = useState<ResumeTypes[]>([])
     const [selectedResume, setSelectedResume] = useState<SelectedResumeTypes>({
         uid: "",
         id: "",
-        selectedResumeId: "",
+        resumeId: "",
     })
     const [searchTerm, setSearchTerm] = useState("")
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(9)
     const [isFetchingResumes, setIsFetchingResumes] = useState(true)
     const [, setIsLoading] = useState(false)
+    const resumeTable = new SupabaseDatabase<ResumeTypes>("resumes",supabase);
+    const selectedResumeTable = new SupabaseDatabase<SelectedResumeTypes>("selectedResumes",supabase);
 
     useEffect(() => {
         const fetchResumes = async () => {
             try {
                 if (user) {
-                    const resumeData = await getArrayDataFromFirestore<ResumeTypes>("resumes", user.uid)
-                    const selectedData = await getArrayDataFromFirestore<SelectedResumeTypes>("selectedResume", user.uid)
+                    const resumeData = await resumeTable.getArrayDataByUserId(user.uid);
+                    const selectedData = await selectedResumeTable.getArrayDataByUserId(user.uid);
                     setResumes(resumeData)
                     setSelectedResume(selectedData[0])
                 }
@@ -42,17 +47,17 @@ export default function ResumesPage() {
     }, [user])
 
     const handleDelete = async (id: string) => {
-        setIsLoading(true)
+        setIsLoading(true);
         try {
             if (user) {
-                await deleteDataOnFirestore("resumes", id)
-                const resumeData = await getArrayDataFromFirestore<ResumeTypes>("resumes", user.uid)
-                setResumes(resumeData)
+                await resumeTable.deleteData(id);
+                const resumeData = await resumeTable.getArrayDataByUserId(user.uid);
+                setResumes(resumeData);
             }
         } catch (error) {
-            console.error("Error deleting resume:", error)
+            console.error("Error deleting resume:", error);
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
@@ -61,7 +66,7 @@ export default function ResumesPage() {
         try {
             const updated = { ...selectedResume, selectedResumeId: id }
             setSelectedResume(updated)
-            await updateDataOnFirestore<SelectedResumeTypes>("selectedResume", updated)
+            await selectedResumeTable.updateData(id,updated)
         } catch (error) {
             console.error("Error selecting resume:", error)
         } finally {
