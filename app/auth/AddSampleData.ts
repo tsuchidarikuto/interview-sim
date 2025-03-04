@@ -1,7 +1,7 @@
-import { ResumeTypes,CompanyTypes, SelectedCompanyTypes, SelectedResumeTypes } from "@/types";
+import { ResumeTypes,CompanyTypes, SelectedCompanyTypes, SelectedResumeTypes, SettingTypes } from "@/types";
 import { SupabaseDatabase } from "@/utils/supabase/database";
 import { createClient } from "@/utils/supabase/server";
-import { sampleCompanyData,sampleResumeData } from "./SampleData";
+import { sampleCompanyData,sampleResumeData, sampleSettingData } from "./SampleData";
 
 export default async function AddSampleData() {
     const supabase = await createClient();
@@ -9,7 +9,7 @@ export default async function AddSampleData() {
     const companyTable = new SupabaseDatabase<CompanyTypes>("companies", supabase);
     const selectedResumeTable = new SupabaseDatabase<SelectedResumeTypes>("selectedResumes", supabase);
     const selectedCompanyTable = new SupabaseDatabase<SelectedCompanyTypes>("selectedCompanies", supabase);
-    
+    const settingTable = new SupabaseDatabase<SettingTypes>("settings",supabase);
     try {
         const { data: { user } } = await supabase.auth.getUser();
         
@@ -22,7 +22,8 @@ export default async function AddSampleData() {
 
         const resumeData = await resumeTable.getArrayDataByUserId(user.id);
         const companyData = await companyTable.getArrayDataByUserId(user.id);
-        
+        const settingData = await settingTable.getArrayDataByUserId(user.id);
+
         if(resumeData.length === 0) {
             console.log('Adding sample resume data...'); // デバッグ用
             const createdResume = await resumeTable.addData(sampleResumeData, user.id);
@@ -43,6 +44,10 @@ export default async function AddSampleData() {
                     companyId: createdCompany.id
                 } as SelectedCompanyTypes, user.id);
             }
+        }
+
+        if(settingData.length === 0){
+            await settingTable.addData(sampleSettingData,user.id);
         }
 
     } catch (error) {
