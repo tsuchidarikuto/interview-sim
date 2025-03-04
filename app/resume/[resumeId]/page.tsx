@@ -20,8 +20,7 @@ export default function ResumeEditPage() {
   const params = useParams();
   const resumeId = Array.isArray(params.resumeId) ? params.resumeId[0] : params.resumeId;
   const [resume, setResume] = useState<ResumeTypes>({
-    uid: "",
-    id: "",
+    
     name: "",
     birthday: "",
     age: "",

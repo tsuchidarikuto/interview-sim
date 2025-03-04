@@ -17,9 +17,7 @@ export default function CompanyEditPage() {
   const [user,] = useAtom(userAtom);  
   const params = useParams();
   const companyId = Array.isArray(params.companyId) ? params.companyId[0] : params.companyId;
-  const [company, setCompany] = useState<CompanyTypes>({
-          uid:"",
-          id: "",
+  const [company, setCompany] = useState<CompanyTypes>({          
           name: "",
           position: "",
           skillset: "",
