@@ -1,4 +1,4 @@
-import { ResumeTypes } from "@/types";
+import { ResumeTypes, SettingTypes } from "@/types";
 
 export const sampleResumeData: ResumeTypes = {
     name: "サンプル 太郎",
@@ -22,4 +22,10 @@ export const sampleCompanyData = {
     product: "革新的なサービス",
     culture: "オープンで自由",
     others: "未定"
+}
+export const sampleSettingData:SettingTypes = {
+    difficulty:"普通",
+    duration:10,
+    interviewType:"複合面接",
+    interviewMode: 'voice'   
 }
