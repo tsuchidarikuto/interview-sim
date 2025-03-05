@@ -60,7 +60,7 @@ export default function Ranking({ ranking, isFetching, difficulty }: RankingProp
                                     Rank {index + 1}
                                 </Typography>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                    {item.name || 'No Name'}
+                                    {item.userName || 'No Name'}
                                 </Typography>
                                 <Typography variant="body1" sx={{ mt: 1 }}>
                                     Score: {item.totalScore}

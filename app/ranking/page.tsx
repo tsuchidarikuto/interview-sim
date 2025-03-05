@@ -25,7 +25,7 @@ export default function Page() {
   const [tabValue, setTabValue] = useState("1");
   const [ranking, setRanking] = useAtom(rankingAtom);
   const [isFetching, setIsFetching] = useState(true);
-  const historyTable = new SupabaseDatabase<HistoryTypes>("histories",supabase);
+  const rankingTable = new SupabaseDatabase<RankingTypes>("rankings",supabase);
 
   const [, setBestUserRanking] = useState<RankingTypes>();
 
@@ -35,11 +35,12 @@ export default function Page() {
 
   const getRankingData = async () => {
     try {
-      const rankingDataFromDatabase = await historyTable.getRankingData();
+      const rankingDataFromDatabase = await rankingTable.getSortedData('totalScore','desc');
       return rankingDataFromDatabase;
       
     } catch (e) {
-      
+      console.error("Error fetching ranking data:", e);
+      return [];
     }
   };
 
