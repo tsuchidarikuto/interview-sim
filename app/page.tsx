@@ -29,6 +29,7 @@ import ResumeAndCompanyTab from '@/components/ResumeAndCompanyTab';
 
 import { stopAudio } from '@/utils/handleAzureSpeach';
 import InterviewSetting from '@/components/InterviewSetting';
+import { PreparationInterview } from '@/utils/PreparationInterview';
 
 /**
  * ホームページコンポーネント
@@ -70,9 +71,7 @@ export default function Home() {
 	}, [user, setUser]);
 
 
-	const handleStartInterview = async () => {
-	}
-/*
+
 	const handleStartInterview = async () => {
 		setIsLoadInterview(true);
 		try {
@@ -82,7 +81,7 @@ export default function Home() {
 			}
 
 			// 面接準備の処理（質問リストの生成、履歴書・会社情報のセットなど）
-			const selectedInterviewMode = await PreparationInterview(setProgress, setQuestions, setResume, setCompany, setSetting, user.userId);
+			const selectedInterviewMode = await PreparationInterview(setProgress, setQuestions, setResume, setCompany, setSetting, user.uid);
 
 			// プログレスを100%に設定して完了状態を示す
 			setProgress(100);
@@ -90,7 +89,7 @@ export default function Home() {
 
 			// 面接モードに応じてpush先を変更
 			if (selectedInterviewMode === "voice") {
-				push('/interview/speach');
+				push('/interview/speech');
 			} else if (selectedInterviewMode === "chat") {
 				push('/interview/chat')
 			} else {
@@ -113,7 +112,7 @@ export default function Home() {
 			</Box>
 		);
 	}
-		*/
+		
 		
 
 	return (
@@ -134,8 +133,7 @@ export default function Home() {
 			<Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
 				本アプリはAIを活用した面接シミュレーターです。<br />
 				プロフィールと志望企業の情報を入力して、面接練習を始めましょう。<br />
-			</Typography>
-
+			</Typography>			
 
 			<Grid container spacing={2} sx={{ py: 1 }}>
 				<Grid size={{ xs: 12, sm: 12, md: 6 }}>
