@@ -19,6 +19,7 @@ import {
 	resumeAtom,
 	companyAtom,
 	settingAtom,
+	userAtom,
 } from "@/atoms/state";
 import { useState, useEffect, useContext, useRef } from "react";
 import { ConversationTypes, interviewResultTypes } from "@/types";
@@ -35,7 +36,7 @@ import "@/styles/chat.scss";
 
 export default function Interview() {
 	const { push } = useRouter();
-	const { user } = useContext(AuthContext);
+	const [user, ] = useAtom(userAtom);
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 	const [questions] = useAtom(questionsAtom);
 	const [conversation, setConversation] = useState<ConversationTypes[]>([]);
@@ -207,12 +208,12 @@ export default function Interview() {
 			if (result) {
 				setInterviewResult(result);
 				const totalScore =
-					result.score.technical +
-					result.score.communication +
-					result.score.teamwork +
-					result.score.logicalThinking +
-					result.score.learningDesire +
-					result.score.companyUnderstanding;
+					result.technicalScore +
+					result.communicationScore +
+					result.teamworkScore +
+					result.logicalThinkingScore +
+					result.learningDesireScore +
+					result.companyUnderstandingScore;
 				setAnalysisProgress(80);
 				// 履歴に面接結果を保存
 				addToHistory(totalScore, result, company, resume, setting, conversation, interestShift, user.uid);
