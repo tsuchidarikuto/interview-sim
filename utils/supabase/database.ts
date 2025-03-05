@@ -1,6 +1,7 @@
 // utils/supabase/database.ts
 import { SupabaseClient } from '@supabase/supabase-js'  // 型定義用に追加
 import { convertKeysToSnakeCase, convertKeysToCamelCase,toSnakeCase } from '@/utils/case-converter'
+import { RankingTypes } from '@/types'
 
 export class SupabaseDatabase<T extends object> {
   private supabase: SupabaseClient
@@ -139,23 +140,23 @@ export class SupabaseDatabase<T extends object> {
     }
   }
 
-  async getRankingData(): Promise<T[]> {
+  async getSortedData(column: string, direction: 'asc' | 'desc'): Promise<T[]> {
     try {
       const { data, error } = await this.supabase
         .from(toSnakeCase(this.tableName))
         .select('*')
-        .eq('is_rank_in', true)        
-        .order('total_score', { ascending: false })
-  
+        .order(column, { ascending: direction === 'asc' })
+
       if (error) {
         console.error('Error details:', error)
-        throw new Error(`ランキングデータの取得に失敗しました: ${error.message}`)
+        throw new Error(`Failed to fetch data: ${error.message}`)
       }
-  
+
       return (data || []).map(item => convertKeysToCamelCase(item) as T)
     } catch (error) {
-      console.error('Error fetching ranking data:', error)
+      console.error('Error fetching data:', error)
       throw error
     }
   }
+  
 }
