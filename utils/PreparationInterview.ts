@@ -1,7 +1,8 @@
 'use client'
 import CallOpenai from "@/utils/callOpenai";
-import { getArrayDataFromFirestore, getDataFromFirestoreWithId } from '@/utils/handleFirebase';
 import { ResumeTypes, CompanyTypes, SettingTypes, SelectedResumeTypes, SelectedCompanyTypes } from '@/types';
+import { SupabaseDatabase } from "./supabase/database";
+import { createClient } from "./supabase/client";
 
 
 export async function PreparationInterview(
@@ -12,27 +13,36 @@ export async function PreparationInterview(
         setSetting:(s:any)=>void,
         uid:string
     ){
+
     
     try{
-        
-    const selectedResumeId:SelectedResumeTypes[] = await getArrayDataFromFirestore<SelectedResumeTypes>('selectedResume',uid);
-    const selectedCompanyId:SelectedCompanyTypes[] = await getArrayDataFromFirestore<SelectedCompanyTypes>('selectedCompany',uid);
-    console.log(selectedResumeId);
-    setProgress(20);
-    
-    const resumeDataFromFirestore = await getDataFromFirestoreWithId<ResumeTypes>('resumes',selectedResumeId[0].selectedResumeId)            
-    const companyDataFromFirestore = await getDataFromFirestoreWithId<CompanyTypes>('company',selectedCompanyId[0].selectedCompanyId)    
-    const settingDataFromFirestore = await getArrayDataFromFirestore<SettingTypes>('setting',uid);
-    console.log(resumeDataFromFirestore);
+        const supabase = createClient();
 
-    setResume(resumeDataFromFirestore)
-    setCopmany(companyDataFromFirestore)
-    setSetting(settingDataFromFirestore[0])
+        const selectedResumeTable = new SupabaseDatabase<SelectedResumeTypes>("selectedResumes",supabase);
+        const selectedCompanyTable = new SupabaseDatabase<SelectedCompanyTypes>("selectedCompanies",supabase);
+        const resumeTable = new SupabaseDatabase<ResumeTypes>("resumes",supabase);
+        const companyTable = new SupabaseDatabase<CompanyTypes>("companies",supabase);
+        const settingTable = new SupabaseDatabase<SettingTypes>("settings",supabase);
+
+        
+        const selectedResumeData:SelectedResumeTypes[] = await selectedResumeTable.getArrayDataByUserId(uid);
+        const selectedCompanyData:SelectedCompanyTypes[] = await selectedCompanyTable.getArrayDataByUserId(uid);
+    
+        setProgress(20);
+    
+        const resumeDataFromDatabase = await resumeTable.getDataById(selectedResumeData[0].resumeId)
+        const companyDataFromDatabase = await companyTable.getDataById(selectedCompanyData[0].companyId)
+        const settingDataFromDatabase = await settingTable.getArrayDataByUserId(uid)
+        
+        
+        setResume(resumeDataFromDatabase)
+        setCopmany(companyDataFromDatabase)
+        setSetting(settingDataFromDatabase[0])
     
     setProgress(40);
 
 
-    if (!resumeDataFromFirestore || !companyDataFromFirestore || !settingDataFromFirestore ) {
+    if (!resumeDataFromDatabase || !companyDataFromDatabase || !settingDataFromDatabase ) {
         return [];
     }
 
@@ -42,7 +52,7 @@ export async function PreparationInterview(
         type: ""
     }
 
-    switch (settingDataFromFirestore[0].difficulty) {
+    switch (settingDataFromDatabase[0].difficulty) {
         case "簡単":
             settingDetail.difficulty = "簡単です。大きく深堀はしないように、ある程度気になる部分だけ聞いてください";
             break;
@@ -57,7 +67,7 @@ export async function PreparationInterview(
             break;
     }
 
-    switch (settingDataFromFirestore[0].interviewType) {
+    switch (settingDataFromDatabase[0].interviewType) {
         case "技術面接":
             settingDetail.type = "技術面接です。プログラミングの経験や研究成果について聞いてください";
             break;
@@ -74,7 +84,7 @@ export async function PreparationInterview(
     const minQuestions = 3;
     const maxQuestions = 20;
 
-    const duration = settingDataFromFirestore[0].duration;
+    const duration = settingDataFromDatabase[0].duration;
     const ratio = (Math.log(duration) - Math.log(minDuration)) / (Math.log(maxDuration) - Math.log(minDuration));
     const rawQuestions = minQuestions + ratio * (maxQuestions - minQuestions);
     let numberOfQuestions = Math.round(rawQuestions);
@@ -92,7 +102,7 @@ export async function PreparationInterview(
         **設定:**
 
         *   面接の難易度: ${settingDetail.difficulty}
-        *   面接時間: ${settingDataFromFirestore[0].duration}分
+        *   面接時間: ${settingDataFromDatabase[0].duration}分
         *   面接のタイプ: ${settingDetail.type}
         *   評価基準: ['技術力','コミュニケーション力','チームワーク','論理的思考力','学習意欲','企業理解・志望動機']
 
@@ -111,33 +121,33 @@ export async function PreparationInterview(
     const prompt = `
         #応募者の情報
         ##研究成果
-            ${resumeDataFromFirestore.research}
+            ${resumeDataFromDatabase.research}
         ##プログラミングの経験・使用言語
-            ${resumeDataFromFirestore.programming}
+            ${resumeDataFromDatabase.programming}
         ##自己PR
-            ${resumeDataFromFirestore.selfPR}
+            ${resumeDataFromDatabase.selfPromotion}
         ##学生時代に頑張ったこと
-            ${resumeDataFromFirestore.bestAtStu}
+            ${resumeDataFromDatabase.studentAchievements}
         ##志望動機
-            ${resumeDataFromFirestore.reason}
+            ${resumeDataFromDatabase.reasonForApply}
         ##資格
-            ${resumeDataFromFirestore.qualification}   
+            ${resumeDataFromDatabase.qualification}   
     
         #会社情報
         ##会社名
-            ${companyDataFromFirestore.name}
+            ${companyDataFromDatabase.name}
         ##採用ポジション
-            ${companyDataFromFirestore.position}
+            ${companyDataFromDatabase.position}
         ##必須スキルセット
-            ${companyDataFromFirestore.skillset}
+            ${companyDataFromDatabase.skillset}
         ##主力製品・サービス
-            ${companyDataFromFirestore.product}
+            ${companyDataFromDatabase.product}
         ##社風
-            ${companyDataFromFirestore.culture}
+            ${companyDataFromDatabase.culture}
         ##会社のミッション・ビジョン
-            ${companyDataFromFirestore.mission}
+            ${companyDataFromDatabase.mission}
         ##その他特記事項
-            ${companyDataFromFirestore.others}
+            ${companyDataFromDatabase.others}
     `;
     console.log(prompt)
     setProgress(80);
@@ -151,7 +161,7 @@ export async function PreparationInterview(
     
 
     //ページ遷移用に面接モードを返す
-    return settingDataFromFirestore[0].interviewMode;
+    return settingDataFromDatabase[0].interviewMode;
 }catch(e){
     console.error('Error during preparation:', e);
     return ;
