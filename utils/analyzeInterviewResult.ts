@@ -71,15 +71,28 @@ export default async function analyzeInterviewResult(conversationLog: string, se
         ${JSON.stringify(companyInfo)}
         `;
         setProgress(50);
-        const analysisResult:interviewResultTypes =  JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'interviewResult'));
+        const response = JSON.parse(await CallOpenai('gpt-4o-mini-2024-07-18', systemPrompt, prompt, 'interviewResult'));
         setProgress(70);
         
-        const totalScore = analysisResult.score.technical +
-                   analysisResult.score.communication +
-                   analysisResult.score.teamwork +
-                   analysisResult.score.logicalThinking +
-                   analysisResult.score.learningDesire +
-                   analysisResult.score.companyUnderstanding;
+        const analysisResult: interviewResultTypes = {
+            positiveFeedback: response.feedback.positive,
+            negativeFeedback: response.feedback.negative,
+            technicalScore: response.score.technical,
+            communicationScore: response.score.communication,
+            teamworkScore: response.score.teamwork,
+            logicalThinkingScore: response.score.logicalThinking,
+            learningDesireScore: response.score.learningDesire,
+            companyUnderstandingScore: response.score.companyUnderstanding,
+            isPass: false,
+            isRead: false
+        };
+        
+        const totalScore = analysisResult.technicalScore +
+                   analysisResult.communicationScore +
+                   analysisResult.teamworkScore +
+                   analysisResult.logicalThinkingScore +
+                   analysisResult.learningDesireScore +
+                   analysisResult.companyUnderstandingScore;
         analysisResult.isPass = totalScore >= 40;
         return analysisResult;
     }catch(e){
