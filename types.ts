@@ -54,6 +54,13 @@ export type ConversationTypes={
     interest?:number;
 }
 
+export type conversationTableTypes ={
+    id?:string;
+    uid?:string;
+    role:string[];
+    message:string[];
+    interest:number[];
+}
 
 export type interviewResultTypes = {
     id?: string;
@@ -72,7 +79,7 @@ export type interviewResultTypes = {
 
 export type HistoryTypes ={
     id?:string;
-    uid:string;    
+    uid?:string;    
     isRankIn:boolean;
     totalScore:number;
     isRead:boolean;
@@ -126,4 +133,12 @@ export type Database = {
   export type UserTypes = {
     uid:string;
     name:string;
+  }
+
+  export type MailContentsTypes ={
+    id:string;
+    isRead:boolean;
+    companyName:string;
+    isPass:boolean;
+    time:string;
   }
