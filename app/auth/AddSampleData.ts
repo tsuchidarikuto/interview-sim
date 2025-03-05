@@ -18,14 +18,14 @@ export default async function AddSampleData() {
             return;
         }
         
-        console.log('Current user:', user.id); // デバッグ用
+    
 
         const resumeData = await resumeTable.getArrayDataByUserId(user.id);
         const companyData = await companyTable.getArrayDataByUserId(user.id);
         const settingData = await settingTable.getArrayDataByUserId(user.id);
 
         if(resumeData.length === 0) {
-            console.log('Adding sample resume data...'); // デバッグ用
+            
             const createdResume = await resumeTable.addData(sampleResumeData, user.id);
             
             if (createdResume?.id) {
@@ -37,7 +37,7 @@ export default async function AddSampleData() {
         }
 
         if(companyData.length === 0) {
-            console.log('Adding sample company data...'); // デバッグ用
+            
             const createdCompany = await companyTable.addData(sampleCompanyData, user.id);
             if (createdCompany?.id) {
                 await selectedCompanyTable.addData({
