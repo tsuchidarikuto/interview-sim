@@ -77,7 +77,7 @@ export type interviewResultTypes = {
     companyUnderstandingScore: number;
 };
 
-export type HistoryTypes ={
+export type HistoryTableTypes ={
     id?:string;
     uid?:string;    
     isRankIn:boolean;
@@ -141,4 +141,17 @@ export type Database = {
     companyName:string;
     isPass:boolean;
     time:string;
+  }
+
+  export type HistoryDataTypes ={
+    id:string;
+    isRead:boolean;
+    isRankIn:boolean;
+    time:string;
+    result:interviewResultTypes;
+    company:CompanyTypes;
+    resume:ResumeTypes;
+    setting:SettingTypes;
+    interestShift:number[];    
+    totalScore:number;
   }

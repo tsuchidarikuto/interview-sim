@@ -145,7 +145,7 @@ export class SupabaseDatabase<T extends object> {
       const { data, error } = await this.supabase
         .from(toSnakeCase(this.tableName))
         .select('*')
-        .order(column, { ascending: direction === 'asc' })
+        .order(toSnakeCase(column), { ascending: direction === 'asc' })
 
       if (error) {
         console.error('Error details:', error)

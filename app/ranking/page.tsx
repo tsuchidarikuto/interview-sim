@@ -8,7 +8,7 @@ import {
   Typography,
   Button  
 } from '@mui/material';
-import { HistoryTypes } from '@/types';
+
 
 import { TabList, TabContext, TabPanel } from '@mui/lab';
 import { rankingAtom, userAtom } from "@/atoms/state";

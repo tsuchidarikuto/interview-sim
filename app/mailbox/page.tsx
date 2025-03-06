@@ -20,23 +20,21 @@ import {
 } from '@mui/material';
 
 import MailIcon from '@mui/icons-material/Mail';
-import { HistoryTypes } from '@/types';
-import { AuthContext } from '@/provider/AuthContext';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useRouter } from "next/navigation";
 import { useAtom } from 'jotai';
 import { userAtom } from '@/atoms/state';
-import { createClient } from '@/utils/supabase/client';
-import { SupabaseDatabase } from '@/utils/supabase/database';
-import {getMailboxData} from '@/utils/getMailboxData';
+import {} from '@/utils/handleHistoryTable';
 import { MailContentsTypes } from '@/types';
+import { HandleHistoryTable } from '@/utils/handleHistoryTable';
 
 export default function MailBox() {       
     const [mailContents, setMailContents] = useState<MailContentsTypes[]>([]);
     const [isFetching, setIsFetching] = useState<boolean>(true);
     const [user,]= useAtom(userAtom);
     const {push } = useRouter()
+    const historyTableHandler = new HandleHistoryTable();
 
     useEffect(() => {
         if (!user) {
@@ -44,7 +42,7 @@ export default function MailBox() {
             return;
         }
         const fetchHistory = async () => {
-            const result = await getMailboxData(user.uid);
+            const result = await historyTableHandler.getMailboxData(user.uid);
             if (result) {
                 setMailContents(result);
                 setIsFetching(false);

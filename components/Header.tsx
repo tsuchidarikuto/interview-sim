@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AppBar, Toolbar, Typography, Box, Badge, IconButton } from '@mui/material';
 import { signOut } from 'firebase/auth';
-import { HistoryTypes } from '@/types';
+import { HistoryTableTypes } from '@/types';
 import EmailIcon from '@mui/icons-material/Email';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -57,6 +57,11 @@ export default function Header() {
                     <IconButton color="inherit" onClick={doLogout}>
                         <LogoutOutlinedIcon fontSize="medium" />
                     </IconButton>
+                    <Link href="/mailbox" passHref>
+                        <IconButton color="inherit">                        
+                            <EmailIcon fontSize="medium" />                
+                        </IconButton>
+                    </Link>
                     
                     <Link href="/ranking" passHref>
                         <IconButton color="inherit">
