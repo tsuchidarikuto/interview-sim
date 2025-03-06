@@ -1,70 +1,118 @@
 'use client'
 
+import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
-
-import { useSearchParams } from 'next/navigation'
-import { useEffect } from 'react';
-
+import { useSearchParams, useRouter } from 'next/navigation'
+import { 
+  Box, 
+  Button, 
+  Container, 
+  Typography, 
+  Paper, 
+  Alert, 
+  CircularProgress
+} from '@mui/material'
+import GoogleIcon from '@mui/icons-material/Google'
+import Link from 'next/link'
 
 const getErrorMessage = (error: string) => {
-    switch (error) {
-        case 'auth-code-error':
-            return '認証に失敗しました。もう一度お試しください。'        
-        default:
-            return '予期せぬエラーが発生しました。'
-    }
+  switch (error) {
+    case 'auth-code-error':
+      return '認証に失敗しました。もう一度お試しください。'        
+    default:
+      return '予期せぬエラーが発生しました。'
+  }
 }
 
 export default function SignIn() {
-    const supabase = createClient()
-    const searchParams = useSearchParams()
-    const error = searchParams.get('error')
-    const userId = searchParams.get('userId');
-    const userName = searchParams.get('userName');
-    
+  const supabase = createClient()
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+  const { push } = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
-    const handleSignInWithGoogle = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                queryParams: {
-                    access_type: 'offline',
-                    prompt: 'consent',
-                },
-                redirectTo: 'http://localhost:3000/auth/callback',
-            },
-        })
-        
+  const handleSignInWithGoogle = async () => {
+    try {
+      setIsLoading(true)
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+          // 環境に依存しないリダイレクトパスを使用
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      
+      if (error) {
+        console.error('ログインエラー:', error)
+        push(`/login?error=auth-code-error`)
+      }
+    } catch (err) {
+      console.error('認証エラー:', err)
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    
-
-    return (
+  return (
+    <Container maxWidth="sm" sx={{ mt: 8, mb: 4 }}>
+      <Paper 
+        elevation={3} 
+        sx={{ 
+          p: 4, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          borderRadius: 2
+        }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+				<Box
+					sx={{
+						my: 2,
+						backgroundImage: 'url(/homeLogo.svg)',
+						backgroundSize: 'contain',
+						backgroundRepeat: 'no-repeat',
+						backgroundPosition: 'center',
+						height: 120,
+						width: 350,
+					}}
+				/>
+			</Box>
         
-        <div className="flex min-h-screen flex-col items-center justify-center">
         
-            <div className="w-full max-w-md space-y-8">
+        {error && (
+          <Alert severity="error" sx={{ width: '100%', mb: 3 }}>
+            {getErrorMessage(error)}
+          </Alert>
+        )}
         
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                        {getErrorMessage(error)}
-                    </div>
-                )}
-                
-                <div className="text-center">
-                    <h2 className="mt-6 text-3xl font-bold tracking-tight">
-                        Sign in to your account
-                    </h2>
-                </div>
-                <div className="mt-8 space-y-6">
-                    <button
-                        onClick={handleSignInWithGoogle}
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                        Sign in with Google
-                    </button>
-                </div>                
-            </div>
-        </div>
-    )
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3, textAlign: 'center' }}>
+          MENTRYは面接練習のためのAIシミュレーターです。<br />
+          ログインして面接の練習を始めましょう。
+        </Typography>
+        
+        <Button
+          fullWidth
+          variant="contained"
+          startIcon={<GoogleIcon />}
+          onClick={handleSignInWithGoogle}
+          disabled={isLoading}
+          sx={{ py: 1.5 }}
+        >
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Googleでログイン'}
+        </Button>
+        
+        <Box sx={{ mt: 4, width: '100%', textAlign: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            ログインすることで、<Link href="/terms" passHref style={{ textDecoration: 'underline' }}>利用規約</Link>と
+            <Link href="/privacy" passHref style={{ textDecoration: 'underline' }}>プライバシーポリシー</Link>に同意したことになります。
+          </Typography>
+        </Box>
+      </Paper>
+    </Container>
+  )
 }
