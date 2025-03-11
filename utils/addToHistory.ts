@@ -1,7 +1,6 @@
-import { addDoc, collection } from 'firebase/firestore';
-import { firestore } from '@/firebase';
-import { interviewResultTypes, CompanyTypes, ResumeTypes, SettingTypes, ConversationTypes } from '@/types';
-import { formatDate } from "@/utils/formatDate";
+import { interviewResultTypes, CompanyTypes, ResumeTypes, SettingTypes, ConversationTypes, HistoryTypes, conversationTableTypes } from '@/types';
+import { createClient } from "./supabase/client";
+import { SupabaseDatabase } from "./supabase/database";
 
 export async function addToHistory(
     totalScore:number,
@@ -13,20 +12,42 @@ export async function addToHistory(
     interestShift:number[],
     uid: string
 ) {
+
+    
+
     try {
-        await addDoc(collection(firestore, 'history'), {
-            uid: uid,
-            totalScore:totalScore,
-            IsRankedIn:false,
+        const supabase = createClient();
+        const historyTable = new SupabaseDatabase<HistoryTypes>("histories",supabase );
+        const interviewResultTable = new SupabaseDatabase<interviewResultTypes>("interviewResults",supabase );
+        const conversationTable = new SupabaseDatabase<conversationTableTypes>("conversations",supabase );
+
+        const interviewResultFromDatabase = await interviewResultTable.addData(result,uid);
+
+        const conversationDataToSaveDatabase: conversationTableTypes = {
+            message: conversation.map(c => c.message),
+            role: conversation.map(c => c.role),
+            interest: conversation.filter(c => c.interest !== undefined).map(c => c.interest!)
+        };
+        
+        const conversationFromDatabase = await conversationTable.addData(conversationDataToSaveDatabase, uid);
+
+        
+        
+
+        const historyData:HistoryTypes = {            
+            isRankIn: false,
+            totalScore: totalScore,
             isRead: false,
-            time: formatDate(),
-            result,
-            company,
-            resume,
-            setting,
-            conversation,
-            interestShift
-        });
+            companyId: company.id ?? '',
+            resumeId: resume.id ?? '',
+            settingId: setting.id ?? '',
+            interestShift: interestShift,
+            conversationId: conversationFromDatabase.id ?? '',  
+            interviewResultId: interviewResultFromDatabase.id ?? ''
+        }
+
+        console.log(historyData);
+        await historyTable.addData(historyData,uid);
     } catch (e) {
         console.error('Error adding document:', e);
     }

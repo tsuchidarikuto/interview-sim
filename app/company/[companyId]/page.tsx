@@ -5,18 +5,19 @@ import { useParams,useRouter } from "next/navigation"
 import { Box, CircularProgress, Button, TextField, Container, Stack, Typography } from '@mui/material'
 import Grid from "@mui/material/Grid2"
 import type { CompanyTypes } from "@/types"
-import {  updateDataOnFirestore, addDataToFirestore ,getDataFromFirestoreWithId} from "@/utils/handleFirebase"
-import { AuthContext } from "@/provider/AuthContext"
 import Link from 'next/link';
+import { useAtom } from "jotai"
+import { userAtom } from "@/atoms/state"
+import { SupabaseDatabase } from "@/utils/supabase/database"
+import { createClient } from "@/utils/supabase/client"
 
 export default function CompanyEditPage() {
+  const supabase = createClient();
   const {push} = useRouter()
-  const { user } = useContext(AuthContext)
+  const [user,] = useAtom(userAtom);  
   const params = useParams();
   const companyId = Array.isArray(params.companyId) ? params.companyId[0] : params.companyId;
-  const [company, setCompany] = useState<CompanyTypes>({
-          uid:"",
-          id: "",
+  const [company, setCompany] = useState<CompanyTypes>({          
           name: "",
           position: "",
           skillset: "",
@@ -28,12 +29,13 @@ export default function CompanyEditPage() {
   const [isNew, setIsNew] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isFetchingCompany, setIsFetchingCompany] = useState<boolean>(true)
+  const companyTable = new SupabaseDatabase<CompanyTypes>("companies",supabase);
   
   //IDから会社情報を取得
   useEffect(() => {
     const fetchcompany = async () => {      
       if (companyId !== "new" && user&&companyId) {
-        const foundcompany = await getDataFromFirestoreWithId<CompanyTypes>("company", companyId)
+        const foundcompany = await companyTable.getDataById(companyId)
         if (foundcompany) {
           setCompany(foundcompany)
         } else {
@@ -54,9 +56,9 @@ export default function CompanyEditPage() {
     try {
       if (user) {
         if (isNew) {
-          await addDataToFirestore<CompanyTypes>("company", company, user.uid)
-        } else {
-          await updateDataOnFirestore<CompanyTypes>("company", company)
+          await companyTable.addData(company,user.uid);
+        } else if (company.id) {
+          await companyTable.updateData(company.id, company);
         }
         push("/company");
       }

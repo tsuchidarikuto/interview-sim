@@ -16,7 +16,8 @@ import {
 	companyAtom,
 	settingAtom,
 	isRecordingAtom,
-	isPlayingAudioAtom
+	isPlayingAudioAtom,
+	userAtom
 } from "@/atoms/state";
 import { useState, useEffect, useContext, useRef } from "react";
 import { ConversationTypes, interviewResultTypes } from "@/types";
@@ -36,7 +37,7 @@ import MicFeedbackButton from "@/components/MicFeedbackButton";
 export default function Interview() {
 	const [,setIsRecording] = useAtom(isRecordingAtom)
 	const { push } = useRouter();
-	const { user } = useContext(AuthContext);
+	const [user,] = useAtom(userAtom);
 	const [questions] = useAtom(questionsAtom);
 	const [conversation, setConversation] = useState<ConversationTypes[]>([]);
 	const [currentConversation, setCurrentConversation] = useState<ConversationTypes[]>([]);
@@ -199,12 +200,12 @@ export default function Interview() {
 			if (result) {
 				setInterviewResult(result);
 				const totalScore =
-					result.score.technical +
-					result.score.communication +
-					result.score.teamwork +
-					result.score.logicalThinking +
-					result.score.learningDesire +
-					result.score.companyUnderstanding;
+					result.technicalScore +
+					result.communicationScore +
+					result.teamworkScore +
+					result.logicalThinkingScore +
+					result.learningDesireScore +
+					result.companyUnderstandingScore;
 				addToHistory(totalScore, result, company, resume, setting, conversation, interestShift, user.uid);
 				push("/mailbox");
 			}

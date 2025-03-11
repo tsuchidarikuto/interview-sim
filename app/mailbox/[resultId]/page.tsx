@@ -1,13 +1,9 @@
 "use client";
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { firestore } from '@/firebase';
-import { AuthContext } from '@/provider/AuthContext';
-import { HistoryTypes } from '@/types';
+import { HistoryDataTypes, HistoryTableTypes, RankingTypes } from '@/types';
 import Link from 'next/link';
 import ResultChart from '@/components/resultChart';
-
 import {
     Card,
     CardHeader,
@@ -26,24 +22,27 @@ import BuildIcon from '@mui/icons-material/Build';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import { Settings} from '@mui/icons-material';
 import InterestShiftChart from '@/components/InterestShiftChart';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/atoms/state';
+import { HandleHistoryTable } from '@/utils/handleHistoryTable';
+import { createClient } from '@/utils/supabase/client';
+import { SupabaseDatabase } from '@/utils/supabase/database';
 
 export default function Page() {
-    const { user } = useContext(AuthContext);
+    const [user,] = useAtom(userAtom);    
     const { resultId } = useParams();
-    const [selectedHistory, setSelectedHistory] = useState<HistoryTypes>();
-
+    const [selectedHistory, setSelectedHistory] = useState<HistoryDataTypes>();
+    const historyTableHandler = new HandleHistoryTable();
+    
     useEffect(() => {
         const getResult = async () => {
             try {
-                if (!user) return;
-                const rid = Array.isArray(resultId) ? resultId[0] : resultId;
-                if (!rid) return;
-                const docRef = doc(firestore, 'history', rid);
-                const snapShot = await getDoc(docRef);
-                const data = snapShot.data();
-                if (!data) return;
-                await updateDoc(docRef, { isRead: true });
-                setSelectedHistory(data as HistoryTypes);
+                if(resultId){                    
+                    const id = Array.isArray(resultId) ? resultId[0] : resultId;
+                    const historyData:HistoryDataTypes = await historyTableHandler.getAllHistoryData(id);
+                    setSelectedHistory(historyData);
+                    await historyTableHandler.updateStatus(id,"isRead",true);
+                }
             } catch (error) {
                 console.log(error);
             }
@@ -65,28 +64,35 @@ export default function Page() {
 
     async function addRanking(){
         try {
-            if (!user) return;
-            const rid = Array.isArray(resultId) ? resultId[0] : resultId;
-            if (!rid) return;
-            const docRef = doc(firestore, 'history', rid);
-            const snapShot = await getDoc(docRef);
-            const data = snapShot.data();
-            if (!data) return;
-            await updateDoc(docRef, { isRankedIn: true }); 
-            setSelectedHistory((prev) => {
-                if (!prev) return prev;
-                return {
-                    ...prev,
-                    isRankedIn: true,
-                };
-            });
-            console.log(selectedHistory?.isRankedIn)
+            const supabase = createClient();
+            const rankingTable = new SupabaseDatabase<RankingTypes>("rankings",supabase);
+            const rankingData = {                
+                totalScore: totalScore,
+                userName: resume.name,
+                difficulty: setting.difficulty,                
+            }
+            if (user) {
+                await rankingTable.addData(rankingData, user.uid);
+            }
+            if (resultId) {
+                const id = Array.isArray(resultId) ? resultId[0] : resultId;
+                await historyTableHandler.updateStatus(id,"isRankIn",true);
+                
+                
+                setSelectedHistory(prevState => {
+                    if (prevState) {
+                        return { ...prevState, isRankIn: true };
+                    }
+                    return prevState;
+                });
+            }
+            
         } catch (error) {
             console.log(error);
         }
     }
 
-    const { isRankedIn,result, company, resume, setting, time,interestShift } = selectedHistory;
+    const { isRankIn,result, company, resume, setting, time,interestShift,totalScore } = selectedHistory;
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
@@ -129,15 +135,15 @@ export default function Page() {
                         <Typography >
                             <strong>評価できる点:</strong> <br/>
                             {
-                                result.feedback.positive.length!=0 ?
-                                (result.feedback.positive):
+                                result.positiveFeedback.length!=0 ?
+                                (result.positiveFeedback):
                                 "特になし"
                             }
                         </Typography>
                         <br/>
                         <Typography >
                             <strong>改善を期待する点:</strong> <br/>
-                            {result.feedback.negative}
+                            {result.negativeFeedback}
                         </Typography>
                         <Divider sx={{ my: 3 }} />
                         <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 3 }}>
@@ -146,7 +152,14 @@ export default function Page() {
                         
                         <Box sx={{ display: 'flex', alignItems:"center", justifyContent:"center",flexDirection:  'column', gap: 2, mt: 2 }}>
                             <Box sx={{display: 'flex', alignItems:"center", justifyContent:"center",width:"70%" }}>
-                                <ResultChart {...result.score} />
+                                <ResultChart 
+                                    technical={result.technicalScore}
+                                    communication={result.communicationScore}
+                                    teamwork={result.teamworkScore}
+                                    logicalThinking={result.logicalThinkingScore}
+                                    learningDesire={result.learningDesireScore}
+                                    companyUnderstanding={result.companyUnderstandingScore}
+                                />
                             </Box>
                         </Box>
 
@@ -207,7 +220,7 @@ export default function Page() {
                     <Link href="/" passHref>
                         <Button variant="contained" >ホームへ</Button>
                     </Link>
-                    {isRankedIn ||
+                    {isRankIn ||
                         <Button variant ="outlined" onClick={addRanking}>ランキングに追加 </Button>
                     }
             </Stack>

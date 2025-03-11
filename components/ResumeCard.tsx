@@ -17,7 +17,7 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, selectedResume, handleD
         sx={{
             display: 'flex',
             flexDirection: 'column',
-            border: selectedResume.selectedResumeId === resume.id ? '2px solid black' : undefined,
+            border: selectedResume.resumeId === resume.id ? '2px solid black' : undefined,
             width: '100%',
             height: 200,
         }}
@@ -52,23 +52,23 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, selectedResume, handleD
                 </Button>
             </Link>
             <Button
-                disabled={selectedResume.selectedResumeId === resume.id}
+                disabled={selectedResume.resumeId === resume.id}
                 variant="outlined"
                 size="small"
                 startIcon={<Delete />}
-                onClick={() => handleDelete(resume.id)}
+                onClick={() => resume.id && handleDelete(resume.id)}
             >
                 削除
             </Button>
             <Button
-                variant={selectedResume.selectedResumeId === resume.id ? 'contained' : 'outlined'}
+                variant={selectedResume.resumeId === resume.id ? 'contained' : 'outlined'}
                 size="small"
                 startIcon={
-                    selectedResume.selectedResumeId === resume.id ? <CheckCircle /> : <RadioButtonUnchecked />
+                    selectedResume.resumeId === resume.id ? <CheckCircle /> : <RadioButtonUnchecked />
                 }
-                onClick={() => handleSelect(resume.id)}
+                onClick={() => resume.id && handleSelect(resume.id)}
             >
-                {selectedResume.selectedResumeId === resume.id ? '選択中' : '選択'}
+                {selectedResume.resumeId === resume.id ? '選択中' : '選択'}
             </Button>
         </Box>
     </Card>

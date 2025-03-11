@@ -1,69 +1,118 @@
-'use client';
-import {useState, FormEvent} from 'react';
-import Link from 'next/link';
-import {useRouter} from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { Container,Typography,TextField,Card,Button } from '@mui/material';
+'use client'
 
-import { auth } from '@/firebase';
+import { useState } from 'react'
+import { createClient } from '@/utils/supabase/client'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { 
+  Box, 
+  Button, 
+  Container, 
+  Typography, 
+  Paper, 
+  Alert, 
+  CircularProgress
+} from '@mui/material'
+import GoogleIcon from '@mui/icons-material/Google'
+import Link from 'next/link'
 
-export default function Page() {
-    const {push} = useRouter();
+const getErrorMessage = (error: string) => {
+  switch (error) {
+    case 'auth-code-error':
+      return '認証に失敗しました。もう一度お試しください。'        
+    default:
+      return '予期せぬエラーが発生しました。'
+  }
+}
 
-    const [email,setEmail] = useState('');
-    const [password, setPassword] = useState('');
+export default function SignIn() {
+  const supabase = createClient()
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+  const { push } = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
-    const handleLogin = async (e:FormEvent<HTMLFormElement>)=>{
-        e.preventDefault();
-        try{
-            await signInWithEmailAndPassword(auth,email,password);
-            push('/');            
-        } catch (error){
-            console.log(error);
-            window.alert('ログインに失敗しました');
-        }
-    };
+  const handleSignInWithGoogle = async () => {
+    try {
+      setIsLoading(true)
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+          // 環境に依存しないリダイレクトパスを使用
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      
+      if (error) {
+        console.error('ログインエラー:', error)
+        push(`/login?error=auth-code-error`)
+      }
+    } catch (err) {
+      console.error('認証エラー:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-    return (
-        <>
+  return (
+    <Container maxWidth="sm" sx={{ mt: 8, mb: 4 }}>
+      <Paper 
+        elevation={3} 
+        sx={{ 
+          p: 4, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          borderRadius: 2
+        }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+				<Box
+					sx={{
+						my: 2,
+						backgroundImage: 'url(/homeLogo.svg)',
+						backgroundSize: 'contain',
+						backgroundRepeat: 'no-repeat',
+						backgroundPosition: 'center',
+						height: 120,
+						width: 350,
+					}}
+				/>
+			</Box>
         
-        <Container maxWidth="md" sx={{mt:5}}>
-        <Typography variant = "h4" align = "center" gutterBottom>ログイン</Typography>
-        <Typography variant="body1" color="text.secondary" align="center">
-            InterviewSimを始めるには<br/>
-            InterviewSimアカウントにログインして下さい
+        
+        {error && (
+          <Alert severity="error" sx={{ width: '100%', mb: 3 }}>
+            {getErrorMessage(error)}
+          </Alert>
+        )}
+        
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3, textAlign: 'center' }}>
+          MENTRYは面接練習のためのAIシミュレーターです。<br />
+          ログインして面接の練習を始めましょう。
         </Typography>
-        <Card sx={{p:3}} variant='outlined'>
-            <form onSubmit = {handleLogin}>
-                <TextField
-                    required
-                    label="メールアドレス"
-                    type="email"
-                    fullWidth
-                    value={email}
-                    onChange={(e)=>setEmail(e.target.value)}
-                    sx={{mb:5}}
-                />
-                <TextField
-                    required
-                    label="パスワード"
-                    type="password"
-                    fullWidth
-                    value={password}
-                    onChange={(e)=>setPassword(e.target.value)}
-                    sx={{mb:5}}
-                
-                />
-                <Button type="submit" variant='contained' sx={{mb:5,height:55,width:'100%', backgroundColor:'#555'}}>ログイン</Button>
-            </form>
-            <Card variant='outlined'>
-            <Link href="/signup">
-                <Typography variant="body1" align = "center" sx={{textDecoration: 'underline' ,cursor:"pointer",p:5}}>新規登録はこちら</Typography>
-            </Link>
-            </Card>
-            </Card>
-        </Container>
-
-        </>
-    )
+        
+        <Button
+          fullWidth
+          variant="contained"
+          startIcon={<GoogleIcon />}
+          onClick={handleSignInWithGoogle}
+          disabled={isLoading}
+          sx={{ py: 1.5 }}
+        >
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Googleでログイン'}
+        </Button>
+        
+        <Box sx={{ mt: 4, width: '100%', textAlign: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            ログインすることで、<Link href="/terms" passHref style={{ textDecoration: 'underline' }}>利用規約</Link>と
+            <Link href="/privacy" passHref style={{ textDecoration: 'underline' }}>プライバシーポリシー</Link>に同意したことになります。
+          </Typography>
+        </Box>
+      </Paper>
+    </Container>
+  )
 }
