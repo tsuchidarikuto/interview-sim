@@ -27,7 +27,6 @@ import { useRouter } from "next/navigation";
 import analyzeInterviewResult from "@/utils/analyzeInterviewResult";
 import LinearProgressWithLabel from "@/components/LinearProgressWithLabel";
 import { addToHistory } from "@/utils/addToHistory";
-import { AuthContext } from "@/provider/AuthContext";
 import checkUserInput from "@/utils/checkUserInput";
 import { styled } from "@mui/system";
 import SendIcon from "@mui/icons-material/Send";
