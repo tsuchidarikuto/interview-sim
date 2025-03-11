@@ -19,12 +19,12 @@ import {
 	isPlayingAudioAtom,
 	userAtom
 } from "@/atoms/state";
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ConversationTypes, interviewResultTypes } from "@/types";
 import { useRouter } from "next/navigation";
 import analyzeInterviewResult from "@/utils/analyzeInterviewResult";
 import { addToHistory } from "@/utils/addToHistory";
-import { AuthContext } from "@/provider/AuthContext";
+
 import checkUserInput from "@/utils/checkUserInput";
 import LinearProgressWithLabel from "@/components/LinearProgressWithLabel";
 import { SpeachToText, stopAudio } from "@/utils/handleAzureSpeach";

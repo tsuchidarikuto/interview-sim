@@ -22,7 +22,7 @@ import { SupabaseDatabase } from "@/utils/supabase/database";
 
 export default function SelectedResume() {
     const [user,] = useAtom(userAtom);
-    const [supabase, setSupabase] = useState<any>(null);
+    
     const [resume, setResume] = useState<ResumeTypes | null>(null);
     const [selectedResumeId, setSelectedResumeId] = useState<string | null>("");
     const [isFetchingResume, setIsFetchingResume] = useState<boolean>(true);    
@@ -32,7 +32,7 @@ export default function SelectedResume() {
             
             try {
                 const client = await createClient();
-                setSupabase(client);                
+                             
                 if (user&&user.uid) {
                     const selectedResumeTable = new SupabaseDatabase<SelectedResumeTypes>("selectedResumes",client);
                     const resumeTable = new SupabaseDatabase<ResumeTypes>("resumes",client);

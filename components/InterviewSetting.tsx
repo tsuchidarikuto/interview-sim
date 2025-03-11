@@ -17,7 +17,7 @@ import {
     CardHeader,
     Checkbox,
 } from '@mui/material';
-import React, { useState, useEffect, useContext, FormEvent } from 'react';
+import React, { useState, useEffect,  FormEvent } from 'react';
 import { SettingTypes } from '@/types';
 import { SupabaseDatabase } from '@/utils/supabase/database';
 import { useAtom } from 'jotai';

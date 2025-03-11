@@ -21,7 +21,7 @@ import {
 	settingAtom,
 	userAtom,
 } from "@/atoms/state";
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect,  useRef } from "react";
 import { ConversationTypes, interviewResultTypes } from "@/types";
 import { useRouter } from "next/navigation";
 import analyzeInterviewResult from "@/utils/analyzeInterviewResult";

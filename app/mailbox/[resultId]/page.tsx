@@ -1,7 +1,7 @@
 "use client";
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { HistoryDataTypes, HistoryTableTypes, RankingTypes } from '@/types';
+import { HistoryDataTypes, RankingTypes } from '@/types';
 import Link from 'next/link';
 import ResultChart from '@/components/resultChart';
 import {

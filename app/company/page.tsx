@@ -1,10 +1,9 @@
 "use client"
-import React, { useState, useEffect, useContext } from "react"
+import React, { useState, useEffect} from "react"
 import { Container, Button, TextField, Typography, Select, MenuItem, CircularProgress, Box } from "@mui/material"
 import { AddCircle, ChevronLeft, ChevronRight } from "@mui/icons-material"
 import Link from "next/link"
 import Grid from "@mui/material/Grid2"
-import { AuthContext } from "@/provider/AuthContext"
 import type { CompanyTypes, SelectedCompanyTypes } from "@/types"
 
 import CompanyCard from "@/components/CompanyCard"

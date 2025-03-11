@@ -1,9 +1,8 @@
 'use client';
-import React, { useContext, useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { AppBar, Toolbar, Typography, Box, Badge, IconButton } from '@mui/material';
-import { signOut } from 'firebase/auth';
-import { HistoryTableTypes } from '@/types';
+import { AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material';
+
 import EmailIcon from '@mui/icons-material/Email';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -14,8 +13,7 @@ import { useAtom } from 'jotai';
 import { userAtom } from '@/atoms/state';
 
 export default function Header() {  
-    const supabase = createClient();
-    const {push} = useRouter();
+    const supabase = createClient();    
     const [user,setUser] = useAtom(userAtom);
 
     

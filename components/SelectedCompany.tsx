@@ -13,7 +13,7 @@ import { createClient } from "@/utils/supabase/client";
 
 export default function SelectedCompany() {
     const [user,] = useAtom(userAtom);
-    const [supabase, setSupabase] = useState<any>(null);
+    
     const [company, setCompany] = useState<CompanyTypes | null>(null);
     const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>("");
     const [isFetchingCompany, setIsFetchingCompany] = useState<boolean>(true);
@@ -24,7 +24,7 @@ export default function SelectedCompany() {
             
             try {
                 const client = await createClient();
-                setSupabase(client);
+    
                 
                 if (user&&user.uid) {
                     const selectedCompanyTable = new SupabaseDatabase<SelectedCompanyTypes>("selectedCompanies", client);
