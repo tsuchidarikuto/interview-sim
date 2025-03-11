@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import {
     List,
     ListItem,

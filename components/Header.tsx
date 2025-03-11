@@ -8,7 +8,7 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { createClient } from '@/utils/supabase/client';
 
-import { useRouter } from 'next/navigation';
+
 import { useAtom } from 'jotai';
 import { userAtom } from '@/atoms/state';
 
