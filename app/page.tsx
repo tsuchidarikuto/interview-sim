@@ -136,25 +136,27 @@ export default function Home() {
 			</Typography>			
 
 			<Grid container spacing={2} sx={{ py: 1 }}>
-				<Grid size={{ xs: 12, sm: 12, md: 6 }}>
-					<ResumeAndCompanyTab />
-				</Grid>
-				<Grid size={{ xs: 12, sm: 12, md: 6 }} >
-					<InterviewSetting />
-
-				</Grid>
-				<Grid size={12}>
-					{user &&
-						<Button
-							size="large"
-							variant="contained"
-							onClick={handleStartInterview}
-							fullWidth
-							sx={{ mb: 5 }}
-						>
-							面接開始
-						</Button>}
-				</Grid>
+				@
+					<>
+						<Grid size={{ xs: 12, sm: 12, md: 6 }}>
+							<ResumeAndCompanyTab />
+						</Grid>
+						<Grid size={{ xs: 12, sm: 12, md: 6 }} >
+							<InterviewSetting />
+						</Grid>
+						<Grid size={12}>
+							<Button
+								size="large"
+								variant="contained"
+								onClick={handleStartInterview}
+								fullWidth
+								sx={{ mb: 5 }}
+							>
+								面接開始
+							</Button>
+						</Grid>
+					</>
+				
 			</Grid>
 
 		</Container>

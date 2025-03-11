@@ -73,7 +73,7 @@ export default function InterviewSetting() {
 
     useEffect(() => {
         const fetchData = async (): Promise<void> => {
-            if (user) {
+            if (user&&user.uid) {
                 const data = await settingTable.getArrayDataByUserId(user.uid);
                 if (data.length === 0) {
                     setIsNew(true);

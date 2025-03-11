@@ -16,15 +16,20 @@ import { userAtom } from '@/atoms/state';
 export default function Header() {  
     const supabase = createClient();
     const {push} = useRouter();
-    const [user,] = useAtom(userAtom);
+    const [user,setUser] = useAtom(userAtom);
 
     
 
     const doLogout = async () => {
         try {
             await supabase.auth.signOut();
+            
+            
+            setUser(null);
             console.log('Logout successful');
-            push('/login');
+            
+            
+            window.location.href = '/login';
         } catch (error) {
             console.error('Logout error:', error);
         }
@@ -50,26 +55,27 @@ export default function Header() {
                     </Link>
                 </Box>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="subtitle1" color="inherit" sx={{ display: { xs: 'none', sm: 'block' } }}>
-                        こんにちは{user?.name}さん
-                    </Typography>            
-                    <IconButton color="inherit" onClick={doLogout}>
-                        <LogoutOutlinedIcon fontSize="medium" />
-                    </IconButton>
-                    <Link href="/mailbox" passHref>
-                        <IconButton color="inherit">                        
-                            <EmailIcon fontSize="medium" />                
+                {user ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="subtitle1" color="inherit" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                            こんにちは{user.name}さん
+                        </Typography>            
+                        <IconButton color="inherit" onClick={doLogout}>
+                            <LogoutOutlinedIcon fontSize="medium" />
                         </IconButton>
-                    </Link>
-                    
-                    <Link href="/ranking" passHref>
-                        <IconButton color="inherit">
-                            <EmojiEventsIcon fontSize="medium" />
-                        </IconButton>
-                    </Link>
-                    
-                </Box>
+                        <Link href="/mailbox" passHref>
+                            <IconButton color="inherit">                        
+                                <EmailIcon fontSize="medium" />                
+                            </IconButton>
+                        </Link>
+                        
+                        <Link href="/ranking" passHref>
+                            <IconButton color="inherit">
+                                <EmojiEventsIcon fontSize="medium" />
+                            </IconButton>
+                        </Link>
+                    </Box>
+                ) : null}
             </Toolbar>
         </AppBar>
     );

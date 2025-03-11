@@ -26,7 +26,7 @@ export default function SelectedCompany() {
                 const client = await createClient();
                 setSupabase(client);
                 
-                if (user) {
+                if (user&&user.uid) {
                     const selectedCompanyTable = new SupabaseDatabase<SelectedCompanyTypes>("selectedCompanies", client);
                     const companyTable = new SupabaseDatabase<CompanyTypes>("companies", client);
                     

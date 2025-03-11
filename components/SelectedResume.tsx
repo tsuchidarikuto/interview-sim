@@ -33,19 +33,13 @@ export default function SelectedResume() {
             try {
                 const client = await createClient();
                 setSupabase(client);                
-                if (user) {
+                if (user&&user.uid) {
                     const selectedResumeTable = new SupabaseDatabase<SelectedResumeTypes>("selectedResumes",client);
                     const resumeTable = new SupabaseDatabase<ResumeTypes>("resumes",client);
-                    console.log("User object:", user);
-                    console.log("Fetching selected resumes for user:", user.uid);
-                    try {
-                        console.log("Querying table:", "selected_resumes");
+                    try {                        
                         const selectedDataFromDatabase = await selectedResumeTable.getArrayDataByUserId(user.uid);
-                        console.log("Selected resume data:", selectedDataFromDatabase);
                         if (selectedDataFromDatabase.length > 0) {
-                            console.log("Found selected resume with ID:", selectedDataFromDatabase[0].resumeId);
                             const resumeData = await resumeTable.getDataById(selectedDataFromDatabase[0].resumeId);
-                            console.log("Resume data:", resumeData);
                             if (resumeData) {
                                 setResume(resumeData);
                                 setSelectedResumeId(selectedDataFromDatabase[0].resumeId);
