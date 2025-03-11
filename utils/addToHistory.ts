@@ -1,4 +1,4 @@
-import { interviewResultTypes, CompanyTypes, ResumeTypes, SettingTypes, ConversationTypes, HistoryTypes, conversationTableTypes } from '@/types';
+import { interviewResultTypes, CompanyTypes, ResumeTypes, SettingTypes, ConversationTypes, HistoryTableTypes, conversationTableTypes } from '@/types';
 import { createClient } from "./supabase/client";
 import { SupabaseDatabase } from "./supabase/database";
 
@@ -17,7 +17,7 @@ export async function addToHistory(
 
     try {
         const supabase = createClient();
-        const historyTable = new SupabaseDatabase<HistoryTypes>("histories",supabase );
+        const historyTable = new SupabaseDatabase<HistoryTableTypes>("histories",supabase );
         const interviewResultTable = new SupabaseDatabase<interviewResultTypes>("interviewResults",supabase );
         const conversationTable = new SupabaseDatabase<conversationTableTypes>("conversations",supabase );
 
@@ -34,7 +34,7 @@ export async function addToHistory(
         
         
 
-        const historyData:HistoryTypes = {            
+        const historyData:HistoryTableTypes = {            
             isRankIn: false,
             totalScore: totalScore,
             isRead: false,
