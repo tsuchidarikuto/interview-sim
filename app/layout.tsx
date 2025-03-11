@@ -28,7 +28,7 @@ export default function RootLayout({
     <body className="Paper_v2" style={{height:"100vH"}}>    
         <Provider>
           <ThemeProvider theme={theme}>          
-            <Header title="" />              
+            <Header/>              
               {children}                        
             <Footer/>          
           </ThemeProvider>
