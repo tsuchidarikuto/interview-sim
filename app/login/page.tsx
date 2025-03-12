@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { 
@@ -12,8 +12,8 @@ import {
   Alert, 
   CircularProgress
 } from '@mui/material'
-import GoogleIcon from '@mui/icons-material/Google'
 import Link from 'next/link'
+import {FcGoogle} from 'react-icons/fc'
 
 const getErrorMessage = (error: string) => {
   switch (error) {
@@ -24,7 +24,7 @@ const getErrorMessage = (error: string) => {
   }
 }
 
-export default function SignIn() {
+function LoginContent() {
   const supabase = createClient()
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
@@ -70,18 +70,18 @@ export default function SignIn() {
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-				<Box
-					sx={{
-						my: 2,
-						backgroundImage: 'url(/homeLogo.svg)',
-						backgroundSize: 'contain',
-						backgroundRepeat: 'no-repeat',
-						backgroundPosition: 'center',
-						height: 120,
-						width: 350,
-					}}
-				/>
-			</Box>
+          <Box
+            sx={{
+              my: 2,
+              backgroundImage: 'url(/homeLogo.svg)',
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              height: 120,
+              width: 350,
+            }}
+          />
+        </Box>
         
         
         {error && (
@@ -98,7 +98,7 @@ export default function SignIn() {
         <Button
           fullWidth
           variant="contained"
-          startIcon={<GoogleIcon />}
+          startIcon={<FcGoogle />}
           onClick={handleSignInWithGoogle}
           disabled={isLoading}
           sx={{ py: 1.5 }}
@@ -114,5 +114,17 @@ export default function SignIn() {
         </Box>
       </Paper>
     </Container>
+  )
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={
+      <Container maxWidth="sm" sx={{ mt: 8, mb: 4, display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Container>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }
