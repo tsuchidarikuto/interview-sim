@@ -128,8 +128,7 @@ export default function Home() {
 				プロフィールと志望企業の情報を入力して、面接練習を始めましょう。<br />
 			</Typography>			
 
-			<Grid container spacing={2} sx={{ py: 1 }}>
-				@
+			<Grid container spacing={2} sx={{ py: 1 }}>				
 					<>
 						<Grid size={{ xs: 12, sm: 12, md: 6 }}>
 							<ResumeAndCompanyTab />
