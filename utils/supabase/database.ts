@@ -1,7 +1,7 @@
 // utils/supabase/database.ts
 import { SupabaseClient } from '@supabase/supabase-js'  // 型定義用に追加
 import { convertKeysToSnakeCase, convertKeysToCamelCase,toSnakeCase } from '@/utils/case-converter'
-import { RankingTypes } from '@/types'
+
 
 export class SupabaseDatabase<T extends object> {
   private supabase: SupabaseClient
