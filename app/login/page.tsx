@@ -34,6 +34,7 @@ function LoginContent() {
   const handleSignInWithGoogle = async () => {
     try {
       setIsLoading(true)
+      console.log(window.location.origin)
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
