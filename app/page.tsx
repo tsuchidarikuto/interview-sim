@@ -23,6 +23,7 @@ import ResumeAndCompanyTab from '@/components/ResumeAndCompanyTab';
 import { stopAudio } from '@/utils/handleAzureSpeach';
 import InterviewSetting from '@/components/InterviewSetting';
 import { PreparationInterview } from '@/utils/PreparationInterview';
+import  testGemini  from '@/utils/testGemini';
 
 /**
  * ホームページコンポーネント
@@ -127,7 +128,9 @@ export default function Home() {
 				本アプリはAIを活用した面接シミュレーターです。<br />
 				プロフィールと志望企業の情報を入力して、面接練習を始めましょう。<br />
 			</Typography>			
-
+			<Button onClick= {testGemini} variant="contained" sx={{ mt: 2, mb: 4, width: '100%' }}>
+					GEMINIテスト
+			</Button>
 			<Grid container spacing={2} sx={{ py: 1 }}>				
         	<>
           		<Grid size={{ xs: 12, sm: 12, md: 6 }}>
