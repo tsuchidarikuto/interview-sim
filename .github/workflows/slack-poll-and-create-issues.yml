@@ -2,7 +2,7 @@ name: Slack Message Polling and Issue Creation
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # 5分毎に実行
+    - cron: '*/3 * * * *'  # 3分毎に実行（リアルタイム性向上）
 
 jobs:
   process-slack-messages:
@@ -48,30 +48,86 @@ jobs:
             exit 1
           fi
 
-      - name: Process Messages with Claude
+      - name: Process Messages with Gemini
         if: steps.slack.outputs.has_messages == 'true'
-        uses: anthropics/claude-code-action@beta
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          direct_prompt: |
-            以下のSlackメッセージを分析し、GitHub Issueとして適切に整理してください：
-            
-            ${{ steps.slack.outputs.messages }}
-            
-            各メッセージについて：
-            1. 明確なタイトルを作成
-            2. 構造化された説明を作成
-            3. 適切なラベルを提案
-            4. 優先度を判定
-            5. GitHub Issueを作成（必ず@claude をメンションして自動処理されるようにしてください）
-            
-            雑談や質問の場合は、Issue作成をスキップしてください。
+        id: gemini_process
+        run: |
+          echo "Processing messages with Gemini API..."
           
-          custom_instructions: |
-            - 各Issueには必ず@claudeをメンションして自動処理を有効化
-            - 重複するIssueは作成しない
-            - 明確でないメッセージは詳細確認のIssueとして作成
-            - 処理完了後、元のSlackメッセージにチェックマークのリアクションを追加
+          # Slackメッセージを取得
+          MESSAGES='${{ steps.slack.outputs.messages }}'
+          echo "Messages to process: $MESSAGES"
+          
+          # 各メッセージを処理
+          echo "$MESSAGES" | jq -r '.[] | @base64' | while read -r encoded_msg; do
+            msg=$(echo "$encoded_msg" | base64 -d)
+            msg_text=$(echo "$msg" | jq -r '.text')
+            msg_ts=$(echo "$msg" | jq -r '.ts')
+            msg_user=$(echo "$msg" | jq -r '.user')
+            
+            echo "Processing message: $msg_text"
+            
+            # Gemini APIでメッセージを整形
+            GEMINI_RESPONSE=$(curl -s -X POST \
+              -H "Content-Type: application/json" \
+              -d '{
+                "contents": [{
+                  "parts": [{
+                    "text": "以下のSlackメッセージをGitHub Issue用のタイトルと本文に整形してください。必ず以下のJSON形式で返答してください：\n\n{\n  \"title\": \"明確で具体的なタイトル\",\n  \"body\": \"構造化された説明\",\n  \"should_create_issue\": true/false\n}\n\n雑談や質問の場合はshould_create_issueをfalseにしてください。\n\nSlackメッセージ: '$msg_text'"
+                  }]
+                }]
+              }' \
+              "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${{ secrets.GEMINI_API_KEY }}")
+            
+            if [ $? -eq 0 ]; then
+              echo "Gemini API call successful"
+              echo "Raw response: $GEMINI_RESPONSE"
+              
+              # JSONレスポンスを解析
+              GEMINI_TEXT=$(echo "$GEMINI_RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
+              echo "Gemini response text: $GEMINI_TEXT"
+              
+              # Issueを作成するかチェック
+              if echo "$GEMINI_TEXT" | jq -e '.should_create_issue' >/dev/null 2>&1; then
+                SHOULD_CREATE=$(echo "$GEMINI_TEXT" | jq -r '.should_create_issue')
+                if [ "$SHOULD_CREATE" = "true" ]; then
+                  ISSUE_TITLE=$(echo "$GEMINI_TEXT" | jq -r '.title')
+                  ISSUE_BODY=$(echo "$GEMINI_TEXT" | jq -r '.body')
+                  
+                  echo "Creating issue with title: $ISSUE_TITLE"
+                  echo "issue_data<<EOF" >> $GITHUB_OUTPUT
+                  echo "{\"title\": \"$ISSUE_TITLE\", \"body\": \"$ISSUE_BODY\", \"user\": \"$msg_user\", \"ts\": \"$msg_ts\"}" >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
+                  echo "should_create_issue=true" >> $GITHUB_OUTPUT
+                else
+                  echo "Skipping issue creation - determined to be casual conversation"
+                fi
+              else
+                echo "Error: Could not parse Gemini response as JSON"
+              fi
+            else
+              echo "Error: Gemini API call failed"
+            fi
+          done
+
+      - name: Create GitHub Issue
+        if: steps.gemini_process.outputs.should_create_issue == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueData = JSON.parse('${{ steps.gemini_process.outputs.issue_data }}');
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: issueData.title,
+              body: `${issueData.body}\n\n---\n*Originally posted in Slack by user ${issueData.user}*\n\n@claude`,
+              labels: ['from-slack', 'auto-created']
+            });
+            
+            console.log(`Created issue #${issue.data.number}: ${issue.data.html_url}`);
+            core.setOutput('issue_number', issue.data.number);
+            core.setOutput('issue_url', issue.data.html_url);
 
       - name: Mark Messages as Processed
         if: steps.slack.outputs.has_messages == 'true'
