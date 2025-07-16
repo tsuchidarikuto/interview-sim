@@ -67,16 +67,37 @@ jobs:
             
             echo "Processing message: $msg_text"
             
-            # Gemini APIでメッセージを整形
+            # Gemini APIでメッセージを整形（構造化出力使用）
             GEMINI_RESPONSE=$(curl -s -X POST \
               -H "x-goog-api-key: ${{ secrets.GEMINI_API_KEY }}" \
               -H "Content-Type: application/json" \
               -d '{
                 "contents": [{
                   "parts": [{
-                    "text": "以下のSlackメッセージをGitHub Issue用のタイトルと本文に整形してください。必ず以下のJSON形式で返答してください：\n\n{\n  \"title\": \"明確で具体的なタイトル\",\n  \"body\": \"構造化された説明\",\n  \"should_create_issue\": true/false\n}\n\n雑談や質問の場合はshould_create_issueをfalseにしてください。\n\nSlackメッセージ: '$msg_text'"
+                    "text": "以下のSlackメッセージをGitHub Issue用のタイトルと本文に整形してください。雑談や質問の場合はshould_create_issueをfalseにしてください。\n\nSlackメッセージ: '$msg_text'"
                   }]
-                }]
+                }],
+                "generationConfig": {
+                  "responseMimeType": "application/json",
+                  "responseSchema": {
+                    "type": "OBJECT",
+                    "properties": {
+                      "title": {
+                        "type": "STRING",
+                        "description": "明確で具体的なタイトル"
+                      },
+                      "body": {
+                        "type": "STRING", 
+                        "description": "構造化された説明"
+                      },
+                      "should_create_issue": {
+                        "type": "BOOLEAN",
+                        "description": "Issueを作成するかどうか"
+                      }
+                    },
+                    "required": ["title", "body", "should_create_issue"]
+                  }
+                }
               }' \
               "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
             
@@ -84,16 +105,16 @@ jobs:
               echo "Gemini API call successful"
               echo "Raw response: $GEMINI_RESPONSE"
               
-              # JSONレスポンスを解析
-              GEMINI_TEXT=$(echo "$GEMINI_RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
-              echo "Gemini response text: $GEMINI_TEXT"
+              # 構造化出力から直接JSONを解析
+              GEMINI_JSON=$(echo "$GEMINI_RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
+              echo "Gemini structured output: $GEMINI_JSON"
               
               # Issueを作成するかチェック
-              if echo "$GEMINI_TEXT" | jq -e '.should_create_issue' >/dev/null 2>&1; then
-                SHOULD_CREATE=$(echo "$GEMINI_TEXT" | jq -r '.should_create_issue')
+              if echo "$GEMINI_JSON" | jq -e '.should_create_issue' >/dev/null 2>&1; then
+                SHOULD_CREATE=$(echo "$GEMINI_JSON" | jq -r '.should_create_issue')
                 if [ "$SHOULD_CREATE" = "true" ]; then
-                  ISSUE_TITLE=$(echo "$GEMINI_TEXT" | jq -r '.title')
-                  ISSUE_BODY=$(echo "$GEMINI_TEXT" | jq -r '.body')
+                  ISSUE_TITLE=$(echo "$GEMINI_JSON" | jq -r '.title')
+                  ISSUE_BODY=$(echo "$GEMINI_JSON" | jq -r '.body')
                   
                   echo "Creating issue with title: $ISSUE_TITLE"
                   echo "issue_data<<EOF" >> $GITHUB_OUTPUT
@@ -104,7 +125,7 @@ jobs:
                   echo "Skipping issue creation - determined to be casual conversation"
                 fi
               else
-                echo "Error: Could not parse Gemini response as JSON"
+                echo "Error: Could not parse Gemini structured output as JSON"
               fi
             else
               echo "Error: Gemini API call failed"
