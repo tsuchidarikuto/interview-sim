@@ -32,18 +32,14 @@ jobs:
             echo "Slack API call successful"
             
             # 新しいメッセージをフィルタリング（ボットメッセージと処理済みを除外）
-            jq '.messages[] | select(.bot_id == null and (.reactions // [] | any(.name == "white_check_mark") | not))' slack_response.json > filtered_messages.json
+            FILTERED_MESSAGES=$(jq -c '[.messages[] | select(.bot_id == null and (.reactions // [] | any(.name == "white_check_mark") | not))]' slack_response.json)
             
             # メッセージが存在するかチェック
-            if [ -s filtered_messages.json ]; then
+            if [ "$FILTERED_MESSAGES" != "[]" ] && [ "$FILTERED_MESSAGES" != "null" ]; then
               echo "Found new messages to process"
-              
-              # JSONを1行のコンパクト形式で出力
-              MESSAGES=$(jq -c -s '.' filtered_messages.json)
               echo "has_messages=true" >> $GITHUB_OUTPUT
-              echo "messages=$MESSAGES" >> $GITHUB_OUTPUT
-              
-              echo "Messages output: $MESSAGES"
+              echo "messages=$FILTERED_MESSAGES" >> $GITHUB_OUTPUT
+              echo "Messages output: $FILTERED_MESSAGES"
             else
               echo "No new messages found"
               echo "has_messages=false" >> $GITHUB_OUTPUT
