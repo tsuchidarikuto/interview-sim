@@ -75,91 +75,146 @@ jobs:
             
             echo "Processing message $((i+1)): $msg_text"
             
-            # メッセージテキストをエスケープ
-            ESCAPED_MSG=$(echo "$msg_text" | sed 's/"/\\"/g' | sed 's/\\/\\\\/g' | tr '\n' ' ')
+            # jqを使用した安全なJSONエスケープ処理
+            echo "=== Processing message $((i+1)) ==="
+            echo "User: $msg_user"
+            echo "Timestamp: $msg_ts"
+            echo "Message length: $(echo "$msg_text" | wc -c) characters"
+            echo "Message preview: $(echo "$msg_text" | head -c 200)..."
             
-            # Gemini APIでメッセージを整形（構造化出力使用）
-            GEMINI_RESPONSE=$(curl -s -X POST \
-              -H "x-goog-api-key: ${{ secrets.GEMINI_API_KEY }}" \
-              -H "Content-Type: application/json" \
-              -d "{
-                \"contents\": [{
-                  \"parts\": [{
-                    \"text\": \"以下のSlackメッセージを分析し、GitHub Issue用に整形してください。複雑なタスクの場合は複数のIssueに分割してください。\\n\\n【分割の基準】\\n- 単純なタスク: 1つのIssue\\n- 複雑なタスク: 複数のIssueに分割（最大5個まで）\\n- 各Issueは独立して作業可能であること\\n- 依存関係がある場合は明記すること\\n- 将来のバッチ処理を考慮したメタデータ付与\\n\\n【ブランチ戦略】\\n- 新機能追加: feature/\\n- バグ修正: fix/\\n- 緊急修正: hotfix/\\n- リファクタリング: refactor/\\n- ドキュメント更新: docs/\\n\\n【複雑度の判定】\\n- small: 1-2時間程度\\n- medium: 半日-1日程度\\n- large: 数日程度\\n\\n雑談や質問の場合はshould_create_issueをfalseにしてください。\\n\\nSlackメッセージ: $ESCAPED_MSG\"
+            # プロンプトテンプレートの準備
+            PROMPT_TEMPLATE="以下のSlackメッセージを分析し、GitHub Issue用に整形してください。複雑なタスクの場合は複数のIssueに分割してください。
+
+【分割の基準】
+- 単純なタスク: 1つのIssue
+- 複雑なタスク: 複数のIssueに分割（最大5個まで）
+- 各Issueは独立して作業可能であること
+- 依存関係がある場合は明記すること
+- 将来のバッチ処理を考慮したメタデータ付与
+
+【ブランチ戦略】
+- 新機能追加: feature/
+- バグ修正: fix/
+- 緊急修正: hotfix/
+- リファクタリング: refactor/
+- ドキュメント更新: docs/
+
+【複雑度の判定】
+- small: 1-2時間程度
+- medium: 半日-1日程度
+- large: 数日程度
+
+雑談や質問の場合はshould_create_issueをfalseにしてください。
+
+Slackメッセージ: "
+            
+            # jqを使用してJSON構造を安全に構築
+            REQUEST_BODY=$(jq -n \
+              --arg prompt "$PROMPT_TEMPLATE" \
+              --arg msg_text "$msg_text" \
+              '{
+                contents: [{
+                  parts: [{
+                    text: ($prompt + $msg_text)
                   }]
                 }],
-                \"generationConfig\": {
-                  \"responseMimeType\": \"application/json\",
-                  \"responseSchema\": {
-                    \"type\": \"OBJECT\",
-                    \"properties\": {
-                      \"should_create_issue\": {
-                        \"type\": \"BOOLEAN\",
-                        \"description\": \"Issueを作成するかどうか\"
+                generationConfig: {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                      should_create_issue: {
+                        type: "BOOLEAN",
+                        description: "Issueを作成するかどうか"
                       },
-                      \"task_type\": {
-                        \"type\": \"STRING\",
-                        \"enum\": [\"simple\", \"complex\"],
-                        \"description\": \"タスクの種類\"
+                      task_type: {
+                        type: "STRING",
+                        enum: ["simple", "complex"],
+                        description: "タスクの種類"
                       },
-                      \"issues\": {
-                        \"type\": \"ARRAY\",
-                        \"items\": {
-                          \"type\": \"OBJECT\",
-                          \"properties\": {
-                            \"title\": {
-                              \"type\": \"STRING\",
-                              \"description\": \"明確で具体的なタイトル\"
+                      issues: {
+                        type: "ARRAY",
+                        items: {
+                          type: "OBJECT",
+                          properties: {
+                            title: {
+                              type: "STRING",
+                              description: "明確で具体的なタイトル"
                             },
-                            \"body\": {
-                              \"type\": \"STRING\",
-                              \"description\": \"構造化された説明\"
+                            body: {
+                              type: "STRING",
+                              description: "構造化された説明"
                             },
-                            \"priority\": {
-                              \"type\": \"STRING\",
-                              \"enum\": [\"low\", \"medium\", \"high\", \"urgent\"],
-                              \"description\": \"優先度\"
+                            priority: {
+                              type: "STRING",
+                              enum: ["low", "medium", "high", "urgent"],
+                              description: "優先度"
                             },
-                            \"branch_strategy\": {
-                              \"type\": \"STRING\",
-                              \"enum\": [\"feature\", \"fix\", \"hotfix\", \"refactor\", \"docs\"],
-                              \"description\": \"適切なブランチ戦略\"
+                            branch_strategy: {
+                              type: "STRING",
+                              enum: ["feature", "fix", "hotfix", "refactor", "docs"],
+                              description: "適切なブランチ戦略"
                             },
-                            \"suggested_branch_name\": {
-                              \"type\": \"STRING\",
-                              \"description\": \"具体的なブランチ名の提案\"
+                            suggested_branch_name: {
+                              type: "STRING",
+                              description: "具体的なブランチ名の提案"
                             },
-                            \"depends_on\": {
-                              \"type\": \"STRING\",
-                              \"description\": \"依存するIssueのタイトル（任意）\"
+                            depends_on: {
+                              type: "STRING",
+                              description: "依存するIssueのタイトル（任意）"
                             },
-                            \"estimated_complexity\": {
-                              \"type\": \"STRING\",
-                              \"enum\": [\"small\", \"medium\", \"large\"],
-                              \"description\": \"作業量の推定\"
+                            estimated_complexity: {
+                              type: "STRING",
+                              enum: ["small", "medium", "large"],
+                              description: "作業量の推定"
                             },
-                            \"batch_processable\": {
-                              \"type\": \"BOOLEAN\",
-                              \"description\": \"バッチ処理可能かどうか\"
+                            batch_processable: {
+                              type: "BOOLEAN",
+                              description: "バッチ処理可能かどうか"
                             }
                           },
-                          \"required\": [\"title\", \"body\", \"priority\", \"branch_strategy\", \"suggested_branch_name\", \"estimated_complexity\", \"batch_processable\"]
+                          required: ["title", "body", "priority", "branch_strategy", "suggested_branch_name", "estimated_complexity", "batch_processable"]
                         }
                       }
                     },
-                    \"required\": [\"should_create_issue\", \"task_type\", \"issues\"]
+                    required: ["should_create_issue", "task_type", "issues"]
                   }
                 }
-              }" \
+              }')
+            
+            # Gemini APIでメッセージを整形（構造化出力使用）
+            echo "Making Gemini API request..."
+            echo "Request body size: $(echo "$REQUEST_BODY" | wc -c) characters"
+            echo "Request body preview: $(echo "$REQUEST_BODY" | head -c 500)..."
+            
+            GEMINI_RESPONSE=$(echo "$REQUEST_BODY" | curl -s -X POST \
+              -H "x-goog-api-key: ${{ secrets.GEMINI_API_KEY }}" \
+              -H "Content-Type: application/json" \
+              -d @- \
               "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
             
             if [ $? -eq 0 ]; then
               echo "Gemini API call successful for message $((i+1))"
               echo "Raw response: $GEMINI_RESPONSE"
               
+              # エラーレスポンスのチェック
+              if echo "$GEMINI_RESPONSE" | jq -e '.error' >/dev/null 2>&1; then
+                ERROR_MSG=$(echo "$GEMINI_RESPONSE" | jq -r '.error.message')
+                ERROR_CODE=$(echo "$GEMINI_RESPONSE" | jq -r '.error.code')
+                echo "Gemini API Error for message $((i+1)): Code $ERROR_CODE - $ERROR_MSG"
+                echo "Problematic message content: $msg_text"
+                continue
+              fi
+              
               # 構造化出力から直接JSONを解析
               GEMINI_JSON=$(echo "$GEMINI_RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
               echo "Gemini structured output: $GEMINI_JSON"
+              
+              # JSONの妥当性をチェック
+              if [ "$GEMINI_JSON" = "null" ] || [ -z "$GEMINI_JSON" ]; then
+                echo "Error: Empty or null structured output for message $((i+1))"
+                continue
+              fi
               
               # Issueを作成するかチェック
               if echo "$GEMINI_JSON" | jq -e '.should_create_issue' >/dev/null 2>&1; then
