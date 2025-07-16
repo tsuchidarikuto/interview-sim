@@ -138,6 +138,63 @@ jobs:
             fi
           done
 
+      - name: Create Priority Labels
+        if: steps.gemini_process.outputs.should_create_issue == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // 優先度ラベルを事前作成（既存の場合はスキップ）
+            const priorityLabels = [
+              { name: 'Priority: Low', color: 'f1bc31', description: '低優先度のIssue' },
+              { name: 'Priority: Medium', color: 'e88a1a', description: '中優先度のIssue' },
+              { name: 'Priority: High', color: 'b22222', description: '高優先度のIssue' },
+              { name: 'Priority: Critical', color: '7c0a02', description: '緊急対応が必要なIssue' }
+            ];
+            
+            for (const label of priorityLabels) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`Created label: ${label.name}`);
+              } catch (error) {
+                if (error.status === 422) {
+                  console.log(`Label already exists: ${label.name}`);
+                } else {
+                  console.error(`Error creating label ${label.name}:`, error.message);
+                }
+              }
+            }
+            
+            // from-slackとauto-createdラベルも作成
+            const additionalLabels = [
+              { name: 'from-slack', color: '4a154b', description: 'Slackから自動作成されたIssue' },
+              { name: 'auto-created', color: '0366d6', description: '自動作成されたIssue' }
+            ];
+            
+            for (const label of additionalLabels) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`Created label: ${label.name}`);
+              } catch (error) {
+                if (error.status === 422) {
+                  console.log(`Label already exists: ${label.name}`);
+                } else {
+                  console.error(`Error creating label ${label.name}:`, error.message);
+                }
+              }
+            }
+
       - name: Create GitHub Issue
         if: steps.gemini_process.outputs.should_create_issue == 'true'
         uses: actions/github-script@v7
@@ -145,12 +202,12 @@ jobs:
           script: |
             const issueData = JSON.parse('${{ steps.gemini_process.outputs.issue_data }}');
             
-            // 優先度に応じたラベルを設定
+            // 優先度に応じたラベルを設定（一般的な命名規則に従う）
             const priorityLabels = {
-              'urgent': ['priority:urgent', 'from-slack', 'auto-created'],
-              'high': ['priority:high', 'from-slack', 'auto-created'],
-              'medium': ['priority:medium', 'from-slack', 'auto-created'],
-              'low': ['priority:low', 'from-slack', 'auto-created']
+              'urgent': ['Priority: Critical', 'from-slack', 'auto-created'],
+              'high': ['Priority: High', 'from-slack', 'auto-created'],
+              'medium': ['Priority: Medium', 'from-slack', 'auto-created'],
+              'low': ['Priority: Low', 'from-slack', 'auto-created']
             };
             
             const labels = priorityLabels[issueData.priority] || ['from-slack', 'auto-created'];
