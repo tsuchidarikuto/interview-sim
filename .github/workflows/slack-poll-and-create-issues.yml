@@ -3,7 +3,6 @@ name: Slack Message Polling and Issue Creation
 on:
   schedule:
     - cron: '*/5 * * * *'  # 5分毎に実行
-  workflow_dispatch:  # 手動実行も可能
 
 jobs:
   process-slack-messages:
@@ -54,7 +53,7 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: |
+          direct_prompt: |
             以下のSlackメッセージを分析し、GitHub Issueとして適切に整理してください：
             
             ${{ steps.slack.outputs.messages }}
