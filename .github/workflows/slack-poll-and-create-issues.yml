@@ -142,6 +142,7 @@ jobs:
         if: steps.gemini_process.outputs.should_create_issue == 'true'
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           script: |
             // 優先度ラベルを事前作成（既存の場合はスキップ）
             const priorityLabels = [
@@ -199,6 +200,7 @@ jobs:
         if: steps.gemini_process.outputs.should_create_issue == 'true'
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           script: |
             const issueData = JSON.parse('${{ steps.gemini_process.outputs.issue_data }}');
             
