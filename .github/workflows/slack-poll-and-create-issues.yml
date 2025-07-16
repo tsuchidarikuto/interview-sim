@@ -82,8 +82,9 @@ jobs:
             echo "Message length: $(echo "$msg_text" | wc -c) characters"
             echo "Message preview: $(echo "$msg_text" | head -c 200)..."
             
-            # プロンプトテンプレートの準備
-            PROMPT_TEMPLATE="以下のSlackメッセージを分析し、GitHub Issue用に整形してください。複雑なタスクの場合は複数のIssueに分割してください。
+            # プロンプトテンプレートの準備（heredoc使用）
+            PROMPT_TEMPLATE=$(cat <<'EOF'
+以下のSlackメッセージを分析し、GitHub Issue用に整形してください。複雑なタスクの場合は複数のIssueに分割してください。
 
 【分割の基準】
 - 単純なタスク: 1つのIssue
@@ -106,7 +107,9 @@ jobs:
 
 雑談や質問の場合はshould_create_issueをfalseにしてください。
 
-Slackメッセージ: "
+Slackメッセージ: 
+EOF
+)
             
             # jqを使用してJSON構造を安全に構築
             REQUEST_BODY=$(jq -n \
