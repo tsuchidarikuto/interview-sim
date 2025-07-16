@@ -218,12 +218,21 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: issueData.title,
-              body: `**優先度**: ${issueData.priority.toUpperCase()}\n\n${issueData.body}\n\n---\n*Originally posted in Slack by user ${issueData.user}*\n\n@claude`,
+              body: `**優先度**: ${issueData.priority.toUpperCase()}\n\n${issueData.body}\n\n---\n*Originally posted in Slack by user ${issueData.user}*`,
               labels: labels
             });
             
             console.log(`Created issue #${issue.data.number}: ${issue.data.html_url}`);
-            console.log(`Claude will automatically process this issue due to @claude mention`);
+            
+            // 作成されたIssueに@claudeメンションのコメントを投稿
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.data.number,
+              body: `@claude このIssue #${issue.data.number} を解決してください。\n\n以下の内容に基づいて、具体的な実装方針と必要なコード変更を提案してください：\n\n**タイトル**: ${issueData.title}\n\n**説明**:\n${issueData.body}\n\n**優先度**: ${issueData.priority}`
+            });
+            
+            console.log(`Posted @claude comment to issue #${issue.data.number}`);
             core.setOutput('issue_number', issue.data.number);
             core.setOutput('issue_url', issue.data.html_url);
 
