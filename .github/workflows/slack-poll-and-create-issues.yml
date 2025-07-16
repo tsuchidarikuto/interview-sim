@@ -82,34 +82,8 @@ jobs:
             echo "Message length: $(echo "$msg_text" | wc -c) characters"
             echo "Message preview: $(echo "$msg_text" | head -c 200)..."
             
-            # プロンプトテンプレートの準備（heredoc使用）
-            PROMPT_TEMPLATE=$(cat <<'EOF'
-以下のSlackメッセージを分析し、GitHub Issue用に整形してください。複雑なタスクの場合は複数のIssueに分割してください。
-
-【分割の基準】
-- 単純なタスク: 1つのIssue
-- 複雑なタスク: 複数のIssueに分割（最大5個まで）
-- 各Issueは独立して作業可能であること
-- 依存関係がある場合は明記すること
-- 将来のバッチ処理を考慮したメタデータ付与
-
-【ブランチ戦略】
-- 新機能追加: feature/
-- バグ修正: fix/
-- 緊急修正: hotfix/
-- リファクタリング: refactor/
-- ドキュメント更新: docs/
-
-【複雑度の判定】
-- small: 1-2時間程度
-- medium: 半日-1日程度
-- large: 数日程度
-
-雑談や質問の場合はshould_create_issueをfalseにしてください。
-
-Slackメッセージ: 
-EOF
-)
+            # プロンプトテンプレートの準備（単一行）
+            PROMPT_TEMPLATE="以下のSlackメッセージを分析し、GitHub Issue用に整形してください。複雑なタスクの場合は複数のIssueに分割してください。分割の基準: 単純なタスクは1つのIssue、複雑なタスクは複数のIssueに分割（最大5個まで）、各Issueは独立して作業可能であること、依存関係がある場合は明記すること、将来のバッチ処理を考慮したメタデータ付与。ブランチ戦略: 新機能追加はfeature/、バグ修正はfix/、緊急修正はhotfix/、リファクタリングはrefactor/、ドキュメント更新はdocs/。複雑度の判定: smallは1-2時間程度、mediumは半日-1日程度、largeは数日程度。雑談や質問の場合はshould_create_issueをfalseにしてください。Slackメッセージ: "
             
             # jqを使用してJSON構造を安全に構築
             REQUEST_BODY=$(jq -n \
