@@ -261,29 +261,7 @@ jobs:
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     title: issueData.title,
-                    body: `@claude このIssueを解決してください。
-
-**必ず日本語で回答してください。**
-
-## 作業内容
-${issueData.body}
-
-## 推奨ブランチ戦略
-- **ブランチ種別**: ${issueData.branch_strategy}
-- **推奨ブランチ名**: \`${issueData.suggested_branch_name}\`
-- **ベースブランチ**: \`dev\`
-
-## 求める回答
-- 具体的な実装方針（日本語）
-- 必要なコード変更の提案
-- テスト戦略
-- 完了の定義
-
-## 優先度
-**${issueData.priority.toUpperCase()}**
-
----
-*Originally posted in Slack by user ${issueData.user}*`,
+                    body: `@claude このIssueを解決してください。\n\n**必ず日本語で回答してください。**\n\n## 作業内容\n${issueData.body}\n\n## 推奨ブランチ戦略\n- **ブランチ種別**: ${issueData.branch_strategy}\n- **推奨ブランチ名**: \`${issueData.suggested_branch_name}\`\n- **ベースブランチ**: \`dev\`\n\n## 求める回答\n- 具体的な実装方針（日本語）\n- 必要なコード変更の提案\n- テスト戦略\n- 完了の定義\n\n## 優先度\n**${issueData.priority.toUpperCase()}**\n\n---\n*Originally posted in Slack by user ${issueData.user}*`,
                     labels: labels
                   });
                   
