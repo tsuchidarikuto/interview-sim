@@ -29,14 +29,23 @@ jobs:
           
           # レスポンスをチェック
           if [ "$(jq -r '.ok' slack_response.json)" = "true" ]; then
+            echo "Slack API call successful"
+            
             # 新しいメッセージをフィルタリング（ボットメッセージと処理済みを除外）
-            jq -r '.messages[] | select(.bot_id == null and (.reactions // [] | any(.name == "white_check_mark") | not))' slack_response.json > filtered_messages.json
+            jq '.messages[] | select(.bot_id == null and (.reactions // [] | any(.name == "white_check_mark") | not))' slack_response.json > filtered_messages.json
             
             # メッセージが存在するかチェック
             if [ -s filtered_messages.json ]; then
+              echo "Found new messages to process"
+              
+              # JSONを1行のコンパクト形式で出力
+              MESSAGES=$(jq -c -s '.' filtered_messages.json)
               echo "has_messages=true" >> $GITHUB_OUTPUT
-              echo "messages=$(cat filtered_messages.json | jq -s '.')" >> $GITHUB_OUTPUT
+              echo "messages=$MESSAGES" >> $GITHUB_OUTPUT
+              
+              echo "Messages output: $MESSAGES"
             else
+              echo "No new messages found"
               echo "has_messages=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -73,10 +82,21 @@ jobs:
         if: steps.slack.outputs.has_messages == 'true'
         run: |
           # 処理済みメッセージにリアクションを追加
+          echo "Processing messages for reactions..."
           echo '${{ steps.slack.outputs.messages }}' | jq -r '.[] | .ts' | while read ts; do
-            curl -s -X POST \
-              -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
-              -H "Content-Type: application/json" \
-              -d "{\"channel\": \"${{ secrets.SLACK_CHANNEL_ID }}\", \"timestamp\": \"$ts\", \"name\": \"white_check_mark\"}" \
-              https://slack.com/api/reactions.add
+            if [ -n "$ts" ]; then
+              echo "Adding reaction to message: $ts"
+              RESPONSE=$(curl -s -X POST \
+                -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+                -H "Content-Type: application/json" \
+                -d "{\"channel\": \"${{ secrets.SLACK_CHANNEL_ID }}\", \"timestamp\": \"$ts\", \"name\": \"white_check_mark\"}" \
+                https://slack.com/api/reactions.add)
+              
+              # レスポンスをチェック
+              if [ "$(echo "$RESPONSE" | jq -r '.ok')" = "true" ]; then
+                echo "Successfully added reaction to $ts"
+              else
+                echo "Failed to add reaction to $ts: $(echo "$RESPONSE" | jq -r '.error')"
+              fi
+            fi
           done
