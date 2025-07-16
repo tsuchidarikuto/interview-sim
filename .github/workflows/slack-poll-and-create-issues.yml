@@ -2,7 +2,14 @@ name: Slack Message Polling and Issue Creation
 
 on:
   schedule:
-    - cron: '*/3 * * * *'  # 3分毎に実行（リアルタイム性向上）
+    - cron: '*/5 * * * *'  # 5分毎に実行（GitHub Actions最小間隔）
+  workflow_dispatch:      # 手動実行対応
+    inputs:
+      force_run:
+        description: 'Force run even if no new messages'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   process-slack-messages:
@@ -78,7 +85,7 @@ jobs:
               -d "{
                 \"contents\": [{
                   \"parts\": [{
-                    \"text\": \"以下のSlackメッセージをGitHub Issue用のタイトルと本文に整形してください。雑談や質問の場合はshould_create_issueをfalseにしてください。また、内容の緊急度・重要度に応じて優先度を設定し、適切なブランチ戦略と具体的なブランチ名も提案してください。\\n\\n- 新機能追加: feature/\\n- バグ修正: fix/\\n- 緊急修正: hotfix/\\n- リファクタリング: refactor/\\n- ドキュメント更新: docs/\\n\\nSlackメッセージ: $ESCAPED_MSG\"
+                    \"text\": \"以下のSlackメッセージを分析し、GitHub Issue用に整形してください。複雑なタスクの場合は複数のIssueに分割してください。\\n\\n【分割の基準】\\n- 単純なタスク: 1つのIssue\\n- 複雑なタスク: 複数のIssueに分割（最大5個まで）\\n- 各Issueは独立して作業可能であること\\n- 依存関係がある場合は明記すること\\n- 将来のバッチ処理を考慮したメタデータ付与\\n\\n【ブランチ戦略】\\n- 新機能追加: feature/\\n- バグ修正: fix/\\n- 緊急修正: hotfix/\\n- リファクタリング: refactor/\\n- ドキュメント更新: docs/\\n\\n【複雑度の判定】\\n- small: 1-2時間程度\\n- medium: 半日-1日程度\\n- large: 数日程度\\n\\n雑談や質問の場合はshould_create_issueをfalseにしてください。\\n\\nSlackメッセージ: $ESCAPED_MSG\"
                   }]
                 }],
                 \"generationConfig\": {
@@ -86,34 +93,61 @@ jobs:
                   \"responseSchema\": {
                     \"type\": \"OBJECT\",
                     \"properties\": {
-                      \"title\": {
-                        \"type\": \"STRING\",
-                        \"description\": \"明確で具体的なタイトル\"
-                      },
-                      \"body\": {
-                        \"type\": \"STRING\", 
-                        \"description\": \"構造化された説明\"
-                      },
                       \"should_create_issue\": {
                         \"type\": \"BOOLEAN\",
                         \"description\": \"Issueを作成するかどうか\"
                       },
-                      \"priority\": {
+                      \"task_type\": {
                         \"type\": \"STRING\",
-                        \"enum\": [\"low\", \"medium\", \"high\", \"urgent\"],
-                        \"description\": \"優先度: low(低), medium(中), high(高), urgent(緊急)\"
+                        \"enum\": [\"simple\", \"complex\"],
+                        \"description\": \"タスクの種類\"
                       },
-                      \"branch_strategy\": {
-                        \"type\": \"STRING\",
-                        \"enum\": [\"feature\", \"fix\", \"hotfix\", \"refactor\", \"docs\"],
-                        \"description\": \"適切なブランチ戦略\"
-                      },
-                      \"suggested_branch_name\": {
-                        \"type\": \"STRING\",
-                        \"description\": \"具体的なブランチ名の提案（例: feature/add-user-auth）\"
+                      \"issues\": {
+                        \"type\": \"ARRAY\",
+                        \"items\": {
+                          \"type\": \"OBJECT\",
+                          \"properties\": {
+                            \"title\": {
+                              \"type\": \"STRING\",
+                              \"description\": \"明確で具体的なタイトル\"
+                            },
+                            \"body\": {
+                              \"type\": \"STRING\",
+                              \"description\": \"構造化された説明\"
+                            },
+                            \"priority\": {
+                              \"type\": \"STRING\",
+                              \"enum\": [\"low\", \"medium\", \"high\", \"urgent\"],
+                              \"description\": \"優先度\"
+                            },
+                            \"branch_strategy\": {
+                              \"type\": \"STRING\",
+                              \"enum\": [\"feature\", \"fix\", \"hotfix\", \"refactor\", \"docs\"],
+                              \"description\": \"適切なブランチ戦略\"
+                            },
+                            \"suggested_branch_name\": {
+                              \"type\": \"STRING\",
+                              \"description\": \"具体的なブランチ名の提案\"
+                            },
+                            \"depends_on\": {
+                              \"type\": \"STRING\",
+                              \"description\": \"依存するIssueのタイトル（任意）\"
+                            },
+                            \"estimated_complexity\": {
+                              \"type\": \"STRING\",
+                              \"enum\": [\"small\", \"medium\", \"large\"],
+                              \"description\": \"作業量の推定\"
+                            },
+                            \"batch_processable\": {
+                              \"type\": \"BOOLEAN\",
+                              \"description\": \"バッチ処理可能かどうか\"
+                            }
+                          },
+                          \"required\": [\"title\", \"body\", \"priority\", \"branch_strategy\", \"suggested_branch_name\", \"estimated_complexity\", \"batch_processable\"]
+                        }
                       }
                     },
-                    \"required\": [\"title\", \"body\", \"should_create_issue\", \"priority\", \"branch_strategy\", \"suggested_branch_name\"]
+                    \"required\": [\"should_create_issue\", \"task_type\", \"issues\"]
                   }
                 }
               }" \
@@ -131,19 +165,30 @@ jobs:
               if echo "$GEMINI_JSON" | jq -e '.should_create_issue' >/dev/null 2>&1; then
                 SHOULD_CREATE=$(echo "$GEMINI_JSON" | jq -r '.should_create_issue')
                 if [ "$SHOULD_CREATE" = "true" ]; then
-                  ISSUE_TITLE=$(echo "$GEMINI_JSON" | jq -r '.title')
-                  ISSUE_BODY=$(echo "$GEMINI_JSON" | jq -r '.body')
-                  ISSUE_PRIORITY=$(echo "$GEMINI_JSON" | jq -r '.priority')
-                  BRANCH_STRATEGY=$(echo "$GEMINI_JSON" | jq -r '.branch_strategy')
-                  SUGGESTED_BRANCH=$(echo "$GEMINI_JSON" | jq -r '.suggested_branch_name')
+                  TASK_TYPE=$(echo "$GEMINI_JSON" | jq -r '.task_type')
+                  ISSUES_ARRAY=$(echo "$GEMINI_JSON" | jq -c '.issues')
+                  ISSUES_COUNT=$(echo "$GEMINI_JSON" | jq '.issues | length')
                   
-                  echo "Will create issue with title: $ISSUE_TITLE (Priority: $ISSUE_PRIORITY, Branch: $SUGGESTED_BRANCH)"
+                  echo "Will create $ISSUES_COUNT issues for message $((i+1)) (Task type: $TASK_TYPE)"
                   
-                  # 個別のIssue作成のため、出力変数は使用せず、直接API呼び出し
-                  echo "issue_data_$i<<EOF" >> $GITHUB_OUTPUT
-                  echo "{\"title\": \"$ISSUE_TITLE\", \"body\": \"$ISSUE_BODY\", \"priority\": \"$ISSUE_PRIORITY\", \"branch_strategy\": \"$BRANCH_STRATEGY\", \"suggested_branch_name\": \"$SUGGESTED_BRANCH\", \"user\": \"$msg_user\", \"ts\": \"$msg_ts\"}" >> $GITHUB_OUTPUT
-                  echo "EOF" >> $GITHUB_OUTPUT
+                  # 複数のIssueを個別に出力変数に格納
+                  for j in $(seq 0 $((ISSUES_COUNT - 1))); do
+                    ISSUE_DATA=$(echo "$GEMINI_JSON" | jq -c ".issues[$j]")
+                    ISSUE_TITLE=$(echo "$ISSUE_DATA" | jq -r '.title')
+                    echo "  Issue $((j+1)): $ISSUE_TITLE"
+                    
+                    # 各IssueデータにSlackメッセージ情報を追加
+                    ENHANCED_ISSUE_DATA=$(echo "$ISSUE_DATA" | jq -c ". + {\"user\": \"$msg_user\", \"ts\": \"$msg_ts\", \"task_type\": \"$TASK_TYPE\", \"slack_msg_index\": $i, \"issue_index\": $j}")
+                    
+                    # 出力変数に格納（メッセージインデックス_イシューインデックス形式）
+                    echo "issue_data_${i}_${j}<<EOF" >> $GITHUB_OUTPUT
+                    echo "$ENHANCED_ISSUE_DATA" >> $GITHUB_OUTPUT
+                    echo "EOF" >> $GITHUB_OUTPUT
+                    echo "should_create_issue_${i}_${j}=true" >> $GITHUB_OUTPUT
+                  done
+                  
                   echo "should_create_issue_$i=true" >> $GITHUB_OUTPUT
+                  echo "issues_count_$i=$ISSUES_COUNT" >> $GITHUB_OUTPUT
                 else
                   echo "Skipping issue creation for message $((i+1)) - determined to be casual conversation"
                 fi
@@ -193,10 +238,15 @@ jobs:
               }
             }
             
-            // from-slackとauto-createdラベルも作成
+            // バッチ処理用ラベルと追加ラベルも作成
             const additionalLabels = [
               { name: 'from-slack', color: '4a154b', description: 'Slackから自動作成されたIssue' },
-              { name: 'auto-created', color: '0366d6', description: '自動作成されたIssue' }
+              { name: 'auto-created', color: '0366d6', description: '自動作成されたIssue' },
+              { name: 'batch-ready', color: '28a745', description: 'バッチ処理可能なIssue' },
+              { name: 'complex-task', color: '6f42c1', description: '複雑タスクの一部' },
+              { name: 'estimated-small', color: '28a745', description: '小規模作業（1-2時間）' },
+              { name: 'estimated-medium', color: 'ffc107', description: '中規模作業（半日-1日）' },
+              { name: 'estimated-large', color: 'dc3545', description: '大規模作業（数日）' }
             ];
             
             for (const label of additionalLabels) {
@@ -222,20 +272,11 @@ jobs:
         if: steps.gemini_process.outputs.should_create_issue == 'true'
         uses: actions/github-script@v7
         env:
-          should_create_issue_0: ${{ steps.gemini_process.outputs.should_create_issue_0 }}
-          should_create_issue_1: ${{ steps.gemini_process.outputs.should_create_issue_1 }}
-          should_create_issue_2: ${{ steps.gemini_process.outputs.should_create_issue_2 }}
-          should_create_issue_3: ${{ steps.gemini_process.outputs.should_create_issue_3 }}
-          should_create_issue_4: ${{ steps.gemini_process.outputs.should_create_issue_4 }}
-          issue_data_0: ${{ steps.gemini_process.outputs.issue_data_0 }}
-          issue_data_1: ${{ steps.gemini_process.outputs.issue_data_1 }}
-          issue_data_2: ${{ steps.gemini_process.outputs.issue_data_2 }}
-          issue_data_3: ${{ steps.gemini_process.outputs.issue_data_3 }}
-          issue_data_4: ${{ steps.gemini_process.outputs.issue_data_4 }}
+          GITHUB_OUTPUT_CONTENT: ${{ toJSON(steps.gemini_process.outputs) }}
         with:
           github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           script: |
-            // 優先度に応じたラベルを設定（一般的な命名規則に従う）
+            // 優先度に応じたラベルを設定
             const priorityLabels = {
               'urgent': ['Priority: Critical', 'from-slack', 'auto-created'],
               'high': ['Priority: High', 'from-slack', 'auto-created'],
@@ -243,34 +284,67 @@ jobs:
               'low': ['Priority: Low', 'from-slack', 'auto-created']
             };
             
-            const createdIssues = [];
+            // 複雑度に応じたラベルを設定
+            const complexityLabels = {
+              'small': ['estimated-small'],
+              'medium': ['estimated-medium'],
+              'large': ['estimated-large']
+            };
             
-            // 各メッセージ用のissue_dataを処理
+            // バッチ処理対応ラベル
+            const batchLabels = ['batch-ready'];
+            
+            const createdIssues = [];
+            const outputData = JSON.parse(process.env.GITHUB_OUTPUT_CONTENT || '{}');
+            
+            // 各メッセージの各Issueを処理
             for (let i = 0; i < 5; i++) { // 最大5個のメッセージまで処理
-              const shouldCreate = process.env[`should_create_issue_${i}`];
-              if (shouldCreate === 'true') {
-                const issueDataStr = process.env[`issue_data_${i}`];
-                if (issueDataStr) {
-                  const issueData = JSON.parse(issueDataStr);
-                  
-                  const labels = priorityLabels[issueData.priority] || ['from-slack', 'auto-created'];
-                  
-                  console.log(`Creating issue ${i+1}: ${issueData.title}`);
-                  
-                  const issue = await github.rest.issues.create({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    title: issueData.title,
-                    body: `@claude このIssueを解決してください。\n\n**必ず日本語で回答してください。**\n\n## 作業内容\n${issueData.body}\n\n## 推奨ブランチ戦略\n- **ブランチ種別**: ${issueData.branch_strategy}\n- **推奨ブランチ名**: \`${issueData.suggested_branch_name}\`\n- **ベースブランチ**: \`dev\`\n\n## 求める回答\n- 具体的な実装方針（日本語）\n- 必要なコード変更の提案\n- テスト戦略\n- 完了の定義\n\n## 優先度\n**${issueData.priority.toUpperCase()}**\n\n---\n*Originally posted in Slack by user ${issueData.user}*`,
-                    labels: labels
-                  });
-                  
-                  console.log(`Created issue #${issue.data.number}: ${issue.data.html_url}`);
-                  
-                  createdIssues.push({
-                    number: issue.data.number,
-                    url: issue.data.html_url
-                  });
+              const shouldCreate = outputData[`should_create_issue_${i}`];
+              const issuesCount = parseInt(outputData[`issues_count_${i}`] || '0');
+              
+              if (shouldCreate === 'true' && issuesCount > 0) {
+                console.log(`Processing ${issuesCount} issues for message ${i+1}`);
+                
+                for (let j = 0; j < issuesCount; j++) {
+                  const issueDataStr = outputData[`issue_data_${i}_${j}`];
+                  if (issueDataStr) {
+                    const issueData = JSON.parse(issueDataStr);
+                    
+                    // ラベルの構築
+                    let labels = [...(priorityLabels[issueData.priority] || ['from-slack', 'auto-created'])];
+                    labels = labels.concat(complexityLabels[issueData.estimated_complexity] || []);
+                    
+                    if (issueData.batch_processable) {
+                      labels = labels.concat(batchLabels);
+                    }
+                    
+                    if (issueData.task_type === 'complex') {
+                      labels.push('complex-task');
+                    }
+                    
+                    console.log(`Creating issue ${i+1}-${j+1}: ${issueData.title}`);
+                    
+                    // Issue本文の構築
+                    let issueBody = `@claude このIssueを解決してください。\n\n**必ず日本語で回答してください。**\n\n## 作業内容\n${issueData.body}\n\n## メタ情報\n- **タスク種別**: ${issueData.task_type}\n- **複雑度**: ${issueData.estimated_complexity}\n- **バッチ処理**: ${issueData.batch_processable ? '可能' : '不可'}\n- **依存関係**: ${issueData.depends_on || 'なし'}\n\n## 推奨ブランチ戦略\n- **ブランチ種別**: ${issueData.branch_strategy}\n- **推奨ブランチ名**: \`${issueData.suggested_branch_name}\`\n- **ベースブランチ**: \`dev\`\n\n## 求める回答\n- 具体的な実装方針（日本語）\n- 必要なコード変更の提案\n- テスト戦略\n- 完了の定義\n\n## 優先度\n**${issueData.priority.toUpperCase()}**\n\n---\n*Originally posted in Slack by user ${issueData.user}*\n*Task group: ${issueData.task_type === 'complex' ? `${i+1}` : 'single'}*`;
+                    
+                    const issue = await github.rest.issues.create({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      title: issueData.title,
+                      body: issueBody,
+                      labels: labels
+                    });
+                    
+                    console.log(`Created issue #${issue.data.number}: ${issue.data.html_url}`);
+                    
+                    createdIssues.push({
+                      number: issue.data.number,
+                      url: issue.data.html_url,
+                      title: issueData.title,
+                      task_type: issueData.task_type,
+                      complexity: issueData.estimated_complexity
+                    });
+                  }
                 }
               }
             }
@@ -279,6 +353,7 @@ jobs:
             if (createdIssues.length > 0) {
               core.setOutput('issue_numbers', createdIssues.map(i => i.number).join(','));
               core.setOutput('issue_urls', createdIssues.map(i => i.url).join(','));
+              core.setOutput('created_issues', JSON.stringify(createdIssues));
             }
 
       - name: Mark Messages as Processed
