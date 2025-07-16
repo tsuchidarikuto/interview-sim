@@ -1,0 +1,82 @@
+name: Slack Message Polling and Issue Creation
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # 5分毎に実行
+  workflow_dispatch:  # 手動実行も可能
+
+jobs:
+  process-slack-messages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Slack Messages
+        id: slack
+        run: |
+          # 5分前のタイムスタンプを計算
+          oldest=$(date -d '5 minutes ago' +%s)
+          
+          # Slack APIでメッセージを取得
+          curl -s -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+            "https://slack.com/api/conversations.history?channel=${{ secrets.SLACK_CHANNEL_ID }}&oldest=$oldest&limit=50" \
+            > slack_response.json
+          
+          # レスポンスをチェック
+          if [ "$(jq -r '.ok' slack_response.json)" = "true" ]; then
+            # 新しいメッセージをフィルタリング（ボットメッセージと処理済みを除外）
+            jq -r '.messages[] | select(.bot_id == null and (.reactions // [] | any(.name == "white_check_mark") | not))' slack_response.json > filtered_messages.json
+            
+            # メッセージが存在するかチェック
+            if [ -s filtered_messages.json ]; then
+              echo "has_messages=true" >> $GITHUB_OUTPUT
+              echo "messages=$(cat filtered_messages.json | jq -s '.')" >> $GITHUB_OUTPUT
+            else
+              echo "has_messages=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "Slack API Error: $(jq -r '.error' slack_response.json)"
+            exit 1
+          fi
+
+      - name: Process Messages with Claude
+        if: steps.slack.outputs.has_messages == 'true'
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            以下のSlackメッセージを分析し、GitHub Issueとして適切に整理してください：
+            
+            ${{ steps.slack.outputs.messages }}
+            
+            各メッセージについて：
+            1. 明確なタイトルを作成
+            2. 構造化された説明を作成
+            3. 適切なラベルを提案
+            4. 優先度を判定
+            5. GitHub Issueを作成（必ず@claude をメンションして自動処理されるようにしてください）
+            
+            雑談や質問の場合は、Issue作成をスキップしてください。
+          
+          custom_instructions: |
+            - 各Issueには必ず@claudeをメンションして自動処理を有効化
+            - 重複するIssueは作成しない
+            - 明確でないメッセージは詳細確認のIssueとして作成
+            - 処理完了後、元のSlackメッセージにチェックマークのリアクションを追加
+
+      - name: Mark Messages as Processed
+        if: steps.slack.outputs.has_messages == 'true'
+        run: |
+          # 処理済みメッセージにリアクションを追加
+          echo '${{ steps.slack.outputs.messages }}' | jq -r '.[] | .ts' | while read ts; do
+            curl -s -X POST \
+              -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"channel\": \"${{ secrets.SLACK_CHANNEL_ID }}\", \"timestamp\": \"$ts\", \"name\": \"white_check_mark\"}" \
+              https://slack.com/api/reactions.add
+          done
