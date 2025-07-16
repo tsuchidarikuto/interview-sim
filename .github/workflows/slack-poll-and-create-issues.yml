@@ -8,10 +8,9 @@ jobs:
   process-slack-messages:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       issues: write
       id-token: write
-      actions: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -222,22 +221,9 @@ jobs:
             });
             
             console.log(`Created issue #${issue.data.number}: ${issue.data.html_url}`);
+            console.log(`Claude will automatically process this issue due to @claude mention`);
             core.setOutput('issue_number', issue.data.number);
             core.setOutput('issue_url', issue.data.html_url);
-            
-            // repository_dispatchでSlack専用Claudeワークフローをトリガー
-            await github.rest.repos.createDispatchEvent({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              event_type: 'claude-trigger',
-              client_payload: {
-                issue_number: issue.data.number,
-                issue_url: issue.data.html_url,
-                trigger_type: 'new_issue_with_claude_mention'
-              }
-            });
-            
-            console.log(`Triggered Claude Slack Issues workflow for issue #${issue.data.number}`);
 
       - name: Mark Messages as Processed
         if: steps.slack.outputs.has_messages == 'true'
