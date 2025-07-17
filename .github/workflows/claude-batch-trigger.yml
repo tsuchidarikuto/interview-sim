@@ -136,15 +136,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: `@claude このIssueを解決してください。
-
-**バッチ処理実行情報**
-- 実行時刻: ${new Date().toISOString()}
-- 優先度: ${issuePriority}
-- 処理モード: 自動バッチ処理
-
-この自動バッチ処理により、優先度の高いIssueから順に処理されています。
-深夜の時間を活用して、効率的にタスクを完了させましょう。`
+              body: `@claude このIssueを解決してください。\n\n**バッチ処理実行情報**\n- 実行時刻: ${new Date().toISOString()}\n- 優先度: ${issuePriority}\n- 処理モード: 自動バッチ処理\n\nこの自動バッチ処理により、優先度の高いIssueから順に処理されています。\n深夜の時間を活用して、効率的にタスクを完了させましょう。`
             });
             
             console.log(`Posted @claude comment on issue #${issueNumber}`);
