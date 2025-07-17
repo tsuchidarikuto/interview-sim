@@ -1,0 +1,209 @@
+name: Claude Batch Trigger
+
+on:
+  schedule:
+    # 夜間（日本時間22:00-06:00）の30分毎に実行
+    # UTC時間で13:00-21:00（JSTの22:00-06:00）
+    - cron: '0,30 13-23 * * *'  # UTC 13:00-23:30 (JST 22:00-08:30)
+    - cron: '0,30 0-20 * * *'   # UTC 00:00-20:30 (JST 09:00-05:30)
+  workflow_dispatch:  # 手動実行対応
+    inputs:
+      dry_run:
+        description: 'Dry run mode (only show which issue would be processed)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  trigger-claude:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find highest priority issue
+        id: find_issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // 優先度ラベルの定義（高い順）
+            const priorityOrder = [
+              'Priority: Critical',
+              'Priority: High', 
+              'Priority: Medium',
+              'Priority: Low'
+            ];
+            
+            console.log('=== Claude Batch Trigger Starting ===');
+            console.log(`Current time: ${new Date().toISOString()}`);
+            
+            // batch-readyラベルを持つオープンなIssueを取得
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'batch-ready',
+              state: 'open',
+              per_page: 100
+            });
+            
+            console.log(`Found ${issues.data.length} batch-ready issues`);
+            
+            // 処理済みまたはClaude応答済みのIssueを除外
+            const unprocessedIssues = [];
+            for (const issue of issues.data) {
+              // batch-processedラベルがある場合はスキップ
+              if (issue.labels.some(label => label.name === 'batch-processed')) {
+                console.log(`Issue #${issue.number} already has batch-processed label, skipping`);
+                continue;
+              }
+              
+              // Issueのコメントを取得
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number
+              });
+              
+              // @claudeメンションのコメントがあるかチェック
+              const hasClaudeMention = comments.data.some(comment => 
+                comment.body && comment.body.includes('@claude')
+              );
+              
+              if (hasClaudeMention) {
+                console.log(`Issue #${issue.number} already has @claude mention, skipping`);
+                continue;
+              }
+              
+              unprocessedIssues.push(issue);
+            }
+            
+            console.log(`Found ${unprocessedIssues.length} unprocessed issues`);
+            
+            if (unprocessedIssues.length === 0) {
+              console.log('No unprocessed batch-ready issues found');
+              core.setOutput('has_issue', 'false');
+              return;
+            }
+            
+            // 優先度順にソート
+            unprocessedIssues.sort((a, b) => {
+              const getPriority = (issue) => {
+                for (let i = 0; i < priorityOrder.length; i++) {
+                  if (issue.labels.some(label => label.name === priorityOrder[i])) {
+                    return i;
+                  }
+                }
+                return priorityOrder.length; // 優先度ラベルがない場合は最低優先度
+              };
+              
+              return getPriority(a) - getPriority(b);
+            });
+            
+            // 最優先のIssueを選択
+            const selectedIssue = unprocessedIssues[0];
+            const priority = selectedIssue.labels.find(label => 
+              priorityOrder.includes(label.name)
+            )?.name || 'No priority';
+            
+            console.log(`Selected issue #${selectedIssue.number}: ${selectedIssue.title}`);
+            console.log(`Priority: ${priority}`);
+            console.log(`Labels: ${selectedIssue.labels.map(l => l.name).join(', ')}`);
+            
+            core.setOutput('has_issue', 'true');
+            core.setOutput('issue_number', selectedIssue.number.toString());
+            core.setOutput('issue_title', selectedIssue.title);
+            core.setOutput('issue_priority', priority);
+            core.setOutput('issue_url', selectedIssue.html_url);
+
+      - name: Trigger Claude with comment
+        if: steps.find_issue.outputs.has_issue == 'true' && github.event.inputs.dry_run != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = parseInt('${{ steps.find_issue.outputs.issue_number }}');
+            const issueTitle = '${{ steps.find_issue.outputs.issue_title }}';
+            const issuePriority = '${{ steps.find_issue.outputs.issue_priority }}';
+            
+            console.log(`Triggering Claude for issue #${issueNumber}...`);
+            
+            // @claudeメンションのコメントを投稿
+            const comment = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `@claude このIssueを解決してください。
+
+**バッチ処理実行情報**
+- 実行時刻: ${new Date().toISOString()}
+- 優先度: ${issuePriority}
+- 処理モード: 自動バッチ処理
+
+この自動バッチ処理により、優先度の高いIssueから順に処理されています。
+深夜の時間を活用して、効率的にタスクを完了させましょう。`
+            });
+            
+            console.log(`Posted @claude comment on issue #${issueNumber}`);
+            console.log(`Comment URL: ${comment.data.html_url}`);
+            
+            // 処理済みマーカーとして batch-processed ラベルを追加
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                labels: ['batch-processed']
+              });
+              console.log('Added batch-processed label');
+            } catch (error) {
+              console.log('Note: batch-processed label may not exist yet');
+              // ラベルが存在しない場合は作成
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: 'batch-processed',
+                  color: '5319e7',
+                  description: 'Claude batch processing has been triggered'
+                });
+                console.log('Created batch-processed label');
+                
+                // 再度ラベルを追加
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  labels: ['batch-processed']
+                });
+              } catch (createError) {
+                console.error('Failed to create label:', createError.message);
+              }
+            }
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "=== Claude Batch Trigger Summary ==="
+          echo "Execution time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "Execution time (JST): $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S JST')"
+          echo ""
+          if [ "${{ steps.find_issue.outputs.has_issue }}" == "true" ]; then
+            echo "✅ Issue selected for processing:"
+            echo "   Number: #${{ steps.find_issue.outputs.issue_number }}"
+            echo "   Title: ${{ steps.find_issue.outputs.issue_title }}"
+            echo "   Priority: ${{ steps.find_issue.outputs.issue_priority }}"
+            echo "   URL: ${{ steps.find_issue.outputs.issue_url }}"
+            echo ""
+            if [ "${{ github.event.inputs.dry_run }}" == "true" ]; then
+              echo "🔍 Mode: DRY RUN (no actual processing)"
+            else
+              echo "🚀 Mode: PROCESSED - Claude triggered"
+            fi
+          else
+            echo "❌ No unprocessed batch-ready issues found"
+          fi
+          echo "===================================="

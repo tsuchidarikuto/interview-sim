@@ -356,8 +356,8 @@ jobs:
                     
                     console.log(`Creating issue ${i+1}-${j+1}: ${issueData.title}`);
                     
-                    // Issue本文の構築
-                    let issueBody = `@claude このIssueを解決してください。\n\n**必ず日本語で回答してください。**\n\n## 作業内容\n${issueData.body}\n\n## メタ情報\n- **タスク種別**: ${issueData.task_type}\n- **複雑度**: ${issueData.estimated_complexity}\n- **バッチ処理**: ${issueData.batch_processable ? '可能' : '不可'}\n- **依存関係**: ${issueData.depends_on || 'なし'}\n\n## 推奨ブランチ戦略\n- **ブランチ種別**: ${issueData.branch_strategy}\n- **推奨ブランチ名**: \`${issueData.suggested_branch_name}\`\n- **ベースブランチ**: \`dev\`\n\n## 求める回答\n- 具体的な実装方針（日本語）\n- 必要なコード変更の提案\n- テスト戦略\n- 完了の定義\n\n## 優先度\n**${issueData.priority.toUpperCase()}**\n\n---\n*Originally posted in Slack by user ${issueData.user}*\n*Task group: ${issueData.task_type === 'complex' ? `${i+1}` : 'single'}*`;
+                    // Issue本文の構築（@claudeメンションはバッチ処理で後から追加）
+                    let issueBody = `## 作業内容\n${issueData.body}\n\n## メタ情報\n- **タスク種別**: ${issueData.task_type}\n- **複雑度**: ${issueData.estimated_complexity}\n- **バッチ処理**: ${issueData.batch_processable ? '可能' : '不可'}\n- **依存関係**: ${issueData.depends_on || 'なし'}\n\n## 推奨ブランチ戦略\n- **ブランチ種別**: ${issueData.branch_strategy}\n- **推奨ブランチ名**: \`${issueData.suggested_branch_name}\`\n- **ベースブランチ**: \`dev\`\n\n## 期待する成果物\n- 具体的な実装方針\n- 必要なコード変更の提案\n- テスト戦略\n- 完了の定義\n\n## 優先度\n**${issueData.priority.toUpperCase()}**\n\n---\n*Originally posted in Slack by user ${issueData.user}*\n*Task group: ${issueData.task_type === 'complex' ? `${i+1}` : 'single'}*\n\n> **注意**: このIssueは夜間バッチ処理でClaude Code Actionによって自動処理されます。\n> 手動で処理したい場合は@claudeメンションを追加してください。`;
                     
                     const issue = await github.rest.issues.create({
                       owner: context.repo.owner,
