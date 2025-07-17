@@ -16,13 +16,14 @@ An AI-powered interview simulation application that helps users practice and imp
 
 ## Technology Stack
 
-- **Frontend**: Next.js 14 with TypeScript
+- **Frontend**: Next.js 15 with TypeScript
 - **Styling**: SCSS and custom CSS modules
 - **Authentication**: Supabase Auth
 - **Database**: Supabase (PostgreSQL)
 - **AI Integration**: OpenAI GPT for interview simulation
 - **Speech**: Azure Speech Services for voice interaction
-- **State Management**: Recoil
+- **State Management**: Jotai
+- **UI Components**: Material-UI (MUI) and Chat UI Kit
 
 ## Getting Started
 
@@ -90,10 +91,12 @@ interview-sim/
 │   └── ranking/           # User rankings
 ├── components/            # Reusable UI components
 ├── utils/                 # Utility functions and helpers
-├── atoms/                 # Recoil state management
+├── atoms/                 # Jotai state management
 ├── provider/              # Context providers
 ├── styles/               # Global styles and themes
-└── public/               # Static assets
+├── public/               # Static assets
+├── types.ts              # TypeScript type definitions
+└── middleware.ts         # Next.js middleware
 ```
 
 ## Contributing
