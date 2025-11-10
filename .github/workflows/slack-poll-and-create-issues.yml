@@ -1,0 +1,412 @@
+name: Slack Message Polling and Issue Creation
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # 5分毎に実行（GitHub Actions最小間隔）
+  workflow_dispatch:      # 手動実行対応
+    inputs:
+      force_run:
+        description: 'Force run even if no new messages'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  process-slack-messages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Slack Messages
+        id: slack
+        run: |
+          # 5分前のタイムスタンプを計算
+          oldest=$(date -d '5 minutes ago' +%s)
+          
+          # Slack APIでメッセージを取得
+          curl -s -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+            "https://slack.com/api/conversations.history?channel=${{ secrets.SLACK_CHANNEL_ID }}&oldest=$oldest&limit=50" \
+            > slack_response.json
+          
+          # レスポンスをチェック
+          if [ "$(jq -r '.ok' slack_response.json)" = "true" ]; then
+            echo "Slack API call successful"
+            
+            # 新しいメッセージをフィルタリング（ボットメッセージと処理済みを除外）
+            FILTERED_MESSAGES=$(jq -c '[.messages[] | select(.bot_id == null and (.reactions // [] | any(.name == "white_check_mark") | not))]' slack_response.json)
+            
+            # メッセージが存在するかチェック
+            if [ "$FILTERED_MESSAGES" != "[]" ] && [ "$FILTERED_MESSAGES" != "null" ]; then
+              echo "Found new messages to process"
+              echo "has_messages=true" >> $GITHUB_OUTPUT
+              echo "messages=$FILTERED_MESSAGES" >> $GITHUB_OUTPUT
+              echo "Messages output: $FILTERED_MESSAGES"
+            else
+              echo "No new messages found"
+              echo "has_messages=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "Slack API Error: $(jq -r '.error' slack_response.json)"
+            exit 1
+          fi
+
+      - name: Process Messages with Gemini
+        if: steps.slack.outputs.has_messages == 'true'
+        id: gemini_process
+        run: |
+          echo "Processing messages with Gemini API..."
+          
+          # Slackメッセージを取得
+          MESSAGES='${{ steps.slack.outputs.messages }}'
+          echo "Messages to process: $MESSAGES"
+          
+          # 各メッセージを処理して複数のIssueを作成
+          # while loopの代わりにsubshellを使用して、各メッセージを個別に処理
+          for i in $(seq 0 $(($(echo "$MESSAGES" | jq length) - 1))); do
+            msg=$(echo "$MESSAGES" | jq -r ".[$i]")
+            msg_text=$(echo "$msg" | jq -r '.text')
+            msg_ts=$(echo "$msg" | jq -r '.ts')
+            msg_user=$(echo "$msg" | jq -r '.user')
+            
+            echo "Processing message $((i+1)): $msg_text"
+            
+            # jqを使用した安全なJSONエスケープ処理
+            echo "=== Processing message $((i+1)) ==="
+            echo "User: $msg_user"
+            echo "Timestamp: $msg_ts"
+            echo "Message length: $(echo "$msg_text" | wc -c) characters"
+            echo "Message preview: $(echo "$msg_text" | head -c 200)..."
+            
+            # プロンプトテンプレートの準備（単一行）
+            PROMPT_TEMPLATE="以下のSlackメッセージを分析し、GitHub Issue用に整形してください。複雑なタスクの場合は複数のIssueに分割してください。分割の基準: 単純なタスクは1つのIssue、複雑なタスクは複数のIssueに分割（最大5個まで）、各Issueは独立して作業可能であること、依存関係がある場合は明記すること、将来のバッチ処理を考慮したメタデータ付与。ブランチ戦略: 新機能追加はfeature/、バグ修正はfix/、緊急修正はhotfix/、リファクタリングはrefactor/、ドキュメント更新はdocs/。複雑度の判定: smallは1-2時間程度、mediumは半日-1日程度、largeは数日程度。雑談や質問の場合はshould_create_issueをfalseにしてください。Slackメッセージ: "
+            
+            # jqを使用してJSON構造を安全に構築
+            REQUEST_BODY=$(jq -n \
+              --arg prompt "$PROMPT_TEMPLATE" \
+              --arg msg_text "$msg_text" \
+              '{
+                contents: [{
+                  parts: [{
+                    text: ($prompt + $msg_text)
+                  }]
+                }],
+                generationConfig: {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                      should_create_issue: {
+                        type: "BOOLEAN",
+                        description: "Issueを作成するかどうか"
+                      },
+                      task_type: {
+                        type: "STRING",
+                        enum: ["simple", "complex"],
+                        description: "タスクの種類"
+                      },
+                      issues: {
+                        type: "ARRAY",
+                        items: {
+                          type: "OBJECT",
+                          properties: {
+                            title: {
+                              type: "STRING",
+                              description: "明確で具体的なタイトル"
+                            },
+                            body: {
+                              type: "STRING",
+                              description: "構造化された説明"
+                            },
+                            priority: {
+                              type: "STRING",
+                              enum: ["low", "medium", "high", "urgent"],
+                              description: "優先度"
+                            },
+                            branch_strategy: {
+                              type: "STRING",
+                              enum: ["feature", "fix", "hotfix", "refactor", "docs"],
+                              description: "適切なブランチ戦略"
+                            },
+                            suggested_branch_name: {
+                              type: "STRING",
+                              description: "具体的なブランチ名の提案"
+                            },
+                            depends_on: {
+                              type: "STRING",
+                              description: "依存するIssueのタイトル（任意）"
+                            },
+                            estimated_complexity: {
+                              type: "STRING",
+                              enum: ["small", "medium", "large"],
+                              description: "作業量の推定"
+                            },
+                            batch_processable: {
+                              type: "BOOLEAN",
+                              description: "バッチ処理可能かどうか"
+                            }
+                          },
+                          required: ["title", "body", "priority", "branch_strategy", "suggested_branch_name", "estimated_complexity", "batch_processable"]
+                        }
+                      }
+                    },
+                    required: ["should_create_issue", "task_type", "issues"]
+                  }
+                }
+              }')
+            
+            # Gemini APIでメッセージを整形（構造化出力使用）
+            echo "Making Gemini API request..."
+            echo "Request body size: $(echo "$REQUEST_BODY" | wc -c) characters"
+            echo "Request body preview: $(echo "$REQUEST_BODY" | head -c 500)..."
+            
+            GEMINI_RESPONSE=$(echo "$REQUEST_BODY" | curl -s -X POST \
+              -H "x-goog-api-key: ${{ secrets.GEMINI_API_KEY }}" \
+              -H "Content-Type: application/json" \
+              -d @- \
+              "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
+            
+            if [ $? -eq 0 ]; then
+              echo "Gemini API call successful for message $((i+1))"
+              echo "Raw response: $GEMINI_RESPONSE"
+              
+              # エラーレスポンスのチェック
+              if echo "$GEMINI_RESPONSE" | jq -e '.error' >/dev/null 2>&1; then
+                ERROR_MSG=$(echo "$GEMINI_RESPONSE" | jq -r '.error.message')
+                ERROR_CODE=$(echo "$GEMINI_RESPONSE" | jq -r '.error.code')
+                echo "Gemini API Error for message $((i+1)): Code $ERROR_CODE - $ERROR_MSG"
+                echo "Problematic message content: $msg_text"
+                continue
+              fi
+              
+              # 構造化出力から直接JSONを解析
+              GEMINI_JSON=$(echo "$GEMINI_RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
+              echo "Gemini structured output: $GEMINI_JSON"
+              
+              # JSONの妥当性をチェック
+              if [ "$GEMINI_JSON" = "null" ] || [ -z "$GEMINI_JSON" ]; then
+                echo "Error: Empty or null structured output for message $((i+1))"
+                continue
+              fi
+              
+              # Issueを作成するかチェック
+              if echo "$GEMINI_JSON" | jq -e '.should_create_issue' >/dev/null 2>&1; then
+                SHOULD_CREATE=$(echo "$GEMINI_JSON" | jq -r '.should_create_issue')
+                if [ "$SHOULD_CREATE" = "true" ]; then
+                  TASK_TYPE=$(echo "$GEMINI_JSON" | jq -r '.task_type')
+                  ISSUES_ARRAY=$(echo "$GEMINI_JSON" | jq -c '.issues')
+                  ISSUES_COUNT=$(echo "$GEMINI_JSON" | jq '.issues | length')
+                  
+                  echo "Will create $ISSUES_COUNT issues for message $((i+1)) (Task type: $TASK_TYPE)"
+                  
+                  # 複数のIssueを個別に出力変数に格納
+                  for j in $(seq 0 $((ISSUES_COUNT - 1))); do
+                    ISSUE_DATA=$(echo "$GEMINI_JSON" | jq -c ".issues[$j]")
+                    ISSUE_TITLE=$(echo "$ISSUE_DATA" | jq -r '.title')
+                    echo "  Issue $((j+1)): $ISSUE_TITLE"
+                    
+                    # 各IssueデータにSlackメッセージ情報を追加
+                    ENHANCED_ISSUE_DATA=$(echo "$ISSUE_DATA" | jq -c ". + {\"user\": \"$msg_user\", \"ts\": \"$msg_ts\", \"task_type\": \"$TASK_TYPE\", \"slack_msg_index\": $i, \"issue_index\": $j}")
+                    
+                    # 出力変数に格納（メッセージインデックス_イシューインデックス形式）
+                    echo "issue_data_${i}_${j}<<EOF" >> $GITHUB_OUTPUT
+                    echo "$ENHANCED_ISSUE_DATA" >> $GITHUB_OUTPUT
+                    echo "EOF" >> $GITHUB_OUTPUT
+                    echo "should_create_issue_${i}_${j}=true" >> $GITHUB_OUTPUT
+                  done
+                  
+                  echo "should_create_issue_$i=true" >> $GITHUB_OUTPUT
+                  echo "issues_count_$i=$ISSUES_COUNT" >> $GITHUB_OUTPUT
+                else
+                  echo "Skipping issue creation for message $((i+1)) - determined to be casual conversation"
+                fi
+              else
+                echo "Error: Could not parse Gemini structured output as JSON for message $((i+1))"
+              fi
+            else
+              echo "Error: Gemini API call failed for message $((i+1))"
+            fi
+          done
+          
+          # 最初の有効なメッセージのフラグを設定
+          if [ -f "$GITHUB_OUTPUT" ] && grep -q "should_create_issue_0=true" "$GITHUB_OUTPUT"; then
+            echo "should_create_issue=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Priority Labels
+        if: steps.gemini_process.outputs.should_create_issue == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          script: |
+            // 優先度ラベルを事前作成（既存の場合はスキップ）
+            const priorityLabels = [
+              { name: 'Priority: Low', color: 'f1bc31', description: '低優先度のIssue' },
+              { name: 'Priority: Medium', color: 'e88a1a', description: '中優先度のIssue' },
+              { name: 'Priority: High', color: 'b22222', description: '高優先度のIssue' },
+              { name: 'Priority: Critical', color: '7c0a02', description: '緊急対応が必要なIssue' }
+            ];
+            
+            for (const label of priorityLabels) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`Created label: ${label.name}`);
+              } catch (error) {
+                if (error.status === 422) {
+                  console.log(`Label already exists: ${label.name}`);
+                } else {
+                  console.error(`Error creating label ${label.name}:`, error.message);
+                }
+              }
+            }
+            
+            // バッチ処理用ラベルと追加ラベルも作成
+            const additionalLabels = [
+              { name: 'from-slack', color: '4a154b', description: 'Slackから自動作成されたIssue' },
+              { name: 'auto-created', color: '0366d6', description: '自動作成されたIssue' },
+              { name: 'batch-ready', color: '28a745', description: 'バッチ処理可能なIssue' },
+              { name: 'complex-task', color: '6f42c1', description: '複雑タスクの一部' },
+              { name: 'estimated-small', color: '28a745', description: '小規模作業（1-2時間）' },
+              { name: 'estimated-medium', color: 'ffc107', description: '中規模作業（半日-1日）' },
+              { name: 'estimated-large', color: 'dc3545', description: '大規模作業（数日）' }
+            ];
+            
+            for (const label of additionalLabels) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`Created label: ${label.name}`);
+              } catch (error) {
+                if (error.status === 422) {
+                  console.log(`Label already exists: ${label.name}`);
+                } else {
+                  console.error(`Error creating label ${label.name}:`, error.message);
+                }
+              }
+            }
+
+      - name: Create GitHub Issues
+        if: steps.gemini_process.outputs.should_create_issue == 'true'
+        uses: actions/github-script@v7
+        env:
+          GITHUB_OUTPUT_CONTENT: ${{ toJSON(steps.gemini_process.outputs) }}
+        with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          script: |
+            // 優先度に応じたラベルを設定
+            const priorityLabels = {
+              'urgent': ['Priority: Critical', 'from-slack', 'auto-created'],
+              'high': ['Priority: High', 'from-slack', 'auto-created'],
+              'medium': ['Priority: Medium', 'from-slack', 'auto-created'],
+              'low': ['Priority: Low', 'from-slack', 'auto-created']
+            };
+            
+            // 複雑度に応じたラベルを設定
+            const complexityLabels = {
+              'small': ['estimated-small'],
+              'medium': ['estimated-medium'],
+              'large': ['estimated-large']
+            };
+            
+            // バッチ処理対応ラベル
+            const batchLabels = ['batch-ready'];
+            
+            const createdIssues = [];
+            const outputData = JSON.parse(process.env.GITHUB_OUTPUT_CONTENT || '{}');
+            
+            // 各メッセージの各Issueを処理
+            for (let i = 0; i < 5; i++) { // 最大5個のメッセージまで処理
+              const shouldCreate = outputData[`should_create_issue_${i}`];
+              const issuesCount = parseInt(outputData[`issues_count_${i}`] || '0');
+              
+              if (shouldCreate === 'true' && issuesCount > 0) {
+                console.log(`Processing ${issuesCount} issues for message ${i+1}`);
+                
+                for (let j = 0; j < issuesCount; j++) {
+                  const issueDataStr = outputData[`issue_data_${i}_${j}`];
+                  if (issueDataStr) {
+                    const issueData = JSON.parse(issueDataStr);
+                    
+                    // ラベルの構築
+                    let labels = [...(priorityLabels[issueData.priority] || ['from-slack', 'auto-created'])];
+                    labels = labels.concat(complexityLabels[issueData.estimated_complexity] || []);
+                    
+                    if (issueData.batch_processable) {
+                      labels = labels.concat(batchLabels);
+                    }
+                    
+                    if (issueData.task_type === 'complex') {
+                      labels.push('complex-task');
+                    }
+                    
+                    console.log(`Creating issue ${i+1}-${j+1}: ${issueData.title}`);
+                    
+                    // Issue本文の構築
+                    let issueBody = `@claude このIssueを解決してください。\n\n**必ず日本語で回答してください。**\n\n## 作業内容\n${issueData.body}\n\n## メタ情報\n- **タスク種別**: ${issueData.task_type}\n- **複雑度**: ${issueData.estimated_complexity}\n- **バッチ処理**: ${issueData.batch_processable ? '可能' : '不可'}\n- **依存関係**: ${issueData.depends_on || 'なし'}\n\n## 推奨ブランチ戦略\n- **ブランチ種別**: ${issueData.branch_strategy}\n- **推奨ブランチ名**: \`${issueData.suggested_branch_name}\`\n- **ベースブランチ**: \`dev\`\n\n## 求める回答\n- 具体的な実装方針（日本語）\n- 必要なコード変更の提案\n- テスト戦略\n- 完了の定義\n\n## 優先度\n**${issueData.priority.toUpperCase()}**\n\n---\n*Originally posted in Slack by user ${issueData.user}*\n*Task group: ${issueData.task_type === 'complex' ? `${i+1}` : 'single'}*`;
+                    
+                    const issue = await github.rest.issues.create({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      title: issueData.title,
+                      body: issueBody,
+                      labels: labels
+                    });
+                    
+                    console.log(`Created issue #${issue.data.number}: ${issue.data.html_url}`);
+                    
+                    createdIssues.push({
+                      number: issue.data.number,
+                      url: issue.data.html_url,
+                      title: issueData.title,
+                      task_type: issueData.task_type,
+                      complexity: issueData.estimated_complexity
+                    });
+                  }
+                }
+              }
+            }
+            
+            console.log(`Created ${createdIssues.length} issues total`);
+            if (createdIssues.length > 0) {
+              core.setOutput('issue_numbers', createdIssues.map(i => i.number).join(','));
+              core.setOutput('issue_urls', createdIssues.map(i => i.url).join(','));
+              core.setOutput('created_issues', JSON.stringify(createdIssues));
+            }
+
+      - name: Mark Messages as Processed
+        if: steps.slack.outputs.has_messages == 'true'
+        run: |
+          # 処理済みメッセージにリアクションを追加
+          echo "Processing messages for reactions..."
+          echo '${{ steps.slack.outputs.messages }}' | jq -r '.[] | .ts' | while read ts; do
+            if [ -n "$ts" ]; then
+              echo "Adding reaction to message: $ts"
+              RESPONSE=$(curl -s -X POST \
+                -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+                -H "Content-Type: application/json" \
+                -d "{\"channel\": \"${{ secrets.SLACK_CHANNEL_ID }}\", \"timestamp\": \"$ts\", \"name\": \"white_check_mark\"}" \
+                https://slack.com/api/reactions.add)
+              
+              # レスポンスをチェック
+              if [ "$(echo "$RESPONSE" | jq -r '.ok')" = "true" ]; then
+                echo "Successfully added reaction to $ts"
+              else
+                echo "Failed to add reaction to $ts: $(echo "$RESPONSE" | jq -r '.error')"
+              fi
+            fi
+          done
