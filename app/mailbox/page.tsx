@@ -25,16 +25,13 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { useRouter } from "next/navigation";
 import { useAtom } from 'jotai';
 import { userAtom } from '@/atoms/state';
-import {} from '@/utils/handleHistoryTable';
 import { MailContentsTypes } from '@/types';
-import { HandleHistoryTable } from '@/utils/handleHistoryTable';
 
 export default function MailBox() {       
     const [mailContents, setMailContents] = useState<MailContentsTypes[]>([]);
     const [isFetching, setIsFetching] = useState<boolean>(true);
     const [user,]= useAtom(userAtom);
     const {push } = useRouter()
-    const historyTableHandler = new HandleHistoryTable();
 
     useEffect(() => {
         if (!user) {
@@ -42,9 +39,19 @@ export default function MailBox() {
             return;
         }
         const fetchHistory = async () => {
-            const result = await historyTableHandler.getMailboxData(user.uid);
-            if (result) {
-                setMailContents(result);
+            try {
+                const response = await fetch('/api/history');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch mailbox data');
+                }
+                const result = await response.json();
+                
+                if (result.success) {
+                    setMailContents(result.data);
+                }
+            } catch (error) {
+                console.error('Error fetching mailbox data:', error);
+            } finally {
                 setIsFetching(false);
             }
         };
@@ -66,7 +73,7 @@ export default function MailBox() {
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: '60vh' }}>
                         <CircularProgress />
                     </Box>
-                ) : history.length === 0 ? (
+                ) : mailContents.length === 0 ? (
                     <Box sx={{ height: '60vh', display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <Typography variant="h6" color="text.secondary">
                             新着メールはありません
@@ -129,7 +136,7 @@ export default function MailBox() {
                                             />
                                         </ListItem>
                                     </ListItemButton>
-                                    {index < history.length - 1 && (
+                                    {index < mailContents.length - 1 && (
                                         <Divider variant="inset" component="li" />
                                     )}
                                 </React.Fragment>

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { HistoryDataTypes, RankingTypes } from '@/types';
+import { HistoryDataTypes } from '@/types';
 import Link from 'next/link';
 import ResultChart from '@/components/resultChart';
 import {
@@ -24,24 +24,39 @@ import { Settings} from '@mui/icons-material';
 import InterestShiftChart from '@/components/InterestShiftChart';
 import { useAtom } from 'jotai';
 import { userAtom } from '@/atoms/state';
-import { HandleHistoryTable } from '@/utils/handleHistoryTable';
-import { createClient } from '@/utils/supabase/client';
-import { SupabaseDatabase } from '@/utils/supabase/database';
-
 export default function Page() {
     const [user,] = useAtom(userAtom);    
     const { resultId } = useParams();
     const [selectedHistory, setSelectedHistory] = useState<HistoryDataTypes>();
-    const historyTableHandler = new HandleHistoryTable();
     
     useEffect(() => {
         const getResult = async () => {
             try {
                 if(resultId){                    
                     const id = Array.isArray(resultId) ? resultId[0] : resultId;
-                    const historyData:HistoryDataTypes = await historyTableHandler.getAllHistoryData(id);
-                    setSelectedHistory(historyData);
-                    await historyTableHandler.updateStatus(id,"isRead",true);
+                    
+                    // Fetch history data from API
+                    const response = await fetch(`/api/history/${id}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch history data');
+                    }
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        setSelectedHistory(result.data);
+                        
+                        // Mark as read
+                        await fetch(`/api/history/${id}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                columnName: 'isRead',
+                                value: true
+                            }),
+                        });
+                    }
                 }
             } catch (error) {
                 console.log(error);
@@ -64,21 +79,28 @@ export default function Page() {
 
     async function addRanking(){
         try {
-            const supabase = createClient();
-            const rankingTable = new SupabaseDatabase<RankingTypes>("rankings",supabase);
-            const rankingData = {                
-                totalScore: totalScore,
-                userName: resume.name,
-                difficulty: setting.difficulty,                
+            const id = Array.isArray(resultId) ? resultId[0] : resultId;
+            
+            const response = await fetch('/api/rankings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    totalScore: totalScore,
+                    userName: resume.name,
+                    difficulty: setting.difficulty,
+                    historyId: id
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add ranking');
             }
-            if (user) {
-                await rankingTable.addData(rankingData, user.uid);
-            }
-            if (resultId) {
-                const id = Array.isArray(resultId) ? resultId[0] : resultId;
-                await historyTableHandler.updateStatus(id,"isRankIn",true);
-                
-                
+
+            const result = await response.json();
+            
+            if (result.success) {
                 setSelectedHistory(prevState => {
                     if (prevState) {
                         return { ...prevState, isRankIn: true };
